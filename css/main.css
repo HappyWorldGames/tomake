@@ -1,0 +1,128 @@
+:root {
+    --sidebar-bg: #1e1e1e;
+    --main-bg: #252526;
+    --item-hover: #2a2a2a;
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --accent-blue: #0078D4;
+    --border-color: #333333;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--main-bg);
+    color: var(--text-primary);
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 280px;
+    background-color: var(--sidebar-bg);
+    padding: 20px;
+    border-right: 1px solid var(--border-color);
+}
+
+.menu-section {
+    margin-bottom: 30px;
+}
+
+.section-header {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    text-transform: uppercase;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background-color: var(--item-hover);
+}
+
+.menu-item.active {
+    background-color: var(--item-hover);
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: auto;
+    margin-right: 8px;
+}
+
+.dot.green { background-color: #4CAF50; }
+.dot.blue { background-color: #2196F3; }
+
+.count {
+    color: var(--text-secondary);
+    margin-left: auto;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.task-details {
+    width: 300px;
+    background-color: var(--sidebar-bg);
+    padding: 20px;
+    border-left: 1px solid var(--border-color);
+}
+
+.tasks-section {
+    margin-bottom: 30px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+}
+
+.task-item:hover {
+    background-color: var(--item-hover);
+}
+
+.task-tag {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-left: auto;
+    background-color: var(--accent-blue);
+}
+
+.task-time {
+    color: var(--text-secondary);
+    margin-left: 12px;
+    font-size: 12px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: var(--item-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    margin: 20px 0;
+}
+
+.completed .task-item {
+    opacity: 0.5;
+}
