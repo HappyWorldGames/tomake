@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // Конфигурация
-  const GOOGLE_CLIENT_ID = 'ВАШ_CLIENT_ID'; // Замените на ваш Client ID
+  const GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
   const DB_NAME = 'TaskDB';
   const STORE_NAME = 'tasks';
   let db;
