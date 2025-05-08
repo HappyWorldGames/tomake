@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // Конфигурация
   const GOOGLE_CLIENT_ID = 'ВАШ_CLIENT_ID'; // Замените на ваш Client ID
+  const REDIRECT_URI = 'http://localhost:3000';
   const DB_NAME = 'TaskDB';
   const STORE_NAME = 'tasks';
   let db;
@@ -130,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             body: new URLSearchParams({
               code: response.code,
               client_id: GOOGLE_CLIENT_ID,
-              redirect_uri: window.location.href,
+              redirect_uri: window.location.origin,
               grant_type: 'authorization_code'
             })
           }).then(res => res.json());
