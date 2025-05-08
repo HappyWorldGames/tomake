@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Service Worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register('js/sw.js')
         .then(reg => console.log('Service Worker зарегистрирован'))
         .catch(err => console.error('Ошибка Service Worker:', err));
     }
