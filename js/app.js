@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // Конфигурация
-  const GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
+  const GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com'; // Замените на ваш Client ID
   const DB_NAME = 'TaskDB';
   const STORE_NAME = 'tasks';
   let db;
@@ -118,70 +118,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // 4.1 Инициализация Google Auth (НОВАЯ ФУНКЦИЯ)
+  // 4. Google Drive синхронизация
   const initGoogleAuth = () => {
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
       callback: async (response) => {
         try {
-          const { access_token } = await fetch('https://oauth2.googleapis.com/token', {
+          const res = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
               code: response.code,
               client_id: GOOGLE_CLIENT_ID,
-              redirect_uri: window.location.origin + window.location.pathname,
+              redirect_uri: window.location.href,
               grant_type: 'authorization_code'
             })
-          }).then(res => res.json());
+          });
           
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const { access_token } = await res.json();
           googleToken = access_token;
-          syncButton.disabled = false;
         } catch (error) {
           console.error('Ошибка авторизации:', error);
         }
       }
     });
   };
-	
-  // 4.2 Google Drive синхронизация
-  const handleGoogleAuth = async () => {
-    return new Promise((resolve) => {
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: async (response) => {
-          try {
-            const { access_token } = await fetch('https://oauth2.googleapis.com/token', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: new URLSearchParams({
-                code: response.code,
-                client_id: GOOGLE_CLIENT_ID,
-                redirect_uri: window.location.origin + window.location.pathname,
-                grant_type: 'authorization_code'
-              })
-            }).then(res => res.json());
-
-            googleToken = access_token;
-            resolve(access_token);
-          } catch (error) {
-            console.error('Ошибка авторизации:', error);
-            resolve(null);
-          }
-        }
-      });
-      google.accounts.id.prompt();
-    });
-  };
 
   const syncWithDrive = async () => {
     try {
       if (!googleToken) {
-        googleToken = await handleGoogleAuth();
-        if (!googleToken) throw new Error('Авторизация не удалась');
+        google.accounts.id.prompt();
+        return;
       }
 
-      // Получение данных с Google Drive
+      // Загрузка данных с Google Drive
       const driveResponse = await fetch('https://www.googleapis.com/drive/v3/files?q=name="tasks.json"', {
         headers: { Authorization: `Bearer ${googleToken}` }
       });
@@ -235,16 +206,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       
     } catch (error) {
       console.error('Ошибка синхронизации:', error);
-      alert('❌ Ошибка синхронизации! Проверьте консоль');
+      alert('❌ Ошибка синхронизации!');
     }
   };
 
   // 5. Инициализация приложения
   try {
-    // Инициализация БД
     db = await initDB();
     await renderTasks();
-	initGoogleAuth();
+    initGoogleAuth();
 
     // Обработчики событий
     taskForm.addEventListener('submit', async (e) => {
@@ -278,7 +248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Service Worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('js/sw.js')
+      navigator.serviceWorker.register('./js/sw.js')
         .then(reg => console.log('Service Worker зарегистрирован'))
         .catch(err => console.error('Ошибка Service Worker:', err));
     }
