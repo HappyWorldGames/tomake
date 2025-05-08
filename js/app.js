@@ -74,8 +74,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const taskId = e.target.closest('.task-item').dataset.id;
-          await dbOperation('readwrite', { id: taskId });
-          await renderTasks();
+          const transaction = db.transaction(STORE_NAME, 'readwrite');
+          const store = transaction.objectStore(STORE_NAME);
+          store.delete(taskId);
+          
+          transaction.oncomplete = async () => {
+            await renderTasks();
+          };
         });
       });
 
@@ -213,6 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Инициализация БД
     db = await initDB();
     await renderTasks();
+	initGoogleAuth();
 
     // Обработчики событий
     taskForm.addEventListener('submit', async (e) => {

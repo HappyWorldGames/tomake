@@ -90,3 +90,14 @@ button {
   margin: 0 10px;
   flex-grow: 1;
 }
+
+.sync-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#syncButton {
+  background: #3498db;
+  padding: 10px 15px;
+}
