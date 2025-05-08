@@ -118,7 +118,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // 4. Google Drive синхронизация
+  // 4.1 Инициализация Google Auth (НОВАЯ ФУНКЦИЯ)
+  const initGoogleAuth = () => {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: async (response) => {
+        try {
+          const { access_token } = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              code: response.code,
+              client_id: GOOGLE_CLIENT_ID,
+              redirect_uri: window.location.href,
+              grant_type: 'authorization_code'
+            })
+          }).then(res => res.json());
+          
+          googleToken = access_token;
+          syncButton.disabled = false;
+        } catch (error) {
+          console.error('Ошибка авторизации:', error);
+        }
+      }
+    });
+  };
+	
+  // 4.2 Google Drive синхронизация
   const handleGoogleAuth = async () => {
     return new Promise((resolve) => {
       google.accounts.id.initialize({
