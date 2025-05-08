@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             body: new URLSearchParams({
               code: response.code,
               client_id: GOOGLE_CLIENT_ID,
-              redirect_uri: window.location.href,
+              redirect_uri: window.location.origin,
               grant_type: 'authorization_code'
             })
           }).then(res => res.json());
