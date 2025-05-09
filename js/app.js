@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // Конфигурация
+<<<<<<< HEAD
   const GOOGLE_CLIENT_ID = 'ВАШ_CLIENT_ID'; // Замените на ваш Client ID
   const REDIRECT_URI = 'http://localhost:3000';
+=======
+  const GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com'; // Замените на ваш Client ID
+>>>>>>> 9f65606cadb9d7f67cd695f723a9de8bd3812beb
   const DB_NAME = 'TaskDB';
   const STORE_NAME = 'tasks';
   let db;
@@ -119,10 +123,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // 4.1 Инициализация Google Auth (НОВАЯ ФУНКЦИЯ)
+  // 4. Google Drive синхронизация
   const initGoogleAuth = () => {
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
+<<<<<<< HEAD
       callback: async (response) => {
         try {
           const { access_token } = await fetch('https://oauth2.googleapis.com/token', {
@@ -172,17 +177,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
       google.accounts.id.prompt();
+=======
+      callback: (response) => {
+        // Получаем access_token напрямую через Google Identity Services
+        const { access_token } = response;
+        googleToken = access_token;
+        syncButton.disabled = false;
+      },
+      auto_select: true
+>>>>>>> 9f65606cadb9d7f67cd695f723a9de8bd3812beb
     });
   };
 
   const syncWithDrive = async () => {
     try {
       if (!googleToken) {
-        googleToken = await handleGoogleAuth();
-        if (!googleToken) throw new Error('Авторизация не удалась');
+        google.accounts.id.prompt({
+          context: 'use',
+          ux_mode: 'popup',
+          scope: 'https://www.googleapis.com/auth/drive.file'
+        });
+        return;
       }
 
-      // Получение данных с Google Drive
+      // Загрузка данных с Google Drive
       const driveResponse = await fetch('https://www.googleapis.com/drive/v3/files?q=name="tasks.json"', {
         headers: { Authorization: `Bearer ${googleToken}` }
       });
@@ -236,16 +254,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       
     } catch (error) {
       console.error('Ошибка синхронизации:', error);
-      alert('❌ Ошибка синхронизации! Проверьте консоль');
+      alert('❌ Ошибка синхронизации!');
     }
   };
 
   // 5. Инициализация приложения
   try {
-    // Инициализация БД
     db = await initDB();
     await renderTasks();
-	initGoogleAuth();
+    initGoogleAuth();
 
     // Обработчики событий
     taskForm.addEventListener('submit', async (e) => {
@@ -279,7 +296,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Service Worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('js/sw.js')
+      navigator.serviceWorker.register('./js/sw.js')
         .then(reg => console.log('Service Worker зарегистрирован'))
         .catch(err => console.error('Ошибка Service Worker:', err));
     }
