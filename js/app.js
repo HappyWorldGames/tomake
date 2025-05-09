@@ -133,29 +133,87 @@ document.addEventListener('DOMContentLoaded', async () => {
     const syncWithDrive = async () => {
 		try {
 			if (!googleToken) {
-				// Новый метод запроса разрешений
 				const tokenClient = google.accounts.oauth2.initTokenClient({
 					client_id: GOOGLE_CLIENT_ID,
 					scope: 'https://www.googleapis.com/auth/drive.file',
 					callback: (response) => {
 						if (response.error) throw new Error(response.error);
 						googleToken = response.access_token;
-						uploadToDrive();
+						syncWithDrive(); // Рекурсивный вызов после авторизации
 					}
 				});
 				tokenClient.requestAccessToken();
 				return;
 			}
-			await uploadToDrive();
+			
+			// 1. Поиск файла в Google Drive
+			const searchResponse = await fetch('https://www.googleapis.com/drive/v3/files?q=name="tasks.json"', {
+				headers: { 'Authorization': `Bearer ${googleToken}` }
+			});
+			
+			const { files } = await searchResponse.json();
+			let driveData = [];
+			
+			// 2. Загрузка данных из Google Drive
+			if (files.length > 0) {
+				const fileContent = await fetch(`https://www.googleapis.com/drive/v3/files/${files[0].id}?alt=media`, {
+					headers: { 'Authorization': `Bearer ${googleToken}` }
+				});
+				driveData = await fileContent.json();
+			}
+
+			// 3. Слияние данных
+			const localData = await dbOperation('readonly');
+			const merged = mergeTasks(localData, driveData);
+			
+			// 4. Сохранение объединенных данных
+			await dbOperation('readwrite', null); // Очистка БД
+			await Promise.all(merged.map(task => dbOperation('readwrite', task)));
+			
+			// 5. Загрузка обновленных данных в Drive
+			await uploadToDrive(merged);
+			
+			alert('✅ Синхронизация завершена!');
+			await renderTasks();
+			
 		} catch (error) {
 			console.error('Ошибка синхронизации:', error);
 			alert('❌ Ошибка: ' + error.message);
 		}
 	};
 	
-	const uploadToDrive = async () => {
-		const localData = await dbOperation('readonly');
-		const blob = new Blob([JSON.stringify(localData)], { type: 'application/json' });
+	const mergeTasks = (local, remote) => {
+		const taskMap = new Map();
+		
+		// Добавляем локальные задачи
+		local.forEach(task => {
+			taskMap.set(task.id, task);
+		});
+		
+		// Обновляем из облака при наличии более новых версий
+		remote.forEach(task => {
+			const existing = taskMap.get(task.id);
+			if (!existing || task.lastModified > existing.lastModified) {
+				taskMap.set(task.id, task);
+			}
+		});
+		
+		return Array.from(taskMap.values());
+	};
+
+	const uploadToDrive = async (data) => {
+		const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+		
+		// Поиск существующего файла
+		const searchResponse = await fetch('https://www.googleapis.com/drive/v3/files?q=name="tasks.json"', {
+			headers: { 'Authorization': `Bearer ${googleToken}` }
+		});
+		const { files } = await searchResponse.json();
+		
+		// Обновление или создание файла
+		const url = files.length > 0 
+			? `https://www.googleapis.com/upload/drive/v3/files/${files[0].id}?uploadType=multipart`
+			: 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
 		
 		const formData = new FormData();
 		formData.append('metadata', new Blob([JSON.stringify({
@@ -165,14 +223,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 		
 		formData.append('file', blob);
 
-		const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-			method: 'POST',
+		await fetch(url, {
+			method: files.length > 0 ? 'PATCH' : 'POST',
 			headers: { 'Authorization': `Bearer ${googleToken}` },
 			body: formData
 		});
-
-		if (!response.ok) throw new Error('Ошибка загрузки: ' + response.status);
-		alert('✅ Данные сохранены в Google Drive!');
 	};
 
     // 5. Инициализация приложения
