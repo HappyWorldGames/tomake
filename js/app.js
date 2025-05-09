@@ -122,46 +122,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   const initGoogleAuth = () => {
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
-      callback: async (response) => {
-        try {
-          const redirect_uri = window.location.origin + window.location.pathname;
-          
-          const res = await fetch('https://oauth2.googleapis.com/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-              code: response.code,
-              client_id: GOOGLE_CLIENT_ID,
-              redirect_uri: redirect_uri,
-              grant_type: 'authorization_code'
-            })
-          });
-          
-          if (!res.ok) {
-            const errorData = await res.json();
-            console.error('Полная ошибка:', errorData);
-            throw new Error(`Ошибка ${res.status}: ${errorData.error_description}`);
-          }
-          
-          const { access_token } = await res.json();
-          googleToken = access_token;
-          syncButton.disabled = false;
-        } catch (error) {
-          console.error('Ошибка авторизации:', error);
-          alert('Ошибка авторизации: ' + error.message);
-        }
-      }
+      callback: (response) => {
+        // Получаем access_token напрямую через Google Identity Services
+        const { access_token } = response;
+        googleToken = access_token;
+        syncButton.disabled = false;
+      },
+      auto_select: true
     });
   };
 
   const syncWithDrive = async () => {
     try {
       if (!googleToken) {
-        google.accounts.id.prompt(notification => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            alert('Разрешите всплывающие окна для авторизации!');
-            return;
-          }
+        google.accounts.id.prompt({
+          context: 'use',
+          ux_mode: 'popup',
+          scope: 'https://www.googleapis.com/auth/drive.file'
         });
         return;
       }
