@@ -201,13 +201,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 		
 		// Добавляем локальные задачи
 		local.forEach(task => {
-			taskMap.set(task.id, task);
+		  if (task.title != 'undefined') {
+			  taskMap.set(task.id, task);
+		  }
 		});
 		
 		// Обновляем из облака при наличии более новых версий
 		remote.forEach(task => {
-		  alert('task: ' + task.title);
-		  if (task) {
+		  if (task.title != 'undefined') {
   			const existing = taskMap.get(task.id);
   			if (!existing || task.lastModified > existing.lastModified) {
   				taskMap.set(task.id, task);
