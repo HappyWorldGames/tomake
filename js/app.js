@@ -124,22 +124,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       client_id: GOOGLE_CLIENT_ID,
       callback: async (response) => {
         try {
+          const redirect_uri = window.location.origin + window.location.pathname;
+          
           const res = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
               code: response.code,
               client_id: GOOGLE_CLIENT_ID,
-              redirect_uri: window.location.href,
+              redirect_uri: redirect_uri,
               grant_type: 'authorization_code'
             })
           });
           
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          if (!res.ok) {
+            const errorData = await res.json();
+            console.error('Полная ошибка:', errorData);
+            throw new Error(`Ошибка ${res.status}: ${errorData.error_description}`);
+          }
+          
           const { access_token } = await res.json();
           googleToken = access_token;
+          syncButton.disabled = false;
         } catch (error) {
           console.error('Ошибка авторизации:', error);
+          alert('Ошибка авторизации: ' + error.message);
         }
       }
     });
@@ -148,7 +157,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const syncWithDrive = async () => {
     try {
       if (!googleToken) {
-        google.accounts.id.prompt();
+        google.accounts.id.prompt(notification => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            alert('Разрешите всплывающие окна для авторизации!');
+            return;
+          }
+        });
         return;
       }
 
