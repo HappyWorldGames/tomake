@@ -74,9 +74,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Обработчики событий
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    const taskId = e.target.closest('.task-item').dataset.id;
-                    await dbOperation('readwrite', { id: taskId });
-                    await renderTasks();
+                    try {
+					  const taskId = e.target.closest('.task-item').dataset.id;
+					  
+					  // Удаление из IndexedDB
+					  const transaction = db.transaction(STORE_NAME, 'readwrite');
+					  const store = transaction.objectStore(STORE_NAME);
+					  const deleteRequest = store.delete(taskId);
+
+					  await new Promise((resolve, reject) => {
+						deleteRequest.onsuccess = resolve;
+						deleteRequest.onerror = reject;
+					  });
+					  
+					  await renderTasks();
+					} catch (error) {
+					  console.error('Ошибка удаления:', error);
+					}
                 });
             });
 
