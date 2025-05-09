@@ -1,307 +1,212 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // Конфигурация
-<<<<<<< HEAD
-  const GOOGLE_CLIENT_ID = 'ВАШ_CLIENT_ID'; // Замените на ваш Client ID
-  const REDIRECT_URI = 'http://localhost:3000';
-=======
-  const GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com'; // Замените на ваш Client ID
->>>>>>> 9f65606cadb9d7f67cd695f723a9de8bd3812beb
-  const DB_NAME = 'TaskDB';
-  const STORE_NAME = 'tasks';
-  let db;
-  let googleToken = null;
+    const GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
+    const DB_NAME = 'TaskDB';
+    const STORE_NAME = 'tasks';
+    let db;
+    let googleToken = null;
 
-  // Элементы DOM
-  const taskForm = document.getElementById('taskForm');
-  const taskInput = document.getElementById('taskInput');
-  const taskList = document.getElementById('taskList');
-  const themeToggle = document.getElementById('themeToggle');
-  const syncButton = document.getElementById('syncButton');
+    // Элементы DOM
+    const elements = {
+        taskForm: document.getElementById('taskForm'),
+        taskInput: document.getElementById('taskInput'),
+        taskList: document.getElementById('taskList'),
+        themeToggle: document.getElementById('themeToggle'),
+        syncButton: document.getElementById('syncButton')
+    };
 
-  // 1. Инициализация IndexedDB
-  const initDB = () => {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, 2);
+    // 1. Инициализация IndexedDB
+    const initDB = () => {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 3);
+            
+            request.onupgradeneeded = (e) => {
+                db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    store.createIndex('by_modified', 'lastModified');
+                }
+            };
 
-      request.onupgradeneeded = (e) => {
-        db = e.target.result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-          store.createIndex('by_lastModified', 'lastModified', { unique: false });
-        }
-      };
+            request.onsuccess = (e) => {
+                db = e.target.result;
+                resolve(db);
+            };
 
-      request.onsuccess = (e) => {
-        db = e.target.result;
-        resolve(db);
-      };
-
-      request.onerror = reject;
-    });
-  };
-
-  // 2. CRUD операции
-  const dbOperation = async (mode, data) => {
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(STORE_NAME, mode);
-      const store = transaction.objectStore(STORE_NAME);
-      
-      let request;
-      if (mode === 'readonly') {
-        request = store.getAll();
-      } else if (data) {
-        request = data.id ? store.put(data) : store.add(data);
-      } else {
-        request = store.clear();
-      }
-
-      transaction.oncomplete = () => resolve(request?.result);
-      transaction.onerror = (e) => reject(e.target.error);
-    });
-  };
-
-  // 3. Рендер задач
-  const renderTasks = async () => {
-    try {
-      const tasks = await dbOperation('readonly');
-      taskList.innerHTML = tasks.map(task => `
-        <li class="task-item" data-id="${task.id}">
-          <input type="checkbox" ${task.completed ? 'checked' : ''}>
-          <span class="task-title">${task.title}</span>
-          <div class="task-actions">
-            <button class="edit-btn">✎</button>
-            <button class="delete-btn">×</button>
-          </div>
-        </li>
-      `).join('');
-
-      // Обработчики событий
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const taskId = e.target.closest('.task-item').dataset.id;
-          const transaction = db.transaction(STORE_NAME, 'readwrite');
-          const store = transaction.objectStore(STORE_NAME);
-          store.delete(taskId);
-          
-          transaction.oncomplete = async () => {
-            await renderTasks();
-          };
+            request.onerror = reject;
         });
-      });
+    };
 
-      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', async (e) => {
-          const taskId = e.target.closest('.task-item').dataset.id;
-          const tasks = await dbOperation('readonly');
-          const task = tasks.find(t => t.id === taskId);
-          task.completed = e.target.checked;
-          task.lastModified = new Date().toISOString();
-          await dbOperation('readwrite', task);
+    // 2. CRUD операции
+    const dbOperation = (mode, data) => {
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(STORE_NAME, mode);
+            const store = transaction.objectStore(STORE_NAME);
+            
+            let request;
+            if (mode === 'readonly') {
+                request = store.getAll();
+            } else if (data) {
+                request = data.id ? store.put(data) : store.add(data);
+            } else {
+                request = store.clear();
+            }
+
+            transaction.oncomplete = () => resolve(request?.result);
+            transaction.onerror = (e) => reject(e.target.error);
         });
-      });
+    };
 
-      document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const taskItem = e.target.closest('.task-item');
-          const titleSpan = taskItem.querySelector('.task-title');
-          const newTitle = prompt('Новое название:', titleSpan.textContent);
-          
-          if (newTitle) {
-            const taskId = taskItem.dataset.id;
-            const tasks = await dbOperation('readonly');
-            const task = tasks.find(t => t.id === taskId);
-            task.title = newTitle;
-            task.lastModified = new Date().toISOString();
-            await dbOperation('readwrite', task);
-            await renderTasks();
-          }
-        });
-      });
-
-    } catch (error) {
-      console.error('Ошибка рендера:', error);
-    }
-  };
-
-  // 4. Google Drive синхронизация
-  const initGoogleAuth = () => {
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-<<<<<<< HEAD
-      callback: async (response) => {
+    // 3. Рендер задач
+    const renderTasks = async () => {
         try {
-          const { access_token } = await fetch('https://oauth2.googleapis.com/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-              code: response.code,
-              client_id: GOOGLE_CLIENT_ID,
-              redirect_uri: window.location.origin,
-              grant_type: 'authorization_code'
-            })
-          }).then(res => res.json());
-          
-          googleToken = access_token;
-          syncButton.disabled = false;
+            const tasks = await dbOperation('readonly');
+            elements.taskList.innerHTML = tasks.map(task => `
+                <li class="task-item" data-id="${task.id}">
+                    <input type="checkbox" ${task.completed ? 'checked' : ''}>
+                    <span class="task-title">${task.title}</span>
+                    <div class="task-actions">
+                        <button class="edit-btn">✎</button>
+                        <button class="delete-btn">×</button>
+                    </div>
+                </li>
+            `).join('');
+
+            // Обработчики событий
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const taskId = e.target.closest('.task-item').dataset.id;
+                    await dbOperation('readwrite', { id: taskId });
+                    await renderTasks();
+                });
+            });
+
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', async (e) => {
+                    const taskId = e.target.closest('.task-item').dataset.id;
+                    const tasks = await dbOperation('readonly');
+                    const task = tasks.find(t => t.id === taskId);
+                    task.completed = e.target.checked;
+                    task.lastModified = Date.now();
+                    await dbOperation('readwrite', task);
+                });
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const taskItem = e.target.closest('.task-item');
+                    const titleSpan = taskItem.querySelector('.task-title');
+                    const newTitle = prompt('Редактировать:', titleSpan.textContent);
+                    
+                    if (newTitle) {
+                        const tasks = await dbOperation('readonly');
+                        const task = tasks.find(t => t.id === taskItem.dataset.id);
+                        task.title = newTitle;
+                        task.lastModified = Date.now();
+                        await dbOperation('readwrite', task);
+                        await renderTasks();
+                    }
+                });
+            });
+
         } catch (error) {
-          console.error('Ошибка авторизации:', error);
+            console.error('Ошибка рендера:', error);
         }
-      }
-    });
-  };
-	
-  // 4.2 Google Drive синхронизация
-  const handleGoogleAuth = async () => {
-    return new Promise((resolve) => {
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: async (response) => {
-          try {
-            const { access_token } = await fetch('https://oauth2.googleapis.com/token', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: new URLSearchParams({
-                code: response.code,
-                client_id: GOOGLE_CLIENT_ID,
-                redirect_uri: window.location.href,
-                grant_type: 'authorization_code'
-              })
-            }).then(res => res.json());
+    };
 
-            googleToken = access_token;
-            resolve(access_token);
-          } catch (error) {
-            console.error('Ошибка авторизации:', error);
-            resolve(null);
-          }
+    // 4. Google Drive синхронизация
+    const initGoogleAuth = () => {
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: (response) => {
+                googleToken = response.access_token;
+                elements.syncButton.disabled = false;
+            },
+            auto_select: true
+        });
+    };
+
+    const syncWithDrive = async () => {
+        try {
+            if (!googleToken) {
+                google.accounts.id.prompt({
+                    context: 'use',
+                    ux_mode: 'popup',
+                    scope: 'https://www.googleapis.com/auth/drive.file'
+                });
+                return;
+            }
+
+            // Синхронизация данных
+            const localData = await dbOperation('readonly');
+            const blob = new Blob([JSON.stringify(localData)], { type: 'application/json' });
+            
+            // Загрузка на Google Drive
+            const formData = new FormData();
+            formData.append('metadata', new Blob([JSON.stringify({
+                name: 'tasks.json',
+                mimeType: 'application/json'
+            })], { type: 'application/json' }));
+            
+            formData.append('file', blob);
+
+            await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${googleToken}`
+                },
+                body: formData
+            });
+
+            alert('Синхронизация успешна!');
+        } catch (error) {
+            console.error('Ошибка синхронизации:', error);
+            alert('Ошибка синхронизации!');
         }
-      });
-      google.accounts.id.prompt();
-=======
-      callback: (response) => {
-        // Получаем access_token напрямую через Google Identity Services
-        const { access_token } = response;
-        googleToken = access_token;
-        syncButton.disabled = false;
-      },
-      auto_select: true
->>>>>>> 9f65606cadb9d7f67cd695f723a9de8bd3812beb
-    });
-  };
+    };
 
-  const syncWithDrive = async () => {
+    // 5. Инициализация приложения
     try {
-      if (!googleToken) {
-        google.accounts.id.prompt({
-          context: 'use',
-          ux_mode: 'popup',
-          scope: 'https://www.googleapis.com/auth/drive.file'
-        });
-        return;
-      }
-
-      // Загрузка данных с Google Drive
-      const driveResponse = await fetch('https://www.googleapis.com/drive/v3/files?q=name="tasks.json"', {
-        headers: { Authorization: `Bearer ${googleToken}` }
-      });
-      
-      const { files } = await driveResponse.json();
-      let driveData = [];
-      
-      if (files.length > 0) {
-        const fileContent = await fetch(`https://www.googleapis.com/drive/v3/files/${files[0].id}?alt=media`, {
-          headers: { Authorization: `Bearer ${googleToken}` }
-        });
-        driveData = await fileContent.json();
-      }
-
-      // Слияние данных
-      const localData = await dbOperation('readonly');
-      const merged = [...localData, ...driveData].reduce((acc, task) => {
-        const existing = acc.find(t => t.id === task.id);
-        const current = existing?.lastModified > task.lastModified ? existing : task;
-        return [...acc.filter(t => t.id !== task.id), current];
-      }, []);
-
-      // Сохранение данных
-      await dbOperation('readwrite', null);
-      for (const task of merged) {
-        await dbOperation('readwrite', task);
-      }
-
-      // Загрузка на Google Drive
-      const blob = new Blob([JSON.stringify(merged)], { type: 'application/json' });
-      const formData = new FormData();
-      formData.append('metadata', new Blob([JSON.stringify({
-        name: 'tasks.json',
-        mimeType: 'application/json'
-      })], { type: 'application/json' }));
-      formData.append('file', blob);
-
-      await fetch(
-        files.length > 0 
-          ? `https://www.googleapis.com/upload/drive/v3/files/${files[0].id}?uploadType=multipart`
-          : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
-        {
-          method: files.length > 0 ? 'PATCH' : 'POST',
-          headers: { Authorization: `Bearer ${googleToken}` },
-          body: formData
-        }
-      );
-
-      alert('✅ Синхронизация завершена!');
-      await renderTasks();
-      
-    } catch (error) {
-      console.error('Ошибка синхронизации:', error);
-      alert('❌ Ошибка синхронизации!');
-    }
-  };
-
-  // 5. Инициализация приложения
-  try {
-    db = await initDB();
-    await renderTasks();
-    initGoogleAuth();
-
-    // Обработчики событий
-    taskForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const title = taskInput.value.trim();
-      if (title) {
-        await dbOperation('readwrite', {
-          id: Date.now().toString(),
-          title,
-          completed: false,
-          lastModified: new Date().toISOString()
-        });
-        taskInput.value = '';
+        db = await initDB();
         await renderTasks();
-      }
-    });
+        initGoogleAuth();
 
-    syncButton.addEventListener('click', syncWithDrive);
+        // Обработчики событий
+        elements.taskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = elements.taskInput.value.trim();
+            if (title) {
+                await dbOperation('readwrite', {
+                    id: Date.now().toString(),
+                    title,
+                    completed: false,
+                    lastModified: Date.now()
+                });
+                elements.taskInput.value = '';
+                await renderTasks();
+            }
+        });
 
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-theme');
-      localStorage.setItem('theme', 
-        document.body.classList.contains('dark-theme') ? 'dark' : 'light'
-      );
-    });
+        elements.syncButton.addEventListener('click', syncWithDrive);
+        elements.themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', 
+                document.body.classList.contains('dark-theme') ? 'dark' : 'light'
+            );
+        });
 
-    // Восстановление темы
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark-theme');
+        // Восстановление темы
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./js/sw.js')
+                .then(reg => console.log('Service Worker зарегистрирован'))
+                .catch(err => console.error('Ошибка SW:', err));
+        }
+
+    } catch (error) {
+        console.error('Ошибка инициализации:', error);
     }
-
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./js/sw.js')
-        .then(reg => console.log('Service Worker зарегистрирован'))
-        .catch(err => console.error('Ошибка Service Worker:', err));
-    }
-
-  } catch (error) {
-    console.error('Ошибка инициализации:', error);
-  }
 });
