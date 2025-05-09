@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		
 		// Обновляем из облака при наличии более новых версий
 		remote.forEach(task => {
-		  alert(task.title);
+		  alert('task: ' + task.title);
 		  if (task) {
   			const existing = taskMap.get(task.id);
   			if (!existing || task.lastModified > existing.lastModified) {
