@@ -213,6 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		remote.forEach(task => {
 		  alert('task: ' + task.title);
 		  if (task.title != 'undefined') {
+		    alert('have title: ' + task.title);
   			const existing = taskMap.get(task.id);
   			if (!existing || task.lastModified > existing.lastModified) {
   				taskMap.set(task.id, task);
