@@ -115,54 +115,65 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 4. Google Drive синхронизация
     const initGoogleAuth = () => {
-        google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: (response) => {
-                googleToken = response.access_token;
-                elements.syncButton.disabled = false;
-            },
-            auto_select: true
-        });
-    };
+		google.accounts.id.initialize({
+			client_id: GOOGLE_CLIENT_ID,
+			callback: (response) => {
+				if (response.error) {
+					console.error('Ошибка авторизации:', response.error);
+					return;
+				}
+				googleToken = response.access_token;
+				elements.syncButton.disabled = false;
+				syncWithDrive(); // Автоматическая синхронизация после авторизации
+			},
+			use_fedcm_for_prompt: true // Включаем FedCM
+		});
+	};
 
     const syncWithDrive = async () => {
-        try {
-            if (!googleToken) {
-                google.accounts.id.prompt({
-                    context: 'use',
-                    ux_mode: 'popup',
-                    scope: 'https://www.googleapis.com/auth/drive.file'
-                });
-                return;
-            }
+		try {
+			if (!googleToken) {
+				// Новый метод запроса разрешений
+				const tokenClient = google.accounts.oauth2.initTokenClient({
+					client_id: GOOGLE_CLIENT_ID,
+					scope: 'https://www.googleapis.com/auth/drive.file',
+					callback: (response) => {
+						if (response.error) throw new Error(response.error);
+						googleToken = response.access_token;
+						uploadToDrive();
+					}
+				});
+				tokenClient.requestAccessToken();
+				return;
+			}
+			await uploadToDrive();
+		} catch (error) {
+			console.error('Ошибка синхронизации:', error);
+			alert('❌ Ошибка: ' + error.message);
+		}
+	};
+	
+	const uploadToDrive = async () => {
+		const localData = await dbOperation('readonly');
+		const blob = new Blob([JSON.stringify(localData)], { type: 'application/json' });
+		
+		const formData = new FormData();
+		formData.append('metadata', new Blob([JSON.stringify({
+			name: 'tasks.json',
+			mimeType: 'application/json'
+		})], { type: 'application/json' }));
+		
+		formData.append('file', blob);
 
-            // Синхронизация данных
-            const localData = await dbOperation('readonly');
-            const blob = new Blob([JSON.stringify(localData)], { type: 'application/json' });
-            
-            // Загрузка на Google Drive
-            const formData = new FormData();
-            formData.append('metadata', new Blob([JSON.stringify({
-                name: 'tasks.json',
-                mimeType: 'application/json'
-            })], { type: 'application/json' }));
-            
-            formData.append('file', blob);
+		const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+			method: 'POST',
+			headers: { 'Authorization': `Bearer ${googleToken}` },
+			body: formData
+		});
 
-            await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${googleToken}`
-                },
-                body: formData
-            });
-
-            alert('Синхронизация успешна!');
-        } catch (error) {
-            console.error('Ошибка синхронизации:', error);
-            alert('Ошибка синхронизации!');
-        }
-    };
+		if (!response.ok) throw new Error('Ошибка загрузки: ' + response.status);
+		alert('✅ Данные сохранены в Google Drive!');
+	};
 
     // 5. Инициализация приложения
     try {
