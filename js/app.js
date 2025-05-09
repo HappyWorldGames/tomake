@@ -206,10 +206,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		
 		// Обновляем из облака при наличии более новых версий
 		remote.forEach(task => {
-			const existing = taskMap.get(task.id);
-			if (!existing || task.lastModified > existing.lastModified) {
-				taskMap.set(task.id, task);
-			}
+		  if (task) {
+  			const existing = taskMap.get(task.id);
+  			if (!existing || task.lastModified > existing.lastModified) {
+  				taskMap.set(task.id, task);
+  			}
+		  }
 		});
 		
 		return Array.from(taskMap.values());
