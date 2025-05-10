@@ -190,6 +190,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 	
 	const mergeTasks = (local, remote) => {
     const taskMap = new Map();
+    
+    remote.forEach(task => {
+      
+    });
   
     // Добавляем только неудаленные задачи
     [...local, ...remote].forEach(task => {
