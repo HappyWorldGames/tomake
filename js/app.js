@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const renderTasks = async () => {
         try {
             const preFiltredTasks = await dbOperation('readonly');
-            const tasks = tasks.filter(task => !task.deleted); // Фильтрация
+            const tasks = preFiltredTasks.filter(task => !task.deleted); // Фильтрация
 
             elements.taskList.innerHTML = tasks.map(task => `
                 <li class="task-item" data-id="${task.id}">
