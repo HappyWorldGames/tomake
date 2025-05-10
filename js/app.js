@@ -189,23 +189,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 	};
 	
 	const mergeTasks = (local, remote) => {
-    const taskMap = new Map();
-    
-    remote.forEach(task => {
-      
-    });
-  
-    // Добавляем только неудаленные задачи
-    [...local, ...remote].forEach(task => {
-      if (task.deleted) return; // Пропускаем удаленные
-      const existing = taskMap.get(task.id);
-      if (!existing || task.lastModified > existing.lastModified) {
-        taskMap.set(task.id, task);
-      }
-    });
-  
-    return Array.from(taskMap.values());
-  };
+		const taskMap = new Map();
+		
+		alert(typeof remote);
+		alert(typeof local);
+		//remoteTask = 
+		remote.forEach(task => {
+			
+		});
+
+		// Добавляем только неудаленные задачи
+		[...local, ...remote].forEach(task => {
+			if (task.deleted) return; // Пропускаем удаленные
+			const existing = taskMap.get(task.id);
+			if (!existing || task.lastModified > existing.lastModified) {
+				taskMap.set(task.id, task);
+			}
+		});
+	  
+		return Array.from(taskMap.values());
+	};
 
 	const uploadToDrive = async (data) => {
 		const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
