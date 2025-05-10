@@ -199,19 +199,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const mergeTasks = (local, remote) => {
 		const taskMap = new Map();
 		
-		alert('local');
 		// Добавляем локальные задачи
 		local.forEach(task => {
-		  alert('task: ' + task.title);
 		  if (task.title != undefined) {
 			  taskMap.set(task.id, task);
 		  }
 		});
 		
-		alert('remote');
 		// Обновляем из облака при наличии более новых версий
 		remote.forEach(task => {
-		  alert('task: ' + task.title);
 		  if (task.title != undefined) {
 		    alert('have title: ' + task.title);
   			const existing = taskMap.get(task.id);
