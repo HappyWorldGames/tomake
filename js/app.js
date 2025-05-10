@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// Добавляем локальные задачи
 		local.forEach(task => {
 		  alert('task: ' + task.title);
-		  if (task.title != 'undefined') {
+		  if (task.title != undefined) {
 			  taskMap.set(task.id, task);
 		  }
 		});
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// Обновляем из облака при наличии более новых версий
 		remote.forEach(task => {
 		  alert('task: ' + task.title);
-		  if (task.title != 'undefined') {
+		  if (task.title != undefined) {
 		    alert('have title: ' + task.title);
   			const existing = taskMap.get(task.id);
   			if (!existing || task.lastModified > existing.lastModified) {
