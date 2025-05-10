@@ -59,7 +59,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Рендер задач
     const renderTasks = async () => {
         try {
-            const tasks = await dbOperation('readonly');
+            const preFiltredTasks = await dbOperation('readonly');
+            const tasks = tasks.filter(task => !task.deleted); // Фильтрация
+
             elements.taskList.innerHTML = tasks.map(task => `
                 <li class="task-item" data-id="${task.id}">
                     <input type="checkbox" ${task.completed ? 'checked' : ''}>
@@ -73,25 +75,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Обработчики событий
             document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    try {
-					  const taskId = e.target.closest('.task-item').dataset.id;
-					  
-					  // Удаление из IndexedDB
-					  const transaction = db.transaction(STORE_NAME, 'readwrite');
-					  const store = transaction.objectStore(STORE_NAME);
-					  const deleteRequest = store.delete(taskId);
-
-					  await new Promise((resolve, reject) => {
-						deleteRequest.onsuccess = resolve;
-						deleteRequest.onerror = reject;
-					  });
-					  
-					  await renderTasks();
-					} catch (error) {
-					  console.error('Ошибка удаления:', error);
-					}
-                });
+              btn.addEventListener('click', async (e) => {
+                const taskId = e.target.closest('.task-item').dataset.id;
+                const tasks = await dbOperation('readonly');
+                const task = tasks.find(t => t.id === taskId);
+                task.deleted = true; // Помечаем как удаленную
+                task.lastModified = Date.now();
+                await dbOperation('readwrite', task);
+                await renderTasks();
+              });
             });
 
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
@@ -129,20 +121,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 4. Google Drive синхронизация
     const initGoogleAuth = () => {
-		google.accounts.id.initialize({
-			client_id: GOOGLE_CLIENT_ID,
-			callback: (response) => {
-				if (response.error) {
-					console.error('Ошибка авторизации:', response.error);
-					return;
-				}
-				googleToken = response.access_token;
-				elements.syncButton.disabled = false;
-				syncWithDrive(); // Автоматическая синхронизация после авторизации
-			},
-			use_fedcm_for_prompt: true // Включаем FedCM
-		});
-	};
+  		google.accounts.id.initialize({
+  			client_id: GOOGLE_CLIENT_ID,
+  			callback: (response) => {
+  				if (response.error) {
+  					console.error('Ошибка авторизации:', response.error);
+  					return;
+  				}
+  				googleToken = response.access_token;
+  				elements.syncButton.disabled = false;
+  				syncWithDrive(); // Автоматическая синхронизация после авторизации
+  			},
+  			use_fedcm_for_prompt: true // Включаем FedCM
+  		});
+  	};
 
     const syncWithDrive = async () => {
 		try {
@@ -197,27 +189,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 	};
 	
 	const mergeTasks = (local, remote) => {
-		const taskMap = new Map();
-		
-		// Добавляем локальные задачи
-		local.forEach(task => {
-		  if (task.title != undefined) {
-			  taskMap.set(task.id, task);
-		  }
-		});
-		
-		// Обновляем из облака при наличии более новых версий
-		remote.forEach(task => {
-		  if (task.title != undefined) {
-  			const existing = taskMap.get(task.id);
-  			if (!existing || task.lastModified > existing.lastModified) {
-  				taskMap.set(task.id, task);
-  			}
-		  }
-		});
-		
-		return Array.from(taskMap.values());
-	};
+    const taskMap = new Map();
+  
+    // Добавляем только неудаленные задачи
+    [...local, ...remote].forEach(task => {
+      if (task.deleted) return; // Пропускаем удаленные
+      const existing = taskMap.get(task.id);
+      if (!existing || task.lastModified > existing.lastModified) {
+        taskMap.set(task.id, task);
+      }
+    });
+  
+    return Array.from(taskMap.values());
+  };
 
 	const uploadToDrive = async (data) => {
 		const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
@@ -263,6 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     id: Date.now().toString(),
                     title,
                     completed: false,
+                    deleted: false,
                     lastModified: Date.now()
                 });
                 elements.taskInput.value = '';
