@@ -170,6 +170,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 			// 3. Слияние данных
 			const localData = await dbOperation('readonly');
+			alert('next');
+			alert(typeof localData);
+		  alert(typeof driveData);
 			const merged = mergeTasks(localData, driveData);
 			
 			// 4. Сохранение объединенных данных
@@ -191,8 +194,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const mergeTasks = (local, remote) => {
 		const taskMap = new Map();
 		
-		alert(typeof remote);
-		alert(typeof local);
 		//remoteTask = 
 		remote.forEach(task => {
 			
