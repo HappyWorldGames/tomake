@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 reader.onload = async (e) => {
                     const tasks = JSON.parse(e.target.result);
                     await dbOperation('readwrite', null);
-                    await Promise.all(tasks.map(task => dbOperation('readwrite', task));
+                    await Promise.all(tasks.map(task => dbOperation('readwrite', task)));
                     await renderTasks();
                     alert('Данные успешно импортированы!');
                 };
