@@ -191,11 +191,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const mergeTasks = (local, remote) => {
 		const taskMap = new Map();
 	  
-		remote.map(task => {
+		/*remote.map(task => {
 			if (task.deleted === undefined) {
 				task.deleted = false;
 			}
-		});
+		});*/
 
 		// Добавляем только неудаленные задачи
 		[...local, ...remote].forEach(task => {
