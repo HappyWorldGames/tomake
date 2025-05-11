@@ -189,25 +189,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 	};
 	
 	const mergeTasks = (local, remote) => {
-		console.log("merge 13");
 		const taskMap = new Map();
 
-		/*remote.map(task => {
+		remote.map(task => {
 			if (task.deleted === undefined) {
 				task.deleted = false;
 			}
-		});*/
-		remote.forEach(task => {
-			console.log(task.title);
 		});
 
-		// Добавляем только неудаленные задачи
 		[...local, ...remote].forEach(task => {
 			// Если задача удалена больше 30 дней, выкинуть из списка
-			if (task.deleted && Date.now() - task.lastModified > 60000/*30 * 86400000*/) return; // Пропускаем удаленные
+			if (task.deleted && Date.now() - task.lastModified > 60000/*30 * 86400000*/) return;
 			const existing = taskMap.get(task.id);
 			if (!existing || task.lastModified > existing.lastModified) {
-				console.log('existing: ' + existing + ' ' + JSON.stringify(task));
 				taskMap.set(task.id, task);
 			}
 		});
