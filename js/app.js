@@ -240,6 +240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Функция экспорта
     const exportData = async () => {
+        if (!confirm('Экспортировать все задачи в файл?')) return;
         try {
             const tasks = await dbOperation('readonly');
             
@@ -271,6 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const importData = async () => {
+        if (!confirm('Текущие данные будут заменены. Продолжить?')) return;
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';
