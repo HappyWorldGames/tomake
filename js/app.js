@@ -177,9 +177,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 			await Promise.all(merged.map(task => dbOperation('readwrite', task)));
 			
 			// 5. Загрузка обновленных данных в Drive
-			await uploadToDrive(merged);
+			//await uploadToDrive(merged);
 			
-			alert('✅ Синхронизация завершена!');
+			alert('✅ Синхронизация gзавершена!');
 			await renderTasks();
 			
 		} catch (error) {
