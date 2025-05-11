@@ -179,7 +179,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 5. Загрузка обновленных данных в Drive
 			//await uploadToDrive(merged);
 			
-			alert('✅ Синхронизация gзавершена!');
+			alert('wtf?');
+			alert('✅ Синхронизация завершена!');
 			await renderTasks();
 			
 		} catch (error) {
