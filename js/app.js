@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	};
 	
 	const mergeTasks = (local, remote) => {
-		console.log("merge 11");
+		console.log("merge 12");
 		const taskMap = new Map();
 
 		/*remote.map(task => {
@@ -200,7 +200,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		// Добавляем только неудаленные задачи
 		[...local, ...remote].forEach(task => {
-			// if (task.deleted) return; // Пропускаем удаленные
+			// Если задача удалена больше 30 дней, выкинуть из списка
+			if (task.deleted && Date.now() - task.lastModified > 60000/*30 * 86400000*/) return; // Пропускаем удаленные
 			const existing = taskMap.get(task.id);
 			if (!existing || task.lastModified > existing.lastModified) {
 				console.log('existing: ' + existing + ' ' + JSON.stringify(task));
