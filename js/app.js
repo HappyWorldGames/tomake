@@ -162,7 +162,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			
 			// 2. Загрузка данных из Google Drive
 			if (files.length > 0) {
-                console.log("files: " + files.length)
 				const fileContent = await fetch(`https://www.googleapis.com/drive/v3/files/${files[0].id}?alt=media`, {
 					headers: { 'Authorization': `Bearer ${googleToken}` }
 				});
