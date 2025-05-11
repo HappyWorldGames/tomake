@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 5. Загрузка обновленных данных в Drive
 			await uploadToDrive(merged);
 			
-			alert('wtf?1.3');
+			alert('wtf?1.4');
 			alert('✅ Синхронизация завершена!');
 			await renderTasks();
 			
@@ -192,11 +192,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const mergeTasks = (local, remote) => {
 		const taskMap = new Map();
 	  
-		/*remote.map(task => {
+		remote.map(task => {
 			if (task.deleted === undefined) {
 				task.deleted = false;
 			}
-		});*/
+		});
 
 		// Добавляем только неудаленные задачи
 		[...local, ...remote].forEach(task => {
