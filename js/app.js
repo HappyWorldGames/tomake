@@ -179,7 +179,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 5. Загрузка обновленных данных в Drive
 			await uploadToDrive(merged);
 			
-			alert('wtf?1.5');
 			alert('✅ Синхронизация завершена!');
 			await renderTasks();
 			
@@ -190,8 +189,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 	};
 	
 	const mergeTasks = (local, remote) => {
+		console.log("merge 1");
 		const taskMap = new Map();
-	  
+
 		/*remote.map(task => {
 			if (task.deleted === undefined) {
 				task.deleted = false;
@@ -203,11 +203,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 			if (task.deleted) return; // Пропускаем удаленные
 			const existing = taskMap.get(task.id);
 			if (!existing || task.lastModified > existing.lastModified) {
-				console.log(JSON.stringify(task));
+				console.log('existing: ' + existing + ' ' + JSON.stringify(task));
 				taskMap.set(task.id, task);
 			}
 		});
-	  
+		
 		return Array.from(taskMap.values());
 	};
 
