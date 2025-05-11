@@ -270,6 +270,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    const importData = async () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const tasks = JSON.parse(e.target.result);
+                    await dbOperation('readwrite', null);
+                    await Promise.all(tasks.map(task => dbOperation('readwrite', task));
+                    await renderTasks();
+                    alert('Данные успешно импортированы!');
+                };
+                reader.readAsText(file);
+            } catch (error) {
+                console.error('Ошибка импорта:', error);
+                alert('Некорректный файл!');
+            }
+        };
+        
+        input.click();
+    };
+
     // 5. Инициализация приложения
     try {
         db = await initDB();
@@ -295,6 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         elements.syncButton.addEventListener('click', syncWithDrive);
         document.getElementById('exportBtn').addEventListener('click', exportData);
+        document.getElementById('importBtn').addEventListener('click', importData);
         elements.themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark-theme');
             localStorage.setItem('theme', 
