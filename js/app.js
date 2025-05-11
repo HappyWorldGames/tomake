@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 5. Загрузка обновленных данных в Drive
 			await uploadToDrive(merged);
 			
-			alert('wtf?1.1');
+			alert('wtf?1.2');
 			alert('✅ Синхронизация завершена!');
 			await renderTasks();
 			
@@ -203,6 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			if (task.deleted) return; // Пропускаем удаленные
 			const existing = taskMap.get(task.id);
 			if (!existing || task.lastModified > existing.lastModified) {
+				console.log(task.toString());
 				taskMap.set(task.id, task);
 			}
 		});
