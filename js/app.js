@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		[...local, ...remote].forEach(task => {
 			// Если задача удалена больше 30 дней, выкинуть из списка
-			if (task.deleted && Date.now() - task.lastModified > 60000/*30 * 86400000*/) return;
+			if (task.deleted && Date.now() - task.lastModified > 30 * 86400000) return;
 			const existing = taskMap.get(task.id);
 			if (!existing || task.lastModified > existing.lastModified) {
 				taskMap.set(task.id, task);
