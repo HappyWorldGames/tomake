@@ -262,6 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         elements.syncButton.addEventListener('click', syncWithDrive);
+        document.getElementById('exportBtn').addEventListener('click', exportData);
         elements.themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark-theme');
             localStorage.setItem('theme', 
@@ -284,4 +285,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Ошибка инициализации:', error);
     }
+
+    // Функция экспорта
+    const exportData = async () => {
+        try {
+            const tasks = await dbOperation('readonly');
+            
+            if (tasks.length === 0) {
+                alert('Нет данных для экспорта!');
+                return;
+            }
+
+            // Форматирование данных
+            const dataStr = JSON.stringify(tasks, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            
+            // Создание ссылки для скачивания
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `tasks_backup_${new Date().toISOString().slice(0,10)}.json`;
+            
+            // Автоматическое скачивание
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error('Ошибка экспорта:', error);
+            alert('Не удалось экспортировать данные!');
+        }
+    };
 });
