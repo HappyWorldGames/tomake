@@ -271,6 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    // Функция импорта
     const importData = async () => {
         if (!confirm('Текущие данные будут заменены. Продолжить?')) return;
         const input = document.createElement('input');
