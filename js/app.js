@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const taskMap = new Map();
 	  
 		remote.map(task => {
-			if (task.deleted == undefined) {
+			if (task.deleted === undefined) {
 				task.deleted = false;
 			}
 		});
