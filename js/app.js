@@ -174,12 +174,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 			
 			// 4. Сохранение объединенных данных
 			await dbOperation('readwrite', null); // Очистка БД
-			await Promise.all(merged.map(task => dbOperation('readwrite', task)));
+			//await Promise.all(merged.map(task => dbOperation('readwrite', task)));
 			
 			// 5. Загрузка обновленных данных в Drive
 			//await uploadToDrive(merged);
 			
-			alert('wtf?');
+			alert('wtf?1');
 			alert('✅ Синхронизация завершена!');
 			await renderTasks();
 			
