@@ -1,4 +1,9 @@
+import Test from './google_sync.js'
+
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('before');
+    const test = new Test();
+    console.log('after');
     const GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
     const DB_NAME = 'TaskDB';
     const STORE_NAME = 'tasks';
