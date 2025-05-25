@@ -20,8 +20,8 @@ export class GoogleSyncManager {
       use_fedcm_for_prompt: true
     });
     
-    const token = sessionStorage.getItem('google_token');
-    if (!token) _requestToken();
+    this.token = sessionStorage.getItem('google_token');
+    if (!this.token) this._requestToken();
   }
 
   async sync() {
