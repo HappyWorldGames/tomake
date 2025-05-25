@@ -19,6 +19,9 @@ export class GoogleSyncManager {
       },
       use_fedcm_for_prompt: true
     });
+    
+    const token = sessionStorage.getItem('google_token');
+    if (!token) _requestToken();
   }
 
   async sync() {
@@ -52,6 +55,7 @@ export class GoogleSyncManager {
         callback: (response) => {
           if (response.error) reject(new Error(response.error));
           this.token = response.access_token;
+          sessionStorage.setItem('google_token', this.token);
           resolve();
         }
       });
