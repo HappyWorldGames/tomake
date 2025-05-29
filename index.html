@@ -1,13 +1,15 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Tasks</title>
+    <!-- Styles -->
     <link rel="stylesheet" href="./css/styles.css">
-    <script src="https://accounts.google.com/gsi/client?onload=initGoogleAuth"></script> -->
+    <!-- Google -->
+    <script src="https://accounts.google.com/gsi/client?onload=initGoogleAuth"></script>
     <!-- App -->
-    <!-- <script type="module" src="./js/database_manager.js"></script>
+    <script type="module" src="./js/database_manager.js"></script>
     <script type="module" src="./js/task_renderer.js"></script>
     <script type="module" src="./js/google_sync_manager.js"></script>
     <script type="module" src="./js/theme_manager.js"></script>
@@ -15,251 +17,40 @@
     <script type="module" src="./js/app.js"></script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Мои задачи</h1>
+    <div class="account-side">
+        <div class="sync-container">
             <button>Войти</button>
             <button id="themeToggle">🌓</button>
-        </header>
-        
-        <div class="sync-container">
-            <form id="taskForm">
-                <input type="text" id="taskInput" placeholder="Добавить задачу..." required>
-                <button type="submit">+</button>
-            </form>
+            
             <button id="syncButton">🔄 Синхронизировать</button>
             <button id="exportBtn">📥 Экспорт данных</button>
             <button id="importBtn">📤 Импорт данных</button>
         </div>
-
-        <ul id="taskList"></ul>
     </div>
-</body>
-</html> -->
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои задачи</title>
-    <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #333333;
-            --header-bg: #f8f9fa;
-            --input-bg: #ffffff;
-            --border-color: #dee2e6;
-            --hover-bg: #e9ecef;
-        }
 
-        .dark-theme {
-            --bg-color: #2d3436;
-            --text-color: #ffffff;
-            --header-bg: #1a1a1a;
-            --input-bg: #404040;
-            --border-color: #4d4d4d;
-            --hover-bg: #3d3d3d;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: background 0.3s, color 0.3s;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
-        }
-
-        /* Боковое меню */
-        .side-menu {
-            position: fixed;
-            left: -250px;
-            top: 0;
-            width: 250px;
-            height: 100%;
-            background: var(--header-bg);
-            border-right: 1px solid var(--border-color);
-            transition: 0.3s;
-            z-index: 1000;
-        }
-
-        .side-menu.active {
-            left: 0;
-        }
-
-        /* Шапка */
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            background: var(--header-bg);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .menu-button {
-            font-size: 1.5rem;
-            background: none;
-            border: none;
-            color: var(--text-color);
-            cursor: pointer;
-            margin-right: 1rem;
-        }
-
-        /* Основной контент */
-        .main-content {
-            margin-left: 0;
-            padding: 1rem;
-            transition: 0.3s;
-        }
-
-        /* Поле ввода задачи */
-        .task-input-container {
-            display: flex;
-            gap: 0.5rem;
-            margin: 1rem 0;
-        }
-
-        .task-input {
-            flex: 1;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            background: var(--input-bg);
-            color: var(--text-color);
-        }
-
-        /* Список задач */
-        .tasks-list {
-            list-style: none;
-        }
-
-        .task-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .delete-btn {
-            cursor: pointer;
-            color: #dc3545;
-        }
-
-        /* Адаптивность */
-        @media (min-width: 768px) {
-            .side-menu {
-                left: 0;
-            }
-            .main-content {
-                margin-left: 250px;
-            }
-            .menu-button {
-                display: none;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Боковое меню -->
-    <div class="side-menu" id="sideMenu">
-        <div style="padding: 1rem">
-            <h3 style="margin-bottom: 1rem">Списки</h3>
-            <ul style="list-style: none">
-                <li class="menu-item">Рабочие задачи</li>
-                <li class="menu-item">Личные дела</li>
-                <li class="menu-item">Покупки</li>
-                <li class="menu-item">Проект X</li>
-            </ul>
+    <div class="project-list-side">
+        <div class="container">
+            <button id="">Открытия меню слева</button>
+            <h1>Мои задачи</h1>
         </div>
+        <div class="add-task"></div>
+        <div class="tasks-list"></div>
     </div>
-
-    <!-- Основной контент -->
-    <div class="main-content" id="mainContent">
-        <!-- Шапка -->
-        <header class="header">
-            <button class="menu-button" onclick="toggleMenu()">☰</button>
-            <h2 style="flex: 1">Мои задачи</h2>
-            <select class="action-select" onchange="handleAction(this.value)">
-                <option value="">Действия</option>
-                <option value="export">Экспортировать</option>
-                <option value="import">Импортировать</option>
-                <option value="sync">Синхронизация</option>
-            </select>
-            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-            <button class="auth-button" onclick="toggleAuth()">Войти</button>
+    
+    <div class="main-side">
+        <header>
+            <button class="menu-btn">Menu Icon</button>
+            <h1 class="top-text">Today</h1>
         </header>
-
-        <!-- Поле ввода задачи -->
-        <div class="task-input-container">
-            <input type="text" class="task-input" placeholder="Добавить задачу" id="taskInput">
-            <button onclick="addTask()" style="padding: 0.5rem 1rem">+</button>
-        </div>
-
-        <!-- Список задач -->
-        <ul class="tasks-list" id="tasksList">
-            <li class="task-item">
-                <span>Пример задачи</span>
-                <span class="delete-btn" onclick="this.parentElement.remove()">🗑️</span>
-            </li>
-        </ul>
+        <form id="taskForm">
+            <input type="text" id="taskInput" placeholder="Добавить задачу..." required>
+            <button type="submit">+</button>
+        </form>
+        <div class="task-list">tasks...</div>
     </div>
 
-    <script>
-        // Переключение меню
-        function toggleMenu() {
-            document.getElementById('sideMenu').classList.toggle('active');
-        }
-
-        // Переключение темы
-        function toggleTheme() {
-            document.body.classList.toggle('dark-theme');
-        }
-
-        // Авторизация
-        let isLoggedIn = false;
-        function toggleAuth() {
-            isLoggedIn = !isLoggedIn;
-            document.querySelector('.auth-button').textContent = isLoggedIn ? 'Выйти' : 'Войти';
-        }
-
-        // Добавление задачи
-        function addTask() {
-            const input = document.getElementById('taskInput');
-            if (input.value.trim()) {
-                const li = document.createElement('li');
-                li.className = 'task-item';
-                li.innerHTML = `
-                    <span>${input.value}</span>
-                    <span class="delete-btn" onclick="this.parentElement.remove()">🗑️</span>
-                `;
-                document.getElementById('tasksList').appendChild(li);
-                input.value = '';
-            }
-        }
-
-        // Обработка действий
-        function handleAction(action) {
-            const actions = {
-                export: 'Экспорт задач...',
-                import: 'Импорт задач...',
-                sync: 'Синхронизация...'
-            };
-            if (actions[action]) {
-                alert(actions[action]);
-            }
-        }
-
-        // Закрытие меню при клике вне его области
-        document.addEventListener('click', (e) => {
-            const sideMenu = document.getElementById('sideMenu');
-            if (!sideMenu.contains(e.target) && !e.target.classList.contains('menu-button')) {
-                sideMenu.classList.remove('active');
-            }
-        });
-    </script>
+    <div class="task-view">
+        About Task
+    </div>
 </body>
 </html>
