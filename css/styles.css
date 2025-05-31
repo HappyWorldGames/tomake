@@ -77,43 +77,39 @@ button {
 } */
 
 :root {
-    --primary-color: #5865F2;
-    --bg-color: #f9f9f9;
-    --card-bg: #ffffff;
-    --text-color: #333333;
-    --border-radius: 8px;
-    --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  --primary-color: #5865F2;
+  --bg-color: #f9f9f9;
+  --card-bg: #ffffff;
+  --text-color: #333333;
+  --border-radius: 8px;
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 body {
-    background: var(--bg-color);
-    color: var(--text-color);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    gap: 10px;
-}
-
-.account-side {
-    display: flex;
-}
-
-.project-list-side {
-    display: flex;
+  background: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  gap: 10px;
 }
 
 .main-side {
-    display: flex;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
 }
 
 .task-view {
-    display: flex;
+  display: flex;
+  flex-direction: column;
 }

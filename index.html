@@ -6,6 +6,8 @@
     <title>My Tasks</title>
     <!-- Styles -->
     <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/sync-side.css">
+    <link rel="stylesheet" href="./css/project-list-side.css">
     <!-- Google -->
     <script src="https://accounts.google.com/gsi/client?onload=initGoogleAuth"></script>
     <!-- App -->
@@ -17,24 +19,18 @@
     <script type="module" src="./js/app.js"></script>
 </head>
 <body>
-    <div class="account-side">
-        <div class="sync-container">
-            <button>Войти</button>
-            <button id="themeToggle">🌓</button>
-            
-            <button id="syncButton">🔄 Синхронизировать</button>
-            <button id="exportBtn">📥 Экспорт данных</button>
-            <button id="importBtn">📤 Импорт данных</button>
-        </div>
+    <div class="sync-side">
+        <button title="Войти">👤</button>
+        <button id="themeToggle">🌓</button>
+        
+        <button id="syncButton" title="Синхронизировать">🔄</button>
+        <button id="exportBtn" title="Экспорт данных">📥</button>
+        <button id="importBtn" title="Импорт данных">📤</button>
     </div>
 
     <div class="project-list-side">
-        <div class="container">
-            <button id="">Открытия меню слева</button>
-            <h1>Мои задачи</h1>
-        </div>
-        <div class="add-task"></div>
-        <div class="tasks-list"></div>
+        <h1>Мои задачи</h1>
+        <div class="project-list">Projects...</div>
     </div>
     
     <div class="main-side">

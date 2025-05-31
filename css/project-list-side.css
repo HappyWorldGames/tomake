@@ -1,0 +1,4 @@
+.project-list-side {
+  display: flex;
+  flex-direction: column;
+}
