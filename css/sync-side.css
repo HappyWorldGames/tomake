@@ -1,8 +1,28 @@
-.sync-side {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  background-color: pink;
+@media (min-width: 960px) {
+  .sync-side {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: pink;
+  }
+}
+
+@media (min-width: 500px) and (max-width: 640px) {
+  .sync-side {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    background-color: pink;
+  }
+}
+
+@media (max-width: 500px) {
+  .sync-side {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    background-color: pink;
+  }
 }
 
 .sync-side button {
@@ -26,3 +46,7 @@
 .sync-side button:active {
   background-color: #ffdd33;
 }
+
+max 500 phone
+max 640 tablet
+min 960 desktop
