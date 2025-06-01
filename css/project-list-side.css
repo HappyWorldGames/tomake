@@ -16,3 +16,11 @@
     flex-direction: column;
     padding: 10px;
 }
+
+.project-list-side .item {
+    width: 100%;
+    padding: 5px;
+    margin: 1px 0;
+    background-color: #410;
+    border-radius: 5px;
+}
