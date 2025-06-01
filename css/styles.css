@@ -130,16 +130,6 @@ body {
     }
 }
 
-.main-side {
-    display: flex;
-    flex-direction: column;
-}
-
-header {
-    display: flex;
-}
-
-.task-view {
-    display: flex;
-    flex-direction: column;
-}
+/* max 500 phone
+max 640 tablet
+min 960 desktop */

@@ -1,0 +1,32 @@
+@media (min-width: 641px) {
+    .main-side {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-side header {
+        display: flex;
+    }
+}
+
+@media (min-width: 501px) and (max-width: 640px) {
+    .main-side {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-side header {
+        display: flex;
+    }
+}
+
+@media (max-width: 500px) {
+    .main-side {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-side header {
+        display: flex;
+    }
+}

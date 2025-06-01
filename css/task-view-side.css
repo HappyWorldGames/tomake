@@ -1,12 +1,12 @@
-@media (min-width: 641px) {
-    .project-list-side {
+@media (min-width: 961px) {
+    .task-view-side {
         display: flex;
         flex-direction: column;
     }
 }
 
-@media (max-width: 640px) {
-    .project-list-side {
+@media (max-width: 960px) {
+    .task-view-side {
         display: none;
         flex-direction: column;
     }
