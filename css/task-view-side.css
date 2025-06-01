@@ -1,13 +1,17 @@
 @media (min-width: 961px) {
     .task-view-side {
         display: flex;
-        flex-direction: column;
+        width: 100%;
     }
 }
 
 @media (max-width: 960px) {
     .task-view-side {
         display: none;
-        flex-direction: column;
     }
+}
+
+.task-view-side {
+    background-color: #050;
+    flex-direction: column;
 }

@@ -1,13 +1,18 @@
 @media (min-width: 641px) {
     .project-list-side {
         display: flex;
-        flex-direction: column;
     }
 }
 
 @media (max-width: 640px) {
     .project-list-side {
         display: none;
-        flex-direction: column;
     }
+}
+
+.project-list-side {
+    min-width: 200px;
+    background-color: #921;
+    flex-direction: column;
+    padding: 10px;
 }
