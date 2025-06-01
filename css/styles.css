@@ -77,39 +77,69 @@ button {
 } */
 
 :root {
-  --primary-color: #5865F2;
-  --bg-color: #f9f9f9;
-  --card-bg: #ffffff;
-  --text-color: #333333;
-  --border-radius: 8px;
-  --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    --primary-color: #5865F2;
+    --bg-color: #f9f9f9;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --border-radius: 8px;
+    --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
 }
 
 body {
-  background: var(--bg-color);
-  color: var(--text-color);
-  min-height: 100vh;
-  display: flex;
-  gap: 10px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    gap: 10px;
+}
+
+@media (min-width: 641px) {
+    .sync-project-list-side {
+        background: var(--bg-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        display: flex;
+        gap: 10px;
+    }
+}
+
+@media (min-width: 501px) and (max-width: 640px) {
+    .sync-project-list-side {
+        background: var(--bg-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        display: flex;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 500px) {
+    .sync-project-list-side {
+        background: var(--bg-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        display: flex;
+        gap: 10px;
+    }
 }
 
 .main-side {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 header {
-  display: flex;
+    display: flex;
 }
 
 .task-view {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
