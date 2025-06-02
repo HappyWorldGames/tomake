@@ -14,6 +14,7 @@
     padding: 5px;
     background-color: rgba(0,0,0,0);
     border: none;
+    cursor:pointer;
 }
 
 .main-side #task-form {
@@ -25,8 +26,19 @@
     flex: 1;
     background-color: #ea7100;
     border: none;
-    padding: 5px;
+    border-radius: 10px 0 0 10px;
+    padding: 10px;
     margin: 5px 0;
+}
+
+.main-side #task-form #task-input:focus {
+    outline: solid;
+    outline-color: green;
+}
+
+.main-side #task-form #task-input:focus + #add-task-btn {
+    outline: solid;
+    outline-color: green;
 }
 
 .main-side #task-form #add-task-btn {
@@ -34,5 +46,14 @@
     margin: 5px 0;
     background-color: #ea7100;
     border: none;
-    border-radius: 0 50% 50% 0;
+    border-radius: 0 10px 10px 0;
+    cursor:pointer;
+}
+
+.main-side #task-form #add-task-btn:hover {
+    background-color: #ca6200;
+}
+
+.main-side #task-form #add-task-btn:active {
+    background-color: rgb(163, 79, 0);
 }

@@ -23,4 +23,50 @@
     margin: 1px 0;
     background-color: #ced000;
     border-radius: 5px;
+    cursor:pointer;
+}
+
+.project-list-side .item:hover {
+    width: 100%;
+    padding: 5px;
+    margin: 1px 0;
+    background-color: #ced00090;
+    border-radius: 5px;
+    cursor:pointer;
+}
+
+.project-list-side .item:active {
+    width: 100%;
+    padding: 5px;
+    margin: 1px 0;
+    background-color: #b6b900;
+    border-radius: 5px;
+    cursor:pointer;
+}
+
+.project-list-side .item.selected {
+    width: 100%;
+    padding: 5px;
+    margin: 1px 0;
+    background-color: #87ee00;
+    border-radius: 5px;
+    cursor:pointer;
+}
+
+.project-list-side .item.selected:hover {
+    width: 100%;
+    padding: 5px;
+    margin: 1px 0;
+    background-color: #87ee0090;
+    border-radius: 5px;
+    cursor:pointer;
+}
+
+.project-list-side .item.selected:active {
+    width: 100%;
+    padding: 5px;
+    margin: 1px 0;
+    background-color: #63af00;
+    border-radius: 5px;
+    cursor:pointer;
 }

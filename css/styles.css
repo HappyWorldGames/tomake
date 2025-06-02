@@ -1,80 +1,6 @@
-/* :root {
-    --bg-color: #ffffff;
-    --text-color: #333333;
-    --primary-color: #2196F3;
-}
-
-.dark-theme {
-    --bg-color: #1a1a1a;
-    --text-color: #e0e0e0;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    transition: background 0.3s, color 0.3s;
-}
-
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.sync-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-#taskForm {
-    display: flex;
-    gap: 10px;
-    flex-grow: 1;
-}
-
-#taskInput {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-button {
-    padding: 10px 15px;
-    background: var(--primary-color);
-    border: none;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
-}
-
-.task-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.05);
-    margin-bottom: 5px;
-    border-radius: 4px;
-}
-
-.task-actions {
-    margin-left: auto;
-    display: flex;
-    gap: 8px;
-}
-
-@media (max-width: 480px) {
-    .sync-container {
-        flex-direction: column;
-    }
-}
-
-#exportBtn {
-    background: #2ecc71;
-} */
+/* max 500 phone
+max 640 tablet
+min 960 desktop */
 
 :root {
     --primary-color: #5865F2;
@@ -83,6 +9,11 @@ button {
     --text-color: #333333;
     --border-radius: 8px;
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.dark-theme {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
 }
 
 * {
@@ -125,7 +56,3 @@ body {
         display: flex;
     }
 }
-
-/* max 500 phone
-max 640 tablet
-min 960 desktop */
