@@ -4,7 +4,9 @@ min 960 desktop */
 
 :root {
     --primary-color: #5865F2;
-    --bg-color: #f9f9f9;
+    --second-color: #db49ff;
+    --bg-color: #96c000;
+    --second-bg-color: #ffffff93;
     --card-bg: #ffffff;
     --text-color: #333333;
     --border-radius: 8px;

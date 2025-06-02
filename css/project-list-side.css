@@ -1,3 +1,19 @@
+:root {
+    --project-list-side-bg-color: #ffc0cb;
+    --project-list-side-item-bg-color: #ffbd33;
+    --project-list-side-item-hover-bg-color: #e9b826;
+    --project-list-side-item-active-bg-color: #bb9c00;
+    --project-list-side-item-selected-bg-color: #f58c13;
+}
+
+.dark-theme {
+    --project-list-side-bg-color: #ffa2b1dc;
+    --project-list-side-item-bg-color: #ffb820c5;
+    --project-list-side-item-hover-bg-color: #ddac19c5;
+    --project-list-side-item-active-bg-color: #ddac198c;
+    --project-list-side-item-selected-bg-color: #f58b13bb;
+}
+
 @media (min-width: 641px) {
     .project-list-side {
         display: flex;
@@ -12,61 +28,36 @@
 
 .project-list-side {
     min-width: 200px;
-    background-color: #e0b200;
+    background-color: var(--project-list-side-bg-color);
     flex-direction: column;
     padding: 10px;
 }
 
 .project-list-side .item {
     width: 100%;
-    padding: 5px;
+    padding: 10px;
     margin: 1px 0;
-    background-color: #ced000;
+    background-color: var(--project-list-side-item-bg-color);
     border-radius: 5px;
     cursor:pointer;
 }
 
 .project-list-side .item:hover {
-    width: 100%;
-    padding: 5px;
-    margin: 1px 0;
-    background-color: #ced00090;
-    border-radius: 5px;
-    cursor:pointer;
+    background-color: var(--project-list-side-item-hover-bg-color);
 }
 
 .project-list-side .item:active {
-    width: 100%;
-    padding: 5px;
-    margin: 1px 0;
-    background-color: #b6b900;
-    border-radius: 5px;
-    cursor:pointer;
+    background-color: var(--project-list-side-item-active-bg-color);
 }
 
 .project-list-side .item.selected {
-    width: 100%;
-    padding: 5px;
-    margin: 1px 0;
-    background-color: #87ee00;
-    border-radius: 5px;
-    cursor:pointer;
+    background-color: var(--project-list-side-item-selected-bg-color);
 }
 
 .project-list-side .item.selected:hover {
-    width: 100%;
-    padding: 5px;
-    margin: 1px 0;
-    background-color: #87ee0090;
-    border-radius: 5px;
-    cursor:pointer;
+    background-color: var(--project-list-side-item-hover-bg-color);
 }
 
 .project-list-side .item.selected:active {
-    width: 100%;
-    padding: 5px;
-    margin: 1px 0;
-    background-color: #63af00;
-    border-radius: 5px;
-    cursor:pointer;
+    background-color: var(--project-list-side-item-active-bg-color);
 }
