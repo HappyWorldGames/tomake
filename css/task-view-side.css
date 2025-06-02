@@ -1,7 +1,7 @@
 @media (min-width: 961px) {
     .task-view-side {
         display: flex;
-        width: 100%;
+        flex: 1;
     }
 }
 

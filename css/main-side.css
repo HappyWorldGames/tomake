@@ -1,11 +1,38 @@
 .main-side {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    flex: 1;
     padding: 10px;
-    background-color: #029;
+    background-color: #ff7d05;
 }
 
 .main-side header {
     display: flex;
+}
+
+.main-side .menu-btn {
+    padding: 5px;
+    background-color: rgba(0,0,0,0);
+    border: none;
+}
+
+.main-side #task-form {
+    display: flex;
+    flex-direction: row;
+}
+
+.main-side #task-form #task-input {
+    flex: 1;
+    background-color: #ea7100;
+    border: none;
+    padding: 5px;
+    margin: 5px 0;
+}
+
+.main-side #task-form #add-task-btn {
+    padding: 5px 10px;
+    margin: 5px 0;
+    background-color: #ea7100;
+    border: none;
+    border-radius: 0 50% 50% 0;
 }

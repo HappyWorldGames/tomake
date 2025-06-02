@@ -12,7 +12,7 @@
 
 .project-list-side {
     min-width: 200px;
-    background-color: #921;
+    background-color: #e0b200;
     flex-direction: column;
     padding: 10px;
 }
@@ -21,6 +21,6 @@
     width: 100%;
     padding: 5px;
     margin: 1px 0;
-    background-color: #410;
+    background-color: #ced000;
     border-radius: 5px;
 }
