@@ -27,7 +27,8 @@
 }
 
 .main-side .menu-btn {
-    padding: 5px;
+    padding: 10px;
+    color: var(--text-color);
     background-color: rgba(0,0,0,0);
     border: none;
     cursor:pointer;
@@ -40,11 +41,12 @@
 
 .main-side #task-form #task-input {
     flex: 1;
+    color: var(--text-color);
     background-color: #ea7100;
     border: none;
     border-radius: 10px 0 0 10px;
     padding: 10px;
-    margin: 5px 0;
+    margin: 10px 0;
 }
 
 .main-side #task-form #task-input:focus {
@@ -57,9 +59,14 @@
     outline-color: green;
 }
 
+.main-side #task-form #task-input::placeholder {
+    color: #ffc0cb;
+}
+
 .main-side #task-form #add-task-btn {
     padding: 5px 10px;
-    margin: 5px 0;
+    margin: 10px 0;
+    color: var(--text-color);
     background-color: #ea7100;
     border: none;
     border-radius: 0 10px 10px 0;
