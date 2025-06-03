@@ -51,11 +51,35 @@
             <input type="text" id="task-input" placeholder="Добавить задачу..." required>
             <button type="submit" id="add-task-btn">Add</button>
         </form>
-        <div class="task-list">tasks...</div>
+        <div class="task-list">
+            <ul>
+                <div class="task-list-name">
+                    <h6>Name</h6>
+                </div>
+                <li>Test 1</li>
+                <li>Test 2</li>
+            </ul>
+            <ul>
+                <div class="task-list-name">
+                    <h6>Name</h6>
+                </div>
+                <li>Test 3</li>
+                <li>Test 4</li>
+            </ul>
+        </div>
     </div>
 
     <div class="task-view-side">
-        About Task
+        <div class="header">Header</div>
+        <div class="main">
+            <textarea type="text" id="task-view-description-input" placeholder="Описание..."></textarea>
+            <ul class="checkbox-list">
+                <li><input type="checkbox" class="check-field"><input type="text" class="text-field"></li>
+                <li>Test 2</li>
+            </ul>
+            <div class="space"></div>
+        </div>
+        <div class="footer">Footer</div>
     </div>
 </body>
 </html>

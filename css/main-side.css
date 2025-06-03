@@ -1,5 +1,5 @@
 :root {
-    --main-side-bg-color: #ffc0cb;
+    --main-side-bg-color: #ffffff34;
     --main-side-item-bg-color: #ffbd33;
     --main-side-item-hover-bg-color: #e9b826;
     --main-side-item-active-bg-color: #bb9c00;
@@ -60,7 +60,7 @@
 }
 
 .main-side #task-form #task-input::placeholder {
-    color: #ffc0cb;
+    color: var(--placeholder-text-color);
 }
 
 .main-side #task-form #add-task-btn {
@@ -78,5 +78,26 @@
 }
 
 .main-side #task-form #add-task-btn:active {
-    background-color: rgb(163, 79, 0);
+    background-color: #a34f00;
+}
+
+.main-side .task-list li {
+    margin: 0;
+    padding: 10px;
+    list-style-type: none;
+    background-color: #ffb730;
+}
+
+.main-side .task-list li:hover {
+    background-color: #ffdb0f;
+}
+
+.main-side .task-list li:active {
+    background-color: #ffdb0fcc;
+}
+
+.main-side .task-list .task-list-name {
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
 }

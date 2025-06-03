@@ -2,6 +2,15 @@ export class TaskRenderer {
   constructor(dbManager, elements) {
     this.dbManager = dbManager;
     this.elements = elements;
+
+    const textarea = document.getElementById('task-view-description-input');
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = `${this.scrollHeight}px`;
+    });
+    document.querySelector('.task-view-side .main .space').addEventListener('click', function() {
+      textarea.focus();
+    })
   }
 
   async render() {

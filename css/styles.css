@@ -9,6 +9,7 @@ min 960 desktop */
     --second-bg-color: #ffffff93;
     --card-bg: #ffffff;
     --text-color: #333333;
+    --placeholder-text-color: #333333e0;
     --border-radius: 8px;
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
@@ -16,6 +17,7 @@ min 960 desktop */
 .dark-theme {
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
+    --placeholder-text-color: #e0e0e0e0;
 }
 
 * {
