@@ -3,6 +3,10 @@ export class TaskRenderer {
     this.dbManager = dbManager;
     this.elements = elements;
 
+    document.querySelector('.main-side .menu-btn').addEventListener('click', function() {
+        document.querySelector('.project-list-side').style.display = "flex";
+    })
+
     const textarea = document.getElementById('task-view-description-input');
     textarea.addEventListener('input', function() {
       this.style.height = 'auto';
