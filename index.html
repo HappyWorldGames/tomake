@@ -52,19 +52,19 @@
             <button type="submit" id="add-task-btn">Add</button>
         </form>
         <div class="task-list">
-            <ul>
+            <ul class="item-list">
                 <div class="task-list-name">
                     <h6>Name</h6>
                 </div>
-                <li>Test 1</li>
-                <li>Test 2</li>
+                <li class="item selected"><input type="text" class="task-name" value="Test 1"></li>
+                <li class="item"><input type="text" class="task-name" value="Test 2"></li>
             </ul>
-            <ul>
+            <ul class="item-list">
                 <div class="task-list-name">
                     <h6>Name</h6>
                 </div>
-                <li>Test 3</li>
-                <li>Test 4</li>
+                <li class="item">Test 3</li>
+                <li class="item">Test 4</li>
             </ul>
         </div>
     </div>
@@ -74,8 +74,8 @@
         <div class="main">
             <textarea type="text" id="task-view-description-input" placeholder="Описание..."></textarea>
             <ul class="checkbox-list">
-                <li><input type="checkbox" class="check-field"><input type="text" class="text-field"></li>
-                <li>Test 2</li>
+                <li><input type="checkbox" class="check-field"><input type="text" class="text-field" value="Test 1"><button class="delete-btn" title="Удалить">🗑</button></li>
+                <li><input type="checkbox" class="check-field"><input type="text" class="text-field" value="Test 2"><button class="delete-btn" title="Удалить">🗑</button></li>
             </ul>
             <div class="space"></div>
         </div>

@@ -29,7 +29,7 @@
 .main-side .menu-btn {
     padding: 10px;
     color: var(--text-color);
-    background-color: rgba(0,0,0,0);
+    background-color: #00000000;
     border: none;
     cursor:pointer;
 }
@@ -81,23 +81,46 @@
     background-color: #a34f00;
 }
 
-.main-side .task-list li {
-    margin: 0;
-    padding: 10px;
-    list-style-type: none;
-    background-color: #ffb730;
-}
-
-.main-side .task-list li:hover {
-    background-color: #ffdb0f;
-}
-
-.main-side .task-list li:active {
-    background-color: #ffdb0fcc;
-}
-
 .main-side .task-list .task-list-name {
     margin: 5px;
     padding: 5px;
     cursor: pointer;
+}
+
+.main-side .task-list .item-list .item {
+    display: flex;
+    margin: 0;
+    padding: 10px;
+    list-style-type: none;
+    background-color: var(--main-side-item-bg-color);
+}
+
+.main-side .task-list .item-list .item:hover {
+    background-color: var(--main-side-item-hover-bg-color);
+}
+
+.main-side .task-list .item-list .item:active {
+    background-color: var(--main-side-item-active-bg-color);
+}
+
+.main-side .task-list .item-list .item.selected {
+    background-color: var(--main-side-item-selected-bg-color);
+}
+
+.main-side .task-list .item-list .item.selected:hover {
+    background-color: var(--main-side-item-hover-bg-color);
+}
+
+.main-side .task-list .item-list .item.selected:active {
+    background-color: var(--main-side-item-active-bg-color);
+}
+
+.main-side .task-list .item-list .item .task-name {
+    margin: 2px;
+    padding: 2px;
+    flex: 1;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #fff0;
 }
