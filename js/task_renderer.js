@@ -4,7 +4,12 @@ export class TaskRenderer {
     this.elements = elements;
 
     document.querySelector('.main-side .menu-btn').addEventListener('click', function() {
-        document.querySelector('.project-list-side').style.display = "flex";
+      const projectListSide = document.querySelector('.project-list-side')
+      if (getComputedStyle(projectListSide).display == "none") {
+        projectListSide.style.display = "flex";
+        projectListSide.style.zIndex = "1";
+      } else
+        projectListSide.style.display = "none";
     })
 
     const textarea = document.getElementById('task-view-description-input');
