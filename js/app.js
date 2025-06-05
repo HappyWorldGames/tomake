@@ -12,9 +12,9 @@ export class App {
     this.STORE_NAME = 'tasks';
     
     this.elements = {
-      taskForm: document.getElementById('taskForm'),
-      taskInput: document.getElementById('taskInput'),
-      taskList: document.getElementById('taskList'),
+      taskForm: document.getElementById('task-form'),
+      taskInput: document.getElementById('task-input'),
+      taskList: document.getElementsByClassName('item-list')[1],
       themeToggle: document.getElementById('themeToggle'),
       syncButton: document.getElementById('syncButton')
     };

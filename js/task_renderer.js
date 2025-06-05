@@ -28,15 +28,25 @@ export class TaskRenderer {
       const tasks = preFilteredTasks.filter(task => !task.deleted);
 
       this.elements.taskList.innerHTML = tasks.map(task => `
-        <li class="task-item" data-id="${task.id}">
+        <li class="item" data-id="${task.id}">
           <input type="checkbox" ${task.completed ? 'checked' : ''}>
-          <span class="task-title">${task.title}</span>
+          <input type="text" class="task-name" value="${task.title}">
           <div class="task-actions">
-            <button class="edit-btn">✎</button>
             <button class="delete-btn">×</button>
           </div>
         </li>
       `).join('');
+
+      // this.elements.taskList.innerHTML = tasks.map(task => `
+      //   <li class="task-item" data-id="${task.id}">
+      //     <input type="checkbox" ${task.completed ? 'checked' : ''}>
+      //     <span class="task-title">${task.title}</span>
+      //     <div class="task-actions">
+      //       <button class="edit-btn">✎</button>
+      //       <button class="delete-btn">×</button>
+      //     </div>
+      //   </li>
+      // `).join('');
 
       this._attachEventHandlers();
     } catch (error) {
