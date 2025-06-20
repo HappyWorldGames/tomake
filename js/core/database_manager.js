@@ -8,7 +8,7 @@ export class DatabaseManager {
         this.showError = showError
     }
 
-    initDB() {
+    async initDB() { return new Promise((resolve, reject) => {
         let request = indexedDB.open(this.dbName, 1);
 
         request.onblocked = (event) => {
@@ -18,7 +18,7 @@ export class DatabaseManager {
         request.onupgradeneeded = (event) => {
             let db = event.target.result;
 
-            db.onerror = (event) => {
+            db.onerror = (e) => {
                 showError('Error loading database.')
             }
             
@@ -46,18 +46,22 @@ export class DatabaseManager {
 
         request.onsuccess = (event) => {
             this.db = event.target.result;
+            resolve(this.db);
         }
 
-        request.onerror = (event) => {
-            showError('Error init db');
-        }
-    }
+        request.onerror = reject;
+    });}
 
-    getAll() {
-        // ToDo
-    }
+    async getAllTasks() { return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(this.storeName);
+        const store = transaction.objectStore(this.storeName);
+        let request = store.getAll();
 
-    addTask(task) {
+        transaction.oncomplete = () => { resolve(request?.result); }
+        transaction.onerror = (e) => { reject(e.target.error); }
+    });}
+
+    async addTask(task) {
         // ToDo
     }
 }
