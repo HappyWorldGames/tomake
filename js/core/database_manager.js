@@ -18,9 +18,7 @@ export class DatabaseManager {
         request.onupgradeneeded = (event) => {
             let db = event.target.result;
 
-            db.onerror = (e) => {
-                showError('Error loading database.')
-            }
+            db.onerror = reject;
             
             if (!db.objectStoreNames.contains(this.storeName)) {
                 const store = db.createObjectStore(this.storeName, { keyPath: 'tastId', autoIncrement: true });
