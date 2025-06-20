@@ -61,7 +61,7 @@ class Task {
   }
 
   constructor(data) {
-    super(
+    this(
       data.id,
       data.parentId,
       data.listName,
