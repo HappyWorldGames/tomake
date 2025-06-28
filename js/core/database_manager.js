@@ -57,8 +57,26 @@ export class DatabaseManager {
                     return;
                 }
                 const transaction = this.db.transaction(DatabaseManager.storeName);
-                const store = transaction.objectStore(DatabaseManager.storeName);
-                let request = store.getAll();
+                const tasksStore = transaction.objectStore(DatabaseManager.storeName);
+                let request = tasksStore.getAll();
+                request.onsuccess = (event) => {
+                    resolve(event.target.result.map(taskObj => Task.fromDB(taskObj)));
+                };
+                request.onerror = (e) => { reject(e.target.error); };
+            });
+        });
+    }
+    getTasksFromIndex(index, keyRange) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                if (!this.db) {
+                    reject(new Error("Database not initialized. Call initDB() first."));
+                    return;
+                }
+                const transaction = this.db.transaction(DatabaseManager.storeName);
+                const tasksStore = transaction.objectStore(DatabaseManager.storeName);
+                const requestIndex = tasksStore.index(index);
+                const request = requestIndex.getAll(keyRange);
                 request.onsuccess = (event) => {
                     resolve(event.target.result.map(taskObj => Task.fromDB(taskObj)));
                 };
@@ -74,15 +92,15 @@ export class DatabaseManager {
                     return;
                 }
                 const transaction = this.db.transaction(DatabaseManager.storeName, 'readwrite');
-                const tasks = transaction.objectStore(DatabaseManager.storeName);
+                const tasksStore = transaction.objectStore(DatabaseManager.storeName);
                 if (task.id == '') {
                     if (typeof self.crypto.randomUUID !== 'function') {
                         alert("UUID generate error cant find self.crypto.randomUUID()");
                     }
                     task.id = self.crypto.randomUUID();
                 }
-                const request = tasks.put(task.toDB());
-                request.onsuccess = (event) => {
+                const request = tasksStore.put(task.toDB());
+                request.onsuccess = () => {
                     const taskId = task.id;
                     resolve(taskId);
                 };
@@ -92,9 +110,9 @@ export class DatabaseManager {
             });
         });
     }
-    addTask(updatedTaskData) {
+    addTask(task) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.updateTask(updatedTaskData);
+            return this.updateTask(task);
         });
     }
     removeTask(taskId) {
@@ -105,9 +123,9 @@ export class DatabaseManager {
                     return;
                 }
                 const transaction = this.db.transaction(DatabaseManager.storeName, 'readwrite');
-                const store = transaction.objectStore(DatabaseManager.storeName);
-                const request = store.delete(taskId);
-                request.onsuccess = (event) => {
+                const tasksStore = transaction.objectStore(DatabaseManager.storeName);
+                const request = tasksStore.delete(taskId);
+                request.onsuccess = () => {
                     resolve(taskId);
                 };
                 request.onerror = (e) => {

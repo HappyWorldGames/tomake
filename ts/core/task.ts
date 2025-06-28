@@ -115,14 +115,14 @@ export class Task {
   }
 }
 
-enum TaskPriority {
+export enum TaskPriority {
   Nope = 0,
   Low = 1,
   Medium = 2,
   High = 3
 }
 
-enum TaskStatus {
+export enum TaskStatus {
   Normal = 0,
   Completed = 1,
   Archived = 2,

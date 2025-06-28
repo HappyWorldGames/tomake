@@ -39,14 +39,14 @@ export class Task {
         return new Task(obj.title, obj.description, obj.taskId, obj.parentId, obj.childIdList, obj.listName, obj.createdDate, obj.updatedDate, obj.completedDate, obj.startDate, obj.dueDate, obj.reminder, obj.repeat, obj.priority, obj.status);
     }
 }
-var TaskPriority;
+export var TaskPriority;
 (function (TaskPriority) {
     TaskPriority[TaskPriority["Nope"] = 0] = "Nope";
     TaskPriority[TaskPriority["Low"] = 1] = "Low";
     TaskPriority[TaskPriority["Medium"] = 2] = "Medium";
     TaskPriority[TaskPriority["High"] = 3] = "High";
 })(TaskPriority || (TaskPriority = {}));
-var TaskStatus;
+export var TaskStatus;
 (function (TaskStatus) {
     TaskStatus[TaskStatus["Normal"] = 0] = "Normal";
     TaskStatus[TaskStatus["Completed"] = 1] = "Completed";

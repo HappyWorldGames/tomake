@@ -63,8 +63,26 @@ export class DatabaseManager {
         }
 
         const transaction = this.db.transaction(DatabaseManager.storeName);
-        const store = transaction.objectStore(DatabaseManager.storeName);
-        let request = store.getAll();
+        const tasksStore = transaction.objectStore(DatabaseManager.storeName);
+        let request = tasksStore.getAll();
+
+        request.onsuccess = (event) => { 
+            resolve(((event.target as IDBRequest).result as any[]).map(taskObj => Task.fromDB(taskObj)));
+        }
+        request.onerror = (e) => { reject((e.target as IDBTransaction).error); }
+    });}
+
+    async getTasksFromIndex(index: string, keyRange: IDBKeyRange): Promise<Array<Task>> { return new Promise((resolve, reject) => {
+        if (!this.db) {
+            reject(new Error("Database not initialized. Call initDB() first."));
+            return;
+        }
+
+        const transaction = this.db.transaction(DatabaseManager.storeName);
+        const tasksStore = transaction.objectStore(DatabaseManager.storeName);
+        const requestIndex = tasksStore.index(index);
+
+        const request = requestIndex.getAll(keyRange);
 
         request.onsuccess = (event) => { 
             resolve(((event.target as IDBRequest).result as any[]).map(taskObj => Task.fromDB(taskObj)));
@@ -79,7 +97,7 @@ export class DatabaseManager {
         }
 
         const transaction = this.db.transaction(DatabaseManager.storeName, 'readwrite');
-        const tasks = transaction.objectStore(DatabaseManager.storeName);
+        const tasksStore = transaction.objectStore(DatabaseManager.storeName);
 
         if (task.id == '') {
             if (typeof self.crypto.randomUUID !== 'function') {
@@ -89,9 +107,9 @@ export class DatabaseManager {
             task.id = self.crypto.randomUUID(); // Генерируем UUID с помощью встроенного API
         }
 
-        const request = tasks.put(task.toDB());
+        const request = tasksStore.put(task.toDB());
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
             const taskId = task.id;
             resolve(taskId);
         };
@@ -101,8 +119,8 @@ export class DatabaseManager {
         };
     });}
 
-    async addTask(updatedTaskData: Task) {
-        return this.updateTask(updatedTaskData);
+    async addTask(task: Task) {
+        return this.updateTask(task);
     }
 
     async removeTask(taskId: string): Promise<string> { return new Promise((resolve, reject) => {
@@ -112,11 +130,11 @@ export class DatabaseManager {
         }
 
         const transaction = this.db.transaction(DatabaseManager.storeName, 'readwrite');
-        const store = transaction.objectStore(DatabaseManager.storeName);
+        const tasksStore = transaction.objectStore(DatabaseManager.storeName);
 
-        const request = store.delete(taskId);
+        const request = tasksStore.delete(taskId);
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
             resolve(taskId);
         };
 
