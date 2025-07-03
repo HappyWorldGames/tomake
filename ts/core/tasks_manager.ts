@@ -77,6 +77,9 @@ export class TasksManager {
         // TODO check has parent after add child to parent
     }
 
+    // TODO If you delete, then during synchronization, the deleted ones will be restored, 
+    // the solution is to set the status of the deleted and fix the date of the change, 
+    // after 30 days after the change, delete. When displaying, check the status if deleted, then do not display.
     deleteTask(taskId: string): Promise<string> { return new Promise((resolve, reject) => {
         if (!this.db) {
             reject(new Error("Database not initialized. Call initDB() first."));
