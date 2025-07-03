@@ -3,7 +3,7 @@ export class Task {
         this.id = id;
         this.parentId = parentId;
         this.childIdList = childIdList;
-        this.listName = listName;
+        this.listNameId = listName;
         this.title = title;
         this.description = description;
         this.createdDate = createdDate;
@@ -21,7 +21,7 @@ export class Task {
             taskId: this.id,
             parentId: this.parentId,
             childIdList: this.childIdList,
-            listName: this.listName,
+            listNameId: this.listNameId,
             title: this.title,
             description: this.description,
             createdDate: this.createdDate,
@@ -36,7 +36,7 @@ export class Task {
         };
     }
     static fromDB(obj) {
-        return new Task(obj.title, obj.description, obj.taskId, obj.parentId, obj.childIdList, obj.listName, obj.createdDate, obj.updatedDate, obj.completedDate, obj.startDate, obj.dueDate, obj.reminder, obj.repeat, obj.priority, obj.status);
+        return new Task(obj.title, obj.description, obj.taskId, obj.parentId, obj.childIdList, obj.listNameId, obj.createdDate, obj.updatedDate, obj.completedDate, obj.startDate, obj.dueDate, obj.reminder, obj.repeat, obj.priority, obj.status);
     }
 }
 export var TaskPriority;
@@ -50,6 +50,6 @@ export var TaskStatus;
 (function (TaskStatus) {
     TaskStatus[TaskStatus["Normal"] = 0] = "Normal";
     TaskStatus[TaskStatus["Completed"] = 1] = "Completed";
-    TaskStatus[TaskStatus["Archived"] = 2] = "Archived";
-    TaskStatus[TaskStatus["Deleted"] = 3] = "Deleted";
+    TaskStatus[TaskStatus["NoCompleted"] = 2] = "NoCompleted";
+    TaskStatus[TaskStatus["Archived"] = 3] = "Archived";
 })(TaskStatus || (TaskStatus = {}));

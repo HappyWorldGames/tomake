@@ -1,82 +1,32 @@
-// app.js
-import { DatabaseManager } from './database_manager.js';
-import { TaskRenderer } from './task_renderer.js';
-import { GoogleSyncManager } from './google_sync_manager.js';
-import { ThemeManager } from './theme_manager.js';
-import { DataManager } from './data_manager.js';
-
-export class App {
-  constructor() {
-    this.GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
-    this.DB_NAME = 'TaskDB';
-    this.STORE_NAME = 'tasks';
-    
-    this.elements = {
-      taskForm: document.getElementById('task-form'),
-      taskInput: document.getElementById('task-input'),
-      taskList: document.getElementsByClassName('item-list')[1],
-      themeToggle: document.getElementById('themeToggle'),
-      syncButton: document.getElementById('syncButton')
-    };
-  }
-
-  async init() {
-    try {
-      // Инициализация основных компонентов
-      this.dbManager = new DatabaseManager(this.DB_NAME, this.STORE_NAME);
-      await this.dbManager.init();
-      
-      this.taskRenderer = new TaskRenderer(this.dbManager, this.elements);
-      this.googleSync = new GoogleSyncManager(this.GOOGLE_CLIENT_ID, this.dbManager);
-      this.themeManager = new ThemeManager(this.elements.themeToggle);
-      this.dataManager = new DataManager(this.dbManager, this.elements);
-
-      // Первоначальная загрузка данных
-      await this.taskRenderer.render();
-      this.googleSync.initAuth();
-      
-      // Настройка обработчиков
-      this._setupCoreHandlers();
-      this._registerServiceWorker();
-      
-    } catch (error) {
-      console.error('App init error:', error);
-    }
-  }
-
-  _setupCoreHandlers() {
-    // Добавление новой задачи
-    this.elements.taskForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const title = this.elements.taskInput.value.trim();
-      if (title) {
-        await this.dbManager.operation('readwrite', {
-          id: Date.now().toString(),
-          title,
-          completed: false,
-          deleted: false,
-          lastModified: Date.now()
-        });
-        this.elements.taskInput.value = '';
-        await this.taskRenderer.render();
-      }
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-
-    // Синхронизация с Google Drive
-    this.elements.syncButton.addEventListener('click', () => this.googleSync.sync());
-  }
-
-  _registerServiceWorker() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./js/sw.js')
-        .then(reg => console.log('Service Worker registered'))
-        .catch(err => console.error('SW error:', err));
+};
+import { SyncProjectListSideUI } from "./ui/sync-project-list-side.js";
+import { MainSideUI } from "./ui/main-side.js";
+import { DatabaseManager } from "./core/database_manager.js";
+export class App {
+    constructor() {
+        this.syncProjectListSideUI = new SyncProjectListSideUI();
+        this.mainSideUI = new MainSideUI();
+        this.dbManager = new DatabaseManager();
     }
-  }
+    init() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportData, this.dbManager.importData);
+            this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager);
+            this.mainSideUI.clearAll();
+            yield this.dbManager.initDB();
+            yield this.mainSideUI.addToDay(this.dbManager);
+        });
+    }
 }
-
-// Запуск приложения
 document.addEventListener('DOMContentLoaded', () => {
-  const app = new App();
-  app.init();
+    const app = new App();
+    app.init();
 });

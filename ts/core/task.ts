@@ -1,130 +1,132 @@
-export class Task {  
-  id: string;
-  parentId: number;
-  childIdList: string[];
-  listName: string;
+export class Task {
 
-  title: string;
-  description: string;
+    id: string;
+    parentId: number;
+    childIdList: string[];
+    listNameId: string;
 
-  createdDate: Date;
-  updatedDate: Date;
-  completedDate: Date | null;
+    title: string;
+    description: string;
 
-  startDate: Date | null;
-  dueDate: Date | null;
+    createdDate: Date;
+    updatedDate: Date;
+    completedDate: Date | null;
 
-  reminder: Date[];
-  repeat: Date[];
+    startDate: Date | null;
+    dueDate: Date | null;
 
-  priority: TaskPriority;
-  status: TaskStatus;
+    reminder: Date[];
+    repeat: Date[];
 
-  constructor(
-    title: string,
-    description: string = "",
+    priority: TaskPriority;
+    status: TaskStatus;
 
-    id: string = self.crypto.randomUUID(),
-    parentId: number = -1,
-    childIdList: string[] = [],
-    listName: string = "inbox",
+    constructor(
+        title: string,
+        description: string = "",
 
-    createdDate: Date = new Date(),
-    updatedDate: Date = new Date(),
-    completedDate: Date | null = null,
+        id: string = self.crypto.randomUUID(),
+        parentId: number = -1,
+        childIdList: string[] = [],
+        listName: string = "inbox",
 
-    startDate: Date | null = null,
-    dueDate: Date | null = null,
+        createdDate: Date = new Date(),
+        updatedDate: Date = new Date(),
+        completedDate: Date | null = null,
 
-    reminder: Date[] = [],
-    repeat: Date[] = [],
+        startDate: Date | null = null,
+        dueDate: Date | null = null,
 
-    priority: TaskPriority = TaskPriority.Nope,
-    status: TaskStatus = TaskStatus.Normal
-  ) {
-    this.id = id;
-    this.parentId = parentId;
-    this.childIdList = childIdList;
-    this.listName = listName;
+        reminder: Date[] = [],
+        repeat: Date[] = [],
 
-    this.title = title;
-    this.description = description;
+        priority: TaskPriority = TaskPriority.Nope,
+        status: TaskStatus = TaskStatus.Normal
+    ) {
+        this.id = id;
+        this.parentId = parentId;
+        this.childIdList = childIdList;
+        this.listNameId = listName;
 
-    this.createdDate = createdDate;
-    this.updatedDate = updatedDate;
-    this.completedDate = completedDate;
+        this.title = title;
+        this.description = description;
 
-    this.startDate = startDate;
-    this.dueDate = dueDate;
+        this.createdDate = createdDate;
+        this.updatedDate = updatedDate;
+        this.completedDate = completedDate;
 
-    this.reminder = reminder;
-    this.repeat = repeat;
+        this.startDate = startDate;
+        this.dueDate = dueDate;
 
-    this.priority = priority;
-    this.status = status;
-  }
+        this.reminder = reminder;
+        this.repeat = repeat;
 
-  toDB(): Object {
-    return {
-      taskId: this.id,
-      parentId: this.parentId,
-      childIdList: this.childIdList,
-      listName: this.listName,
-
-      title: this.title,
-      description: this.description,
-
-      createdDate: this.createdDate,
-      updatedDate: this.updatedDate,
-      completedDate: this.completedDate,
-
-      startDate: this.startDate,
-      dueDate: this.dueDate,
-
-      reminder: this.reminder,
-      repeat: this.repeat,
-
-      priority: this.priority,
-      status: this.status
+        this.priority = priority;
+        this.status = status;
     }
-  }
 
-  static fromDB(obj: any): Task {
-      return new Task(
-        obj.title,
-        obj.description,
+    toDB(): Object {
+        return {
+        taskId: this.id,
+        parentId: this.parentId,
+        childIdList: this.childIdList,
+        listNameId: this.listNameId,
 
-        obj.taskId,
-        obj.parentId,
-        obj.childIdList,
-        obj.listName,
+        title: this.title,
+        description: this.description,
 
-        obj.createdDate,
-        obj.updatedDate,
-        obj.completedDate,
+        createdDate: this.createdDate,
+        updatedDate: this.updatedDate,
+        completedDate: this.completedDate,
 
-        obj.startDate,
-        obj.dueDate,
+        startDate: this.startDate,
+        dueDate: this.dueDate,
 
-        obj.reminder,
-        obj.repeat,
+        reminder: this.reminder,
+        repeat: this.repeat,
 
-        obj.priority,
-        obj.status
-      )
-  }
+        priority: this.priority,
+        status: this.status
+        }
+    }
+
+    static fromDB(obj: any): Task {
+        return new Task(
+            obj.title,
+            obj.description,
+
+            obj.taskId,
+            obj.parentId,
+            obj.childIdList,
+            obj.listNameId,
+
+            obj.createdDate,
+            obj.updatedDate,
+            obj.completedDate,
+
+            obj.startDate,
+            obj.dueDate,
+
+            obj.reminder,
+            obj.repeat,
+
+            obj.priority,
+            obj.status
+        )
+    }
+
 }
 
 export enum TaskPriority {
-  Nope = 0,
-  Low = 1,
-  Medium = 2,
-  High = 3
+    Nope = 0,
+    Low = 1,
+    Medium = 2,
+    High = 3
 }
 
 export enum TaskStatus {
-  Normal = 0,
-  Completed = 1,
-  Archived = 2,
-  Deleted = 3
+    Normal = 0,
+    Completed = 1,
+    NoCompleted = 2,
+    Archived = 3
 }

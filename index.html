@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,23 +12,25 @@
     <link rel="stylesheet" href="./css/task-view-side.css">
     <!-- Google -->
     <script src="https://accounts.google.com/gsi/client?onload=initGoogleAuth"></script>
+    <!-- UI -->
+     <script type="module" src="js/ui/sync-project-list-side.js"></script>
     <!-- App -->
-    <script type="module" src="./js/database_manager.js"></script>
-    <script type="module" src="./js/task_renderer.js"></script>
-    <script type="module" src="./js/google_sync_manager.js"></script>
-    <script type="module" src="./js/theme_manager.js"></script>
-    <script type="module" src="./js/data_manager.js"></script>
+    <script type="module" src="./js/core/database_manager.js"></script>
+    <!-- <script type="module" src="./js/task_renderer.js"></script>
+    <script type="module" src="./js/google_sync_manager.js"></script> -->
+    <!-- <script type="module" src="./js/ui/theme_manager.js"></script> -->
+    <!-- <script type="module" src="./js/data_manager.js"></script> -->
     <script type="module" src="./js/app.js"></script>
 </head>
 <body>
     <div class="sync-project-list-side">
         <div class="sync-side">
-            <button title="Войти">👤</button>
-            <button id="themeToggle">🌓</button>
+            <button id="authButton" title="Login">👤</button>
+            <button id="themeToggleButton">🌓</button>
             
-            <button id="syncButton" title="Синхронизировать">🔄</button>
-            <button id="exportBtn" title="Экспорт данных">📥</button>
-            <button id="importBtn" title="Импорт данных">📤</button>
+            <button id="syncButton" title="Synchronize">🔄</button>
+            <button id="exportButton" title="Export data">📤</button>
+            <button id="importButton" title="Import data">📥</button>
         </div>
 
         <div class="project-list-side">
@@ -41,32 +43,28 @@
             <div class="project-list">Projects...</div>
         </div>
     </div>
-    
+
     <div class="main-side">
         <header>
             <button class="menu-btn">☰</button>
             <h2 class="top-text">Today</h2>
         </header>
-        <form id="task-form">
-            <input type="text" id="task-input" placeholder="Добавить задачу..." required>
-            <button type="submit" id="add-task-btn">Add</button>
-        </form>
-        <div class="task-array-list">
-            <div class="task-list">
-                <h6 class="task-list-name">Name</h6>
-                <ul class="item-list">
-                    <li class="item selected"><input type="text" class="task-name" value="Test 1"></li>
-                    <li class="item"><input type="text" class="task-name" value="Test 2"></li>
-                </ul>
-            </div>
-            <div class="task-list">
-                <h6 class="task-list-name">Name</h6>
-                <ul class="item-list">
-                    <li class="item selected"><input type="text" class="task-name" value="Test 1"></li>
-                    <li class="item"><input type="text" class="task-name" value="Test 2"></li>
-                </ul>
-            </div>
+        <div id="task-form">
+            <input type="text" id="task-add-input" placeholder="Добавить задачу..." required>
+            <button type="button" id="add-task-btn">Add</button>
         </div>
+        <ul id="task-array-list">
+            <div class="task-list-name">Name</div>
+            <li class="item selected"><input type="text" class="task-name" value="Test 1"></li>
+            <li class="item"><input type="text" class="task-name" value="Test 2"></li>
+            <div class="task-list">
+                <h6 class="task-list-name">Name</h6>
+                <ul class="item-list">
+                    <li class="item selected"><input type="text" class="task-name" value="Test 1"></li>
+                    <li class="item"><input type="text" class="task-name" value="Test 2"></li>
+                </ul>
+            </div>
+        </ul>
     </div>
 
     <div class="task-view-side">
