@@ -1,5 +1,14 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { DatabaseManager } from "./database_manager.js";
-import { Project } from "./project.js";
+import { Project, ProjectStatus } from "./project.js";
 export class ProjectsManager {
     constructor() {
         this.db = null;
@@ -35,7 +44,7 @@ export class ProjectsManager {
             request.onerror = (e) => { reject(e.target.error); };
         });
     }
-    updateProject(project) {
+    updateProject(project, isImportData = false) {
         return new Promise((resolve, reject) => {
             if (!this.db) {
                 reject(new Error("Database not initialized. Call initDB() first."));
@@ -49,6 +58,8 @@ export class ProjectsManager {
                 }
                 project.id = self.crypto.randomUUID();
             }
+            if (!isImportData)
+                project.updatedDate = new Date();
             const request = projectsStore.put(project.toDB());
             request.onsuccess = () => {
                 resolve(project.id);
@@ -58,25 +69,42 @@ export class ProjectsManager {
             };
         });
     }
-    addProject(project) {
-        return this.updateProject(project);
+    addProject(project, isImportData = false) {
+        if (!isImportData)
+            project.createdDate = new Date();
+        return this.updateProject(project, isImportData);
     }
-    deleteProject(projectId) {
-        return new Promise((resolve, reject) => {
-            if (!this.db) {
-                reject(new Error("Database not initialized. Call initDB() first."));
-                return;
-            }
-            const transaction = this.db.transaction(DatabaseManager.storeProjectsName, 'readwrite');
-            const tasksStore = transaction.objectStore(DatabaseManager.storeProjectsName);
-            const taskChildRequest = tasksStore.get(projectId);
-            const request = tasksStore.delete(projectId);
-            request.onsuccess = () => {
-                resolve(projectId);
-            };
-            request.onerror = (e) => {
-                reject(e.target.error);
-            };
+    deleteProject(projectId, dbManager) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                if (!this.db) {
+                    reject(new Error("Database not initialized. Call initDB() first."));
+                    return;
+                }
+                const transaction = this.db.transaction(DatabaseManager.storeProjectsName, 'readwrite');
+                const projectStore = transaction.objectStore(DatabaseManager.storeProjectsName);
+                const projectRequest = projectStore.get(projectId);
+                projectRequest.onsuccess = () => {
+                    if (projectRequest.result === undefined)
+                        return;
+                    const project = projectRequest.result;
+                    if (project instanceof Project) {
+                        project.status = ProjectStatus.Deleted;
+                        dbManager.tasksManager.getTasksFromIndex('listNameId', IDBKeyRange.only(projectId)).then(projectTasks => {
+                            for (const task of projectTasks) {
+                                dbManager.tasksManager.deleteTask(task.id);
+                            }
+                        });
+                        this.updateProject(project);
+                        resolve(projectId);
+                    }
+                    else
+                        resolve('');
+                };
+                projectRequest.onerror = (e) => {
+                    reject(e.target.error);
+                };
+            });
         });
     }
     clear() {

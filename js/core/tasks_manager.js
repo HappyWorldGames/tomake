@@ -1,5 +1,5 @@
 import { DatabaseManager } from "./database_manager.js";
-import { Task } from "./task.js";
+import { Task, TaskStatus } from "./task.js";
 export class TasksManager {
     constructor() {
         this.db = null;
@@ -35,7 +35,7 @@ export class TasksManager {
             request.onerror = (e) => { reject(e.target.error); };
         });
     }
-    updateTask(task) {
+    updateTask(task, isImportData = false) {
         return new Promise((resolve, reject) => {
             if (!this.db) {
                 reject(new Error("Database not initialized. Call initDB() first."));
@@ -49,6 +49,8 @@ export class TasksManager {
                 }
                 task.id = self.crypto.randomUUID();
             }
+            if (!isImportData)
+                task.updatedDate = new Date();
             const request = tasksStore.put(task.toDB());
             request.onsuccess = () => {
                 resolve(task.id);
@@ -58,8 +60,10 @@ export class TasksManager {
             };
         });
     }
-    addTask(task) {
-        return this.updateTask(task);
+    addTask(task, isImportData = false) {
+        if (!isImportData)
+            task.createdDate = new Date();
+        return this.updateTask(task, isImportData);
     }
     addSubTask(task, parentId) {
     }
@@ -71,12 +75,30 @@ export class TasksManager {
             }
             const transaction = this.db.transaction(DatabaseManager.storeTasksName, 'readwrite');
             const tasksStore = transaction.objectStore(DatabaseManager.storeTasksName);
-            const taskChildRequest = tasksStore.get(taskId);
-            const request = tasksStore.delete(taskId);
-            request.onsuccess = () => {
+            const taskRequest = tasksStore.get(taskId);
+            taskRequest.onsuccess = () => {
+                if (taskRequest.result === undefined)
+                    return;
+                const task = taskRequest.result;
+                if (task instanceof Task) {
+                    task.status = TaskStatus.Deleted;
+                    if (task.parentId !== -1) {
+                        this.getTasksFromIndex('taskId', IDBKeyRange.only(task.parentId)).then(tasks => {
+                            this.deleteTask(tasks[0].id);
+                        });
+                    }
+                    if (task.childIdList.length > 0) {
+                        for (const taskId of task.childIdList) {
+                            this.getTasksFromIndex('taskId', IDBKeyRange.only(taskId)).then(tasks => {
+                                this.deleteTask(tasks[0].id);
+                            });
+                        }
+                    }
+                }
+                this.updateTask(task);
                 resolve(taskId);
             };
-            request.onerror = (e) => {
+            taskRequest.onerror = (e) => {
                 reject(e.target.error);
             };
         });

@@ -128,5 +128,6 @@ export enum TaskStatus {
     Normal = 0,
     Completed = 1,
     NoCompleted = 2,
-    Archived = 3
+    Archived = 11,
+    Deleted = 13
 }

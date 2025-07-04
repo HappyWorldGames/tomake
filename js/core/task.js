@@ -51,5 +51,6 @@ export var TaskStatus;
     TaskStatus[TaskStatus["Normal"] = 0] = "Normal";
     TaskStatus[TaskStatus["Completed"] = 1] = "Completed";
     TaskStatus[TaskStatus["NoCompleted"] = 2] = "NoCompleted";
-    TaskStatus[TaskStatus["Archived"] = 3] = "Archived";
+    TaskStatus[TaskStatus["Archived"] = 11] = "Archived";
+    TaskStatus[TaskStatus["Deleted"] = 13] = "Deleted";
 })(TaskStatus || (TaskStatus = {}));

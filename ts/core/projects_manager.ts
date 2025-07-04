@@ -1,5 +1,5 @@
 import { DatabaseManager } from "./database_manager.js";
-import { Project } from "./project.js";
+import { Project, ProjectStatus } from "./project.js";
 
 export class ProjectsManager {
 
@@ -17,7 +17,7 @@ export class ProjectsManager {
         const tasksStore = transaction.objectStore(DatabaseManager.storeProjectsName);
         let request = tasksStore.getAll();
 
-        request.onsuccess = (event) => { 
+        request.onsuccess = (event) => {
             resolve(((event.target as IDBRequest).result as any[]).map(projectObj => Project.fromDB(projectObj)));
         }
         request.onerror = (e) => { reject((e.target as IDBTransaction).error); }
@@ -35,13 +35,13 @@ export class ProjectsManager {
 
         const request = requestIndex.getAll(keyRange);
 
-        request.onsuccess = (event) => { 
+        request.onsuccess = (event) => {
             resolve(((event.target as IDBRequest).result as any[]).map(projectObj => Project.fromDB(projectObj)));
         }
         request.onerror = (e) => { reject((e.target as IDBTransaction).error); }
     });}
 
-    updateProject(project: Project) { return new Promise((resolve, reject) => {
+    updateProject(project: Project, isImportData = false) { return new Promise((resolve, reject) => {
         if (!this.db) {
             reject(new Error("Database not initialized. Call initDB() first."));
             return;
@@ -58,6 +58,7 @@ export class ProjectsManager {
             project.id = self.crypto.randomUUID();
         }
 
+        if (!isImportData) project.updatedDate = new Date();
         const request = projectsStore.put(project.toDB());
 
         request.onsuccess = () => {
@@ -69,28 +70,42 @@ export class ProjectsManager {
         };
     });}
 
-    addProject(project: Project) {
-        return this.updateProject(project);
+    addProject(project: Project, isImportData = false) {
+        if (!isImportData) project.createdDate = new Date();
+        return this.updateProject(project, isImportData);
     }
 
-    deleteProject(projectId: string): Promise<string> { return new Promise((resolve, reject) => {
+    async deleteProject(projectId: string, dbManager: DatabaseManager): Promise<string> { return new Promise((resolve, reject) => {
         if (!this.db) {
             reject(new Error("Database not initialized. Call initDB() first."));
             return;
         }
 
         const transaction = this.db.transaction(DatabaseManager.storeProjectsName, 'readwrite');
-        const tasksStore = transaction.objectStore(DatabaseManager.storeProjectsName);
+        const projectStore = transaction.objectStore(DatabaseManager.storeProjectsName);
 
-        const taskChildRequest = tasksStore.get(projectId);
-        const request = tasksStore.delete(projectId);
+        const projectRequest = projectStore.get(projectId);
 
-        request.onsuccess = () => {
-            // TODO check and delete tasks and update database
-            resolve(projectId);
+        projectRequest.onsuccess = () => {
+            if (projectRequest.result === undefined) return;
+            const project = projectRequest.result;
+
+            if (project instanceof Project) {
+                project.status = ProjectStatus.Deleted;
+
+                dbManager.tasksManager.getTasksFromIndex('listNameId', IDBKeyRange.only(projectId)).then( projectTasks => {
+                    for (const task of projectTasks) {
+                        dbManager.tasksManager.deleteTask(task.id);
+                    }
+                });
+
+                this.updateProject(project);
+
+                resolve(projectId);
+            } else resolve('')
         };
 
-        request.onerror = (e) => {
+        projectRequest.onerror = (e) => {
             reject((e.target as IDBTransaction).error);
         };
     });}

@@ -26,12 +26,12 @@ export class DatabaseManager {
         request.onblocked = (event) => {
             this.showError('Upgrade blocked - Please close other tabs displaying this site.');
         }
-        
+
         request.onupgradeneeded = (event) => {
             const db = (event.target as IDBOpenDBRequest).result;
 
             db.onerror = reject;
-            
+
             this.#initTasksStore(db);
             this.#initProjectsStore(db);
         }
@@ -80,7 +80,11 @@ export class DatabaseManager {
             tasksStore.createIndex('name', 'name', { unique: true });
             tasksStore.createIndex('order', 'order', { unique: true });
             tasksStore.createIndex('color', 'color', { unique: false });
+
             tasksStore.createIndex('createdDate', 'createdDate', { unique: false });
+            tasksStore.createIndex('updatedDate', 'updatedDate', { unique: false });
+
+            tasksStore.createIndex('status', 'status', { unique: false });
         }
     }
 
@@ -115,15 +119,15 @@ export class DatabaseManager {
 
         try {
             const readed = await this.#readFile(file);
-            
+
             const tasks = readed[0].map(task => Task.fromDB(task));
             const projects = readed[1].map(project => Project.fromDB(project));
 
             await this.tasksManager.clear();
             await this.projectsManager.clear();
 
-            await Promise.all(tasks.map(task => this.tasksManager.addTask(task)));
-            await Promise.all(projects.map(project => this.projectsManager.addProject(project)));
+            await Promise.all(tasks.map(task => this.tasksManager.addTask(task, true)));
+            await Promise.all(projects.map(project => this.projectsManager.addProject(project, true)));
 
             alert('Data imported successfully!');
             return true; // For potential chaining
@@ -151,7 +155,7 @@ export class DatabaseManager {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = accept;
-            
+
             input.onchange = (e) => {
                 if (e.target instanceof HTMLInputElement) {
                     resolve(e.target.files?.[0] || null);
@@ -159,7 +163,7 @@ export class DatabaseManager {
                     resolve(null);
                 }
             };
-            
+
             input.click();
         });
     }
@@ -171,7 +175,7 @@ export class DatabaseManager {
                 reject(new Error("Empty file content"));
                 return;
             }
-            
+
             if (typeof e.target.result !== "string") {
                 reject(new Error("Unexpected file content type"));
                 return;

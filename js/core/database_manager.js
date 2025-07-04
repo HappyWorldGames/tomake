@@ -52,8 +52,8 @@ export class DatabaseManager {
                 const projects = readed[1].map(project => Project.fromDB(project));
                 yield this.tasksManager.clear();
                 yield this.projectsManager.clear();
-                yield Promise.all(tasks.map(task => this.tasksManager.addTask(task)));
-                yield Promise.all(projects.map(project => this.projectsManager.addProject(project)));
+                yield Promise.all(tasks.map(task => this.tasksManager.addTask(task, true)));
+                yield Promise.all(projects.map(project => this.projectsManager.addProject(project, true)));
                 alert('Data imported successfully!');
                 return true;
             }
@@ -114,6 +114,8 @@ _a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManag
         tasksStore.createIndex('order', 'order', { unique: true });
         tasksStore.createIndex('color', 'color', { unique: false });
         tasksStore.createIndex('createdDate', 'createdDate', { unique: false });
+        tasksStore.createIndex('updatedDate', 'updatedDate', { unique: false });
+        tasksStore.createIndex('status', 'status', { unique: false });
     }
 }, _DatabaseManager_downloadFile = function _DatabaseManager_downloadFile(content, filename, mimeType) {
     const blob = new Blob([content], { type: mimeType });
