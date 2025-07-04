@@ -75,9 +75,41 @@ export class TasksManager {
         return this.updateTask(task, isImportData);
     }
 
-    addSubTask(task: Task, parentId: string) {
-        // TODO check has parent after add child to parent
-    }
+    addSubTask(parentId: string, task: Task) { return new Promise((resolve, reject) => {
+        if (!this.db) {
+            reject(new Error("Database not initialized. Call initDB() first."));
+            return;
+        }
+
+        this.getTasksFromIndex('taskId', IDBKeyRange.only(parentId)).then( tasks => {
+            if (tasks.length === 0) reject(new Error(`No parent with parentId: ${parentId}.`));
+            const parentTask = tasks[0];
+
+            // Remove childIdList from previous parentId
+            if (task.parentId !== '') {
+                this.getTasksFromIndex('taskId', IDBKeyRange.only(task.parentId)).then(tasks => {
+                    if (tasks.length === 0) return;
+                    const oldParentTask = tasks[0];
+                    const index = oldParentTask.childIdList.indexOf(task.id);
+                    if (index > -1) {
+                        oldParentTask.childIdList = oldParentTask.childIdList.slice(index, 1);
+                        this.updateTask(oldParentTask);
+                    }
+                })
+            }
+
+            // Set new parentId and update parentTask
+            task.parentId = parentId;
+            parentTask.childIdList.push(task.id);
+            this.updateTask(parentTask);
+
+            // Check if a task exists in the database
+            this.getTasksFromIndex('taskId', IDBKeyRange.only(task.id)).then( tasks => {
+                if (tasks.length === 0) this.addTask(task);
+                resolve(task.id);
+            });
+        });
+    });}
 
     // TODO If you delete, then during synchronization, the deleted ones will be restored,
     // + the solution is to set the status of the deleted and fix the date of the change, +
@@ -102,7 +134,7 @@ export class TasksManager {
             if (task instanceof Task) {
                 task.status = TaskStatus.Deleted;
 
-                if (task.parentId !== -1) {
+                if (task.parentId !== '') {
                     this.getTasksFromIndex('taskId', IDBKeyRange.only(task.parentId)).then( tasks => {
                         this.deleteTask(tasks[0].id);
                     });

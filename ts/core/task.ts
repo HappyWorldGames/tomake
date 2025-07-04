@@ -1,7 +1,7 @@
 export class Task {
 
     id: string;
-    parentId: number;
+    parentId: string;
     childIdList: string[];
     listNameId: string;
 
@@ -26,7 +26,7 @@ export class Task {
         description: string = "",
 
         id: string = self.crypto.randomUUID(),
-        parentId: number = -1,
+        parentId: string = '',
         childIdList: string[] = [],
         listName: string = "inbox",
 
