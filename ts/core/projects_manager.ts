@@ -1,5 +1,6 @@
 import { DatabaseManager } from "./database_manager.js";
 import { Project, ProjectStatus } from "./project.js";
+import { TasksManager } from "./tasks_manager.js";
 
 export class ProjectsManager {
 
@@ -75,7 +76,12 @@ export class ProjectsManager {
         return this.updateProject(project, isImportData);
     }
 
-    async deleteProject(projectId: string, dbManager: DatabaseManager): Promise<string> { return new Promise((resolve, reject) => {
+    // TODO If you delete, then during synchronization, the deleted ones will be restored,
+    // + the solution is to set the status of the deleted and fix the date of the change, +
+    // after 30 days after the change, delete. When displaying, check the status if deleted, then do not display.
+    // Also add a check during synchronization, if more than 30 days have passed, do not download the deleted object.
+    // + Add a cleaner, from time to time the cleaner will run and check deleted objects and if more than 30 days have passed, delete them from the database. +
+    async deleteProject(projectId: string, tasksManager: TasksManager, permanently = false): Promise<string> { return new Promise((resolve, reject) => {
         if (!this.db) {
             reject(new Error("Database not initialized. Call initDB() first."));
             return;
@@ -93,13 +99,14 @@ export class ProjectsManager {
             if (project instanceof Project) {
                 project.status = ProjectStatus.Deleted;
 
-                dbManager.tasksManager.getTasksFromIndex('listNameId', IDBKeyRange.only(projectId)).then( projectTasks => {
+                tasksManager.getTasksFromIndex('listNameId', IDBKeyRange.only(projectId)).then( projectTasks => {
                     for (const task of projectTasks) {
-                        dbManager.tasksManager.deleteTask(task.id);
+                        tasksManager.deleteTask(task.id, permanently);
                     }
                 });
 
-                this.updateProject(project);
+                if (permanently) projectStore.delete(projectId);
+                else this.updateProject(project);
 
                 resolve(projectId);
             } else resolve('')
@@ -109,6 +116,20 @@ export class ProjectsManager {
             reject((e.target as IDBTransaction).error);
         };
     });}
+
+    garbageCleaner(tasksManager: TasksManager) {
+        this.getProjectsFromIndex('status', IDBKeyRange.only(ProjectStatus.Deleted)).then( projects => {
+            if (projects.length === 0) return;
+
+            for (const project of projects) {
+                const diffDays = (Date.now() - project.updatedDate.getTime()) / (1000 * 60 * 60 * 24);
+
+                if (diffDays > 30) {
+                    this.deleteProject(project.id, tasksManager, true);
+                }
+            }
+        });
+    }
 
     clear() { return new Promise((resolve, reject) => {
         if (!this.db) {

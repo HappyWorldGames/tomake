@@ -88,10 +88,17 @@ export class DatabaseManager {
         }
     }
 
+    garbageCleaner() {
+        this.projectsManager.garbageCleaner(this.tasksManager);
+        this.tasksManager.garbageCleaner();
+    }
+
     exportData = async () => {
         if (!confirm('Export all tasks to file?')) return;
 
         try {
+            this.garbageCleaner();
+
             const tasks = await this.tasksManager.getAllTasks();
             const projects = await this.projectsManager.getAllProjects();
 
@@ -128,6 +135,8 @@ export class DatabaseManager {
 
             await Promise.all(tasks.map(task => this.tasksManager.addTask(task, true)));
             await Promise.all(projects.map(project => this.projectsManager.addProject(project, true)));
+
+            this.garbageCleaner();
 
             alert('Data imported successfully!');
             return true; // For potential chaining

@@ -115,8 +115,8 @@ export class TasksManager {
     // + the solution is to set the status of the deleted and fix the date of the change, +
     // after 30 days after the change, delete. When displaying, check the status if deleted, then do not display.
     // Also add a check during synchronization, if more than 30 days have passed, do not download the deleted object.
-    // Add a cleaner, from time to time the cleaner will run and check deleted objects and if more than 30 days have passed, delete them from the database.
-    deleteTask(taskId: string): Promise<string> { return new Promise((resolve, reject) => {
+    // + Add a cleaner, from time to time the cleaner will run and check deleted objects and if more than 30 days have passed, delete them from the database. +
+    deleteTask(taskId: string, permanently = false): Promise<string> { return new Promise((resolve, reject) => {
         if (!this.db) {
             reject(new Error("Database not initialized. Call initDB() first."));
             return;
@@ -136,19 +136,20 @@ export class TasksManager {
 
                 if (task.parentId !== '') {
                     this.getTasksFromIndex('taskId', IDBKeyRange.only(task.parentId)).then( tasks => {
-                        this.deleteTask(tasks[0].id);
+                        this.deleteTask(tasks[0].id, permanently);
                     });
                 }
                 if (task.childIdList.length > 0) {
                     for (const taskId of task.childIdList) {
                         this.getTasksFromIndex('taskId', IDBKeyRange.only(taskId)).then( tasks => {
-                            this.deleteTask(tasks[0].id);
+                            this.deleteTask(tasks[0].id, permanently);
                         })
                     }
                 }
             }
 
-            this.updateTask(task);
+            if (permanently) tasksStore.delete(taskId);
+            else this.updateTask(task);
 
             resolve(taskId);
         };
@@ -157,6 +158,20 @@ export class TasksManager {
             reject((e.target as IDBTransaction).error);
         };
     });}
+
+    garbageCleaner() {
+        this.getTasksFromIndex('status', IDBKeyRange.only(TaskStatus.Deleted)).then( tasks => {
+            if (tasks.length === 0) return;
+
+            for (const task of tasks) {
+                const diffDays = (Date.now() - task.updatedDate.getTime()) / (1000 * 60 * 60 * 24);
+
+                if (diffDays > 30) {
+                    this.deleteTask(task.id, true);
+                }
+            }
+        });
+    }
 
     clear() { return new Promise((resolve, reject) => {
         if (!this.db) {
