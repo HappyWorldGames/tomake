@@ -74,8 +74,8 @@ export class ProjectsManager {
             project.createdDate = new Date();
         return this.updateProject(project, isImportData);
     }
-    deleteProject(projectId, dbManager) {
-        return __awaiter(this, void 0, void 0, function* () {
+    deleteProject(projectId_1, tasksManager_1) {
+        return __awaiter(this, arguments, void 0, function* (projectId, tasksManager, permanently = false) {
             return new Promise((resolve, reject) => {
                 if (!this.db) {
                     reject(new Error("Database not initialized. Call initDB() first."));
@@ -90,12 +90,15 @@ export class ProjectsManager {
                     const project = projectRequest.result;
                     if (project instanceof Project) {
                         project.status = ProjectStatus.Deleted;
-                        dbManager.tasksManager.getTasksFromIndex('listNameId', IDBKeyRange.only(projectId)).then(projectTasks => {
+                        tasksManager.getTasksFromIndex('listNameId', IDBKeyRange.only(projectId)).then(projectTasks => {
                             for (const task of projectTasks) {
-                                dbManager.tasksManager.deleteTask(task.id);
+                                tasksManager.deleteTask(task.id, permanently);
                             }
                         });
-                        this.updateProject(project);
+                        if (permanently)
+                            projectStore.delete(projectId);
+                        else
+                            this.updateProject(project);
                         resolve(projectId);
                     }
                     else
@@ -105,6 +108,18 @@ export class ProjectsManager {
                     reject(e.target.error);
                 };
             });
+        });
+    }
+    garbageCleaner(tasksManager) {
+        this.getProjectsFromIndex('status', IDBKeyRange.only(ProjectStatus.Deleted)).then(projects => {
+            if (projects.length === 0)
+                return;
+            for (const project of projects) {
+                const diffDays = (Date.now() - project.updatedDate.getTime()) / (1000 * 60 * 60 * 24);
+                if (diffDays > 30) {
+                    this.deleteProject(project.id, tasksManager, true);
+                }
+            }
         });
     }
     clear() {

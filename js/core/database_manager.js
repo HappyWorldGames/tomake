@@ -27,6 +27,7 @@ export class DatabaseManager {
             if (!confirm('Export all tasks to file?'))
                 return;
             try {
+                this.garbageCleaner();
                 const tasks = yield this.tasksManager.getAllTasks();
                 const projects = yield this.projectsManager.getAllProjects();
                 if (tasks.length === 0 && projects.length === 0) {
@@ -54,6 +55,7 @@ export class DatabaseManager {
                 yield this.projectsManager.clear();
                 yield Promise.all(tasks.map(task => this.tasksManager.addTask(task, true)));
                 yield Promise.all(projects.map(project => this.projectsManager.addProject(project, true)));
+                this.garbageCleaner();
                 alert('Data imported successfully!');
                 return true;
             }
@@ -87,6 +89,10 @@ export class DatabaseManager {
                 request.onerror = reject;
             });
         });
+    }
+    garbageCleaner() {
+        this.projectsManager.garbageCleaner(this.tasksManager);
+        this.tasksManager.garbageCleaner();
     }
 }
 _a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManager_initTasksStore = function _DatabaseManager_initTasksStore(db) {

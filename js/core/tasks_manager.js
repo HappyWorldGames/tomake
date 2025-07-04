@@ -65,9 +65,40 @@ export class TasksManager {
             task.createdDate = new Date();
         return this.updateTask(task, isImportData);
     }
-    addSubTask(task, parentId) {
+    addSubTask(parentId, task) {
+        return new Promise((resolve, reject) => {
+            if (!this.db) {
+                reject(new Error("Database not initialized. Call initDB() first."));
+                return;
+            }
+            this.getTasksFromIndex('taskId', IDBKeyRange.only(parentId)).then(tasks => {
+                if (tasks.length === 0)
+                    reject(new Error(`No parent with parentId: ${parentId}.`));
+                const parentTask = tasks[0];
+                if (task.parentId !== '') {
+                    this.getTasksFromIndex('taskId', IDBKeyRange.only(task.parentId)).then(tasks => {
+                        if (tasks.length === 0)
+                            return;
+                        const oldParentTask = tasks[0];
+                        const index = oldParentTask.childIdList.indexOf(task.id);
+                        if (index > -1) {
+                            oldParentTask.childIdList = oldParentTask.childIdList.slice(index, 1);
+                            this.updateTask(oldParentTask);
+                        }
+                    });
+                }
+                task.parentId = parentId;
+                parentTask.childIdList.push(task.id);
+                this.updateTask(parentTask);
+                this.getTasksFromIndex('taskId', IDBKeyRange.only(task.id)).then(tasks => {
+                    if (tasks.length === 0)
+                        this.addTask(task);
+                    resolve(task.id);
+                });
+            });
+        });
     }
-    deleteTask(taskId) {
+    deleteTask(taskId, permanently = false) {
         return new Promise((resolve, reject) => {
             if (!this.db) {
                 reject(new Error("Database not initialized. Call initDB() first."));
@@ -82,25 +113,40 @@ export class TasksManager {
                 const task = taskRequest.result;
                 if (task instanceof Task) {
                     task.status = TaskStatus.Deleted;
-                    if (task.parentId !== -1) {
+                    if (task.parentId !== '') {
                         this.getTasksFromIndex('taskId', IDBKeyRange.only(task.parentId)).then(tasks => {
-                            this.deleteTask(tasks[0].id);
+                            this.deleteTask(tasks[0].id, permanently);
                         });
                     }
                     if (task.childIdList.length > 0) {
                         for (const taskId of task.childIdList) {
                             this.getTasksFromIndex('taskId', IDBKeyRange.only(taskId)).then(tasks => {
-                                this.deleteTask(tasks[0].id);
+                                this.deleteTask(tasks[0].id, permanently);
                             });
                         }
                     }
                 }
-                this.updateTask(task);
+                if (permanently)
+                    tasksStore.delete(taskId);
+                else
+                    this.updateTask(task);
                 resolve(taskId);
             };
             taskRequest.onerror = (e) => {
                 reject(e.target.error);
             };
+        });
+    }
+    garbageCleaner() {
+        this.getTasksFromIndex('status', IDBKeyRange.only(TaskStatus.Deleted)).then(tasks => {
+            if (tasks.length === 0)
+                return;
+            for (const task of tasks) {
+                const diffDays = (Date.now() - task.updatedDate.getTime()) / (1000 * 60 * 60 * 24);
+                if (diffDays > 30) {
+                    this.deleteTask(task.id, true);
+                }
+            }
         });
     }
     clear() {

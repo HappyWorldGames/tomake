@@ -1,5 +1,5 @@
 export class Task {
-    constructor(title, description = "", id = self.crypto.randomUUID(), parentId = -1, childIdList = [], listName = "inbox", createdDate = new Date(), updatedDate = new Date(), completedDate = null, startDate = null, dueDate = null, reminder = [], repeat = [], priority = TaskPriority.Nope, status = TaskStatus.Normal) {
+    constructor(title, description = "", id = self.crypto.randomUUID(), parentId = '', childIdList = [], listName = "inbox", createdDate = new Date(), updatedDate = new Date(), completedDate = null, startDate = null, dueDate = null, reminder = [], repeat = [], priority = TaskPriority.Nope, status = TaskStatus.Normal) {
         this.id = id;
         this.parentId = parentId;
         this.childIdList = childIdList;
