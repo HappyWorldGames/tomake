@@ -20,11 +20,11 @@ export class App {
     async init() {
         this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportData, this.dbManager.importData);
 
-        this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager);
+        this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager);
         this.mainSideUI.clearAll();
         await this.dbManager.initDB();
 
-        await this.mainSideUI.addToDay(this.dbManager);
+        await this.mainSideUI.addToDay(this.dbManager.tasksManager);
 
         /*this.mainSideUI.addTaskListName('test');
         this.dbManager.getAllTasks().then( tasks => {

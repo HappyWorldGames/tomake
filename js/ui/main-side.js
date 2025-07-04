@@ -28,7 +28,7 @@ export class MainSideUI {
         if (!this.taskArrayList)
             alert('error init taskArrayList');
     }
-    setOnTaskAddButtonClickListener(dbManager) {
+    setOnTaskAddButtonClickListener(tasksManager) {
         var _a;
         (_a = this.taskAddButton) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
             if (this.taskAddInput == null)
@@ -36,16 +36,16 @@ export class MainSideUI {
             const titleTask = this.taskAddInput.value;
             const task = new Task(titleTask);
             task.startDate = new Date();
-            dbManager.tasksManager.addTask(task);
+            tasksManager.addTask(task);
             this.taskAddInput.value = '';
-            this.renderMainSide(dbManager);
+            this.renderMainSide(tasksManager);
         });
     }
-    renderMainSide(dbManager, listName = '') {
+    renderMainSide(tasksManager, listName = '') {
         if (listName != '')
             __classPrivateFieldSet(this, _MainSideUI_listName, listName, "f");
         this.clearAll();
-        this.addToDay(dbManager);
+        this.addToDay(tasksManager);
     }
     clearAll() {
         if (this.taskArrayList == null)
@@ -61,32 +61,40 @@ export class MainSideUI {
         taskListName.textContent = text;
         this.taskArrayList.appendChild(taskListName);
     }
-    addItem(task) {
+    addItem(task, tasksManager) {
         var _a;
         if (this.taskArrayList == null)
             return;
         const taskItem = document.createElement('li');
         taskItem.id = task.id;
         taskItem.classList.add('item');
+        (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
         const taskInput = document.createElement('input');
         taskInput.type = 'text';
         taskInput.classList.add('task-name');
         taskInput.value = task.title;
         taskItem.appendChild(taskInput);
-        (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
+        const taskDelete = document.createElement('button');
+        taskDelete.type = 'button';
+        taskDelete.classList.add('task-delete');
+        taskDelete.textContent = "🗑️";
+        taskDelete.addEventListener('click', () => {
+            tasksManager.deleteTask(task.id);
+        });
+        taskItem.appendChild(taskDelete);
     }
-    addToDay(dbManager) {
+    addToDay(tasksManager) {
         return __awaiter(this, void 0, void 0, function* () {
             const startDate = new Date();
             startDate.setHours(0, 0, 0, 0);
             const endDate = new Date();
             endDate.setHours(23, 59, 59, 999);
-            const tasks = yield dbManager.tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
+            const tasks = yield tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
             if (tasks.length == 0)
                 return;
             this.addTaskListName('ToDay');
             for (const task of tasks) {
-                this.addItem(task);
+                this.addItem(task, tasksManager);
             }
         });
     }

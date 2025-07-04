@@ -126,3 +126,13 @@
     color: var(--text-color);
     background-color: #fff0;
 }
+
+.main-side .item .task-delete {
+    margin: 2px;
+    padding: 2px;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    cursor: pointer;
+}

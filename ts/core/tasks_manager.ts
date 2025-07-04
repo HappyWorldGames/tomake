@@ -129,7 +129,7 @@ export class TasksManager {
 
         taskRequest.onsuccess = () => {
             if (taskRequest.result === undefined) return;
-            const task = taskRequest.result;
+            const task = Task.fromDB(taskRequest.result);
 
             if (task instanceof Task) {
                 task.status = TaskStatus.Deleted;
@@ -146,12 +146,12 @@ export class TasksManager {
                         })
                     }
                 }
-            }
 
-            if (permanently) tasksStore.delete(taskId);
-            else this.updateTask(task);
+                if (permanently) tasksStore.delete(taskId);
+                else this.updateTask(task);
 
-            resolve(taskId);
+                resolve(taskId);
+            } else reject(new Error('is not a Task class.'));
         };
 
         taskRequest.onerror = (e) => {

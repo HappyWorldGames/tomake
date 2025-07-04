@@ -117,7 +117,7 @@ export class DatabaseManager {
             alert('Export failed!');
         }
     }
-    // FIXME import or export bad work, broke data time
+
     importData = async () => {
         if (!confirm('Current data will be replaced. Continue?')) return;
 

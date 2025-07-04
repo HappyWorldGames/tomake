@@ -1,5 +1,5 @@
-import { DatabaseManager } from "../core/database_manager.js";
 import { Task } from "../core/task.js";
+import { TasksManager } from "../core/tasks_manager.js";
 
 export class MainSideUI {
 
@@ -22,7 +22,7 @@ export class MainSideUI {
         if (!this.taskArrayList) alert('error init taskArrayList');
     }
 
-    setOnTaskAddButtonClickListener(dbManager: DatabaseManager) {
+    setOnTaskAddButtonClickListener(tasksManager: TasksManager) {
         this.taskAddButton?.addEventListener('click', () => {
             if (this.taskAddInput == null) return;
 
@@ -30,17 +30,17 @@ export class MainSideUI {
             const task = new Task(titleTask);
             task.startDate = new Date();
 
-            dbManager.tasksManager.addTask(task);
+            tasksManager.addTask(task);
             this.taskAddInput.value = '';
-            this.renderMainSide(dbManager);
+            this.renderMainSide(tasksManager);
         });
     }
 
-    renderMainSide(dbManager: DatabaseManager, listName: string = '') {
+    renderMainSide(tasksManager: TasksManager, listName: string = '') {
         if (listName != '') this.#listName = listName;
         this.clearAll();
-        
-        this.addToDay(dbManager);
+
+        this.addToDay(tasksManager);
     }
 
     clearAll() {
@@ -61,37 +61,46 @@ export class MainSideUI {
         this.taskArrayList.appendChild(taskListName);
     }
 
-    addItem(task: Task) {
+    addItem(task: Task, tasksManager: TasksManager) {
         if (this.taskArrayList == null) return;
 
         const taskItem = document.createElement('li');
-
         taskItem.id = task.id;
         taskItem.classList.add('item');
 
-        const taskInput = document.createElement('input');
+        this.taskArrayList?.appendChild(taskItem);
 
+        const taskInput = document.createElement('input') as HTMLInputElement;
         taskInput.type = 'text';
         taskInput.classList.add('task-name');
         taskInput.value = task.title;
 
         taskItem.appendChild(taskInput);
-        this.taskArrayList?.appendChild(taskItem);
+
+        const taskDelete = document.createElement('button') as HTMLButtonElement;
+        taskDelete.type = 'button';
+        taskDelete.classList.add('task-delete');
+        taskDelete.textContent = "🗑️";
+        taskDelete.addEventListener('click', () => {
+            tasksManager.deleteTask(task.id);
+        })
+
+        taskItem.appendChild(taskDelete);
     }
 
-    async addToDay(dbManager: DatabaseManager) {
+    async addToDay(tasksManager: TasksManager) {
         const startDate = new Date();
         startDate.setHours(0, 0, 0, 0);
 
         const endDate = new Date();
         endDate.setHours(23, 59, 59, 999);
 
-        const tasks = await dbManager.tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
+        const tasks = await tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
         if (tasks.length == 0) return;
 
         this.addTaskListName('ToDay');
         for (const task of tasks) {
-            this.addItem(task);
+            this.addItem(task, tasksManager);
         }
     }
 }
