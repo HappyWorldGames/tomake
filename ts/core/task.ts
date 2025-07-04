@@ -100,15 +100,15 @@ export class Task {
             obj.childIdList,
             obj.listNameId,
 
-            obj.createdDate,
-            obj.updatedDate,
-            obj.completedDate,
+            new Date(obj.createdDate),
+            new Date(obj.updatedDate),
+            obj.completedDate && new Date(obj.completedDate),
 
-            obj.startDate,
-            obj.dueDate,
+            obj.startDate && new Date(obj.startDate),
+            obj.dueDate && new Date(obj.dueDate),
 
-            obj.reminder,
-            obj.repeat,
+            obj.reminder.map((date: string) => new Date(date)),
+            obj.repeat.map((date: string) => new Date(date)),
 
             obj.priority,
             obj.status

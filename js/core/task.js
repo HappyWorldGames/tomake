@@ -36,7 +36,7 @@ export class Task {
         };
     }
     static fromDB(obj) {
-        return new Task(obj.title, obj.description, obj.taskId, obj.parentId, obj.childIdList, obj.listNameId, obj.createdDate, obj.updatedDate, obj.completedDate, obj.startDate, obj.dueDate, obj.reminder, obj.repeat, obj.priority, obj.status);
+        return new Task(obj.title, obj.description, obj.taskId, obj.parentId, obj.childIdList, obj.listNameId, new Date(obj.createdDate), new Date(obj.updatedDate), obj.completedDate && new Date(obj.completedDate), obj.startDate && new Date(obj.startDate), obj.dueDate && new Date(obj.dueDate), obj.reminder.map((date) => new Date(date)), obj.repeat.map((date) => new Date(date)), obj.priority, obj.status);
     }
 }
 export var TaskPriority;
