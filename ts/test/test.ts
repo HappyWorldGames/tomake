@@ -1,17 +1,27 @@
 import { DatabaseManagerTest } from "./database_manager.test.js";
+
+declare global {
+    var testAll: () => void;
+}
+
 globalThis.testAll = () => {
-    const testClass = [
+    const testClass: SelfTest[] = [
         new DatabaseManagerTest()
-    ];
+    ]
+
     console.log('start test');
     for (const selfTest of testClass) {
         selfTest.test();
     }
     console.log('end test');
-};
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    var _a;
-    (_a = document.getElementById('test')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', function () {
+    document.getElementById('test')?.addEventListener('click', function() {
         testAll();
     });
 });
+
+export interface SelfTest {
+    test(): void;
+}

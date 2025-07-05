@@ -14,17 +14,14 @@ export class DatabaseManager {
     tasksManager: TasksManager = new TasksManager();
     projectsManager: ProjectsManager = new ProjectsManager();
 
-    showError: (text: string) => void
-
-    constructor(showError = (text: string) => {}) {
-        this.showError = showError
-    }
+    constructor() {}
 
     async initDB(): Promise<IDBDatabase> { return new Promise((resolve, reject) => {
         let request = indexedDB.open(DatabaseManager.dbName, 1);
 
         request.onblocked = (event) => {
-            this.showError('Upgrade blocked - Please close other tabs displaying this site.');
+            alert('Upgrade blocked - Please close other tabs displaying this site.');
+            console.log('Upgrade blocked - Please close other tabs displaying this site.');
         }
 
         request.onupgradeneeded = (event) => {

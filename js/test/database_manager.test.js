@@ -10,35 +10,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { DatabaseManager } from "../core/database_manager.js";
 import { Task, TaskStatus } from "../core/task.js";
 export class DatabaseManagerTest {
-    constructor(print, printError) {
+    constructor() {
         this.dbManager = null;
-        this.print = print;
-        this.printError = printError;
     }
-    testAll() {
+    test() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.initDBTest();
             this.addDBTest();
-            this.getDBTest();
-            this.removeDBTest();
         });
     }
     initDBTest() {
         return __awaiter(this, void 0, void 0, function* () {
             indexedDB.deleteDatabase(DatabaseManager.dbName);
-            this.print('Old DB deleted');
-            this.dbManager = new DatabaseManager(this.printError);
+            this.dbManager = new DatabaseManager();
             const db = yield this.dbManager.initDB();
-            this.print(`DB name: ${db.name}`);
-            if (this.dbManager !== null)
-                this.dbManager.tasksManager.getAllTasks().then(result => {
-                    this.print(`${result.length}`);
-                });
+            this.dbManager.tasksManager.getAllTasks().then(result => {
+                console.assert(result.length === 0, 'WTF, how?');
+            });
         });
     }
     addDBTest() {
         if (this.dbManager == null) {
-            this.printError('No init DB in addDBTest');
+            console.log('No init DB in addDBTest');
             return;
         }
         const testTask = new Task('test');
@@ -46,13 +39,19 @@ export class DatabaseManagerTest {
         this.dbManager.tasksManager.addTask(testTask);
         const testTask2 = new Task('test2');
         testTask2.status = TaskStatus.Completed;
-        const testTask3 = new Task('test3');
         this.dbManager.tasksManager.addTask(testTask2);
+        const testTask3 = new Task('test3');
         this.dbManager.tasksManager.addTask(testTask3);
+        this.dbManager.tasksManager.getAllTasks().then(result => {
+            console.assert(result.length > 0, 'db lengh wrong');
+            console.assert(!!result.find(task => task.title == 'test'), 'cant find test task');
+            console.assert(!!result.find(task => task.title == 'test2'), 'cant find test task2');
+            console.assert(!!result.find(task => task.title == 'test3'), 'cant find test task3');
+        });
     }
     getDBTest() {
         if (this.dbManager == null) {
-            this.printError('No init DB in addDBTest');
+            console.log('No init DB in getDBTest');
             return;
         }
         this.dbManager.tasksManager.getAllTasks().then(tasks => {

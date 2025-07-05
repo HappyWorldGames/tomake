@@ -18,7 +18,7 @@ import { ProjectsManager } from "./projects_manager.js";
 import { Task } from "./task.js";
 import { TasksManager } from "./tasks_manager.js";
 export class DatabaseManager {
-    constructor(showError = (text) => { }) {
+    constructor() {
         _DatabaseManager_instances.add(this);
         this.db = null;
         this.tasksManager = new TasksManager();
@@ -65,14 +65,14 @@ export class DatabaseManager {
                 return false;
             }
         });
-        this.showError = showError;
     }
     initDB() {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 let request = indexedDB.open(_a.dbName, 1);
                 request.onblocked = (event) => {
-                    this.showError('Upgrade blocked - Please close other tabs displaying this site.');
+                    alert('Upgrade blocked - Please close other tabs displaying this site.');
+                    console.log('Upgrade blocked - Please close other tabs displaying this site.');
                 };
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
