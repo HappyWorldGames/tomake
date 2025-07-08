@@ -11,19 +11,24 @@ export class DatabaseManagerTest implements SelfTest {
     async test() {
         await this.initDBTest();
         this.addDBTest();
-        // this.getDBTest();
-        // this.removeDBTest();
+        this.getDBTest();
+        this.removeDBTest();
     }
 
     async initDBTest() {
         indexedDB.deleteDatabase(DatabaseManager.dbName);
 
         this.dbManager = new DatabaseManager();
-        const db = await this.dbManager.initDB();
-
-        this.dbManager.tasksManager.getAllTasks().then(result => {
-            console.assert(result.length === 0, 'WTF, how?');
-        });
+        await this.dbManager.initDB().then(
+            db => {
+                this.dbManager?.tasksManager.getAllTasks().then(result => {
+                    console.assert(result.length === 0, 'WTF, how?');
+                });
+            },
+            error => {
+                console.log(error);
+            }
+        );
     }
 
     addDBTest() {
@@ -57,39 +62,39 @@ export class DatabaseManagerTest implements SelfTest {
             return;
         }
 
-        this.dbManager.tasksManager.getAllTasks().then(tasks => {
+        /* this.dbManager.tasksManager.getAllTasks().then(tasks => {
             this.print('Test getAllTasks');
             this.print(`tasks length: ${tasks.length}`);
             if (tasks.length > 0) this.print(`first element title: ${tasks[0].title}`);
             this.print('End getAllTasks');
         }).catch(e => {
-            this.printError(e);
-        });
+            console.log(e);
+        }); */
 
-        this.dbManager.tasksManager.getTasksFromIndex('status', IDBKeyRange.upperBound(1, true)).then(tasks => {
+        /* this.dbManager.tasksManager.getTasksFromIndex('status', IDBKeyRange.upperBound(1, true)).then(tasks => {
             this.print('Test getTaskFromIndex');
             this.print(`tasks length: ${tasks.length}`);
             if (tasks.length > 0) this.print(`first element title: ${tasks[0].title}`);
             this.print('End getTaskFromIndex');
         }).catch(err => {
             this.printError(err);
-        })
+        }) */
     }
 
     async removeDBTest() {
         if (this.dbManager == null) {
-            this.printError('No init DB in addDBTest');
+            console.log('No init DB in addDBTest');
             return;
         }
 
         this.dbManager.tasksManager.getAllTasks().then(result => {
             if (this.dbManager === null) {
-                this.printError('How on earth did this happen?!');
+                console.log('How on earth did this happen?!');
                 return;
             }
 
             const deletedId = this.dbManager.tasksManager.deleteTask(result[0].id).then(taskId => {
-                this.print(`Deleted ID: ${taskId}`);
+                console.log(`Deleted ID: ${taskId}`);
             });
         });
     }

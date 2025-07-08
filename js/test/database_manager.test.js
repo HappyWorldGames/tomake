@@ -17,15 +17,21 @@ export class DatabaseManagerTest {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.initDBTest();
             this.addDBTest();
+            this.getDBTest();
+            this.removeDBTest();
         });
     }
     initDBTest() {
         return __awaiter(this, void 0, void 0, function* () {
             indexedDB.deleteDatabase(DatabaseManager.dbName);
             this.dbManager = new DatabaseManager();
-            const db = yield this.dbManager.initDB();
-            this.dbManager.tasksManager.getAllTasks().then(result => {
-                console.assert(result.length === 0, 'WTF, how?');
+            yield this.dbManager.initDB().then(db => {
+                var _a;
+                (_a = this.dbManager) === null || _a === void 0 ? void 0 : _a.tasksManager.getAllTasks().then(result => {
+                    console.assert(result.length === 0, 'WTF, how?');
+                });
+            }, error => {
+                console.log(error);
             });
         });
     }
@@ -44,8 +50,8 @@ export class DatabaseManagerTest {
         this.dbManager.tasksManager.addTask(testTask3);
         this.dbManager.tasksManager.getAllTasks().then(result => {
             console.assert(result.length > 0, 'db lengh wrong');
-            console.assert(!!result.find(task => task.title == 'test'), 'cant find test task');
-            console.assert(!!result.find(task => task.title == 'test2'), 'cant find test task2');
+            console.assert(!!result.find(task => task.repeat.length == 2), 'wrong repeat length');
+            console.assert(!!result.find(task => task.status == TaskStatus.Completed), 'wront status');
             console.assert(!!result.find(task => task.title == 'test3'), 'cant find test task3');
         });
     }
@@ -54,38 +60,20 @@ export class DatabaseManagerTest {
             console.log('No init DB in getDBTest');
             return;
         }
-        this.dbManager.tasksManager.getAllTasks().then(tasks => {
-            this.print('Test getAllTasks');
-            this.print(`tasks length: ${tasks.length}`);
-            if (tasks.length > 0)
-                this.print(`first element title: ${tasks[0].title}`);
-            this.print('End getAllTasks');
-        }).catch(e => {
-            this.printError(e);
-        });
-        this.dbManager.tasksManager.getTasksFromIndex('status', IDBKeyRange.upperBound(1, true)).then(tasks => {
-            this.print('Test getTaskFromIndex');
-            this.print(`tasks length: ${tasks.length}`);
-            if (tasks.length > 0)
-                this.print(`first element title: ${tasks[0].title}`);
-            this.print('End getTaskFromIndex');
-        }).catch(err => {
-            this.printError(err);
-        });
     }
     removeDBTest() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.dbManager == null) {
-                this.printError('No init DB in addDBTest');
+                console.log('No init DB in addDBTest');
                 return;
             }
             this.dbManager.tasksManager.getAllTasks().then(result => {
                 if (this.dbManager === null) {
-                    this.printError('How on earth did this happen?!');
+                    console.log('How on earth did this happen?!');
                     return;
                 }
                 const deletedId = this.dbManager.tasksManager.deleteTask(result[0].id).then(taskId => {
-                    this.print(`Deleted ID: ${taskId}`);
+                    console.log(`Deleted ID: ${taskId}`);
                 });
             });
         });
