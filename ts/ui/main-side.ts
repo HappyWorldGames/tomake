@@ -8,7 +8,7 @@ export class MainSideUI {
 
     taskArrayList: HTMLElement | null;
 
-    #listName: string = 'today';
+    #listName: string = '';
 
     constructor() {
         this.taskAddInput = document.getElementById('task-add-input') as HTMLInputElement;
@@ -36,11 +36,19 @@ export class MainSideUI {
         });
     }
 
-    renderMainSide(tasksManager: TasksManager, listName: string = '') {
-        if (listName != '') this.#listName = listName;
+    renderMainSide(tasksManager: TasksManager, listName: string = '', sysListName = 'today') {
+        if (listName !== '') this.#listName = listName;
         this.clearAll();
 
-        this.addToDay(tasksManager);
+        // TODO listName load
+
+        if (listName !== '') return;
+        switch(sysListName) {
+            case 'today':
+                this.addUntilToDay(tasksManager);
+                this.addToDay(tasksManager);
+                break;
+        }
     }
 
     clearAll() {
@@ -88,6 +96,19 @@ export class MainSideUI {
         taskItem.appendChild(taskDelete);
     }
 
+    async addUntilToDay(tasksManager: TasksManager) {
+        const endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
+
+        const tasks = await tasksManager.getTasksFromIndex('startDate', IDBKeyRange.lowerBound(endDate));
+        if (tasks.length === 0) return;
+
+        this.addTaskListName('Overdue');
+        for (const task of tasks) {
+            this.addItem(task, tasksManager);
+        }
+    }
+
     async addToDay(tasksManager: TasksManager) {
         const startDate = new Date();
         startDate.setHours(0, 0, 0, 0);
@@ -96,7 +117,7 @@ export class MainSideUI {
         endDate.setHours(23, 59, 59, 999);
 
         const tasks = await tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
-        if (tasks.length == 0) return;
+        if (tasks.length === 0) return;
 
         this.addTaskListName('ToDay');
         for (const task of tasks) {

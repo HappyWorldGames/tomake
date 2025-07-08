@@ -17,7 +17,7 @@ var _MainSideUI_listName;
 import { Task } from "../core/task.js";
 export class MainSideUI {
     constructor() {
-        _MainSideUI_listName.set(this, 'today');
+        _MainSideUI_listName.set(this, '');
         this.taskAddInput = document.getElementById('task-add-input');
         this.taskAddButton = document.getElementById('add-task-btn');
         this.taskArrayList = document.getElementById('task-array-list');
@@ -41,11 +41,18 @@ export class MainSideUI {
             this.renderMainSide(tasksManager);
         });
     }
-    renderMainSide(tasksManager, listName = '') {
-        if (listName != '')
+    renderMainSide(tasksManager, listName = '', sysListName = 'today') {
+        if (listName !== '')
             __classPrivateFieldSet(this, _MainSideUI_listName, listName, "f");
         this.clearAll();
-        this.addToDay(tasksManager);
+        if (listName !== '')
+            return;
+        switch (sysListName) {
+            case 'today':
+                this.addUntilToDay(tasksManager);
+                this.addToDay(tasksManager);
+                break;
+        }
     }
     clearAll() {
         if (this.taskArrayList == null)
@@ -83,6 +90,19 @@ export class MainSideUI {
         });
         taskItem.appendChild(taskDelete);
     }
+    addUntilToDay(tasksManager) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const endDate = new Date();
+            endDate.setHours(23, 59, 59, 999);
+            const tasks = yield tasksManager.getTasksFromIndex('startDate', IDBKeyRange.lowerBound(endDate));
+            if (tasks.length === 0)
+                return;
+            this.addTaskListName('Overdue');
+            for (const task of tasks) {
+                this.addItem(task, tasksManager);
+            }
+        });
+    }
     addToDay(tasksManager) {
         return __awaiter(this, void 0, void 0, function* () {
             const startDate = new Date();
@@ -90,7 +110,7 @@ export class MainSideUI {
             const endDate = new Date();
             endDate.setHours(23, 59, 59, 999);
             const tasks = yield tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
-            if (tasks.length == 0)
+            if (tasks.length === 0)
                 return;
             this.addTaskListName('ToDay');
             for (const task of tasks) {

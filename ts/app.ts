@@ -24,7 +24,7 @@ export class App {
         this.mainSideUI.clearAll();
         await this.dbManager.initDB();
 
-        await this.mainSideUI.addToDay(this.dbManager.tasksManager);
+        this.mainSideUI.renderMainSide(this.dbManager.tasksManager);
 
         /*this.mainSideUI.addTaskListName('test');
         this.dbManager.getAllTasks().then( tasks => {

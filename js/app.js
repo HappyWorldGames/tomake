@@ -22,7 +22,7 @@ export class App {
             this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager);
             this.mainSideUI.clearAll();
             yield this.dbManager.initDB();
-            yield this.mainSideUI.addToDay(this.dbManager.tasksManager);
+            this.mainSideUI.renderMainSide(this.dbManager.tasksManager);
         });
     }
 }
