@@ -136,3 +136,23 @@
     background-color: #fff0;
     cursor: pointer;
 }
+
+.main-side .item .task-more-btn {
+    margin: 2px;
+    padding: 2px;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    cursor: pointer;
+}
+
+.main-side .item .task-date-btn {
+    margin: 2px;
+    padding: 2px;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    cursor: pointer;
+}

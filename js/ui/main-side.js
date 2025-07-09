@@ -103,14 +103,32 @@ export class MainSideUI {
         taskInput.classList.add('task-name');
         taskInput.value = task.title;
         taskItem.appendChild(taskInput);
-        const taskDelete = document.createElement('button');
-        taskDelete.type = 'button';
-        taskDelete.classList.add('task-delete');
-        taskDelete.textContent = "🗑️";
-        taskDelete.addEventListener('click', () => {
+        const taskDateButton = document.createElement('button');
+        taskDateButton.type = 'button';
+        taskDateButton.classList.add('task-date-btn');
+        taskDateButton.textContent = task.startDate != null ? this.dateToString(task.startDate) : '';
+        const toDayDate = new Date();
+        toDayDate.setHours(0, 0, 0, 0);
+        if (task.startDate !== null && task.startDate < toDayDate)
+            taskDateButton.style.color = 'red';
+        taskDateButton.addEventListener('click', () => {
+        });
+        taskItem.appendChild(taskDateButton);
+        const taskDeleteButton = document.createElement('button');
+        taskDeleteButton.type = 'button';
+        taskDeleteButton.classList.add('task-delete');
+        taskDeleteButton.textContent = "🗑️";
+        taskDeleteButton.addEventListener('click', () => {
             tasksManager.deleteTask(task.id);
         });
-        taskItem.appendChild(taskDelete);
+        taskItem.appendChild(taskDeleteButton);
+        const taskMoreButton = document.createElement('button');
+        taskMoreButton.type = 'button';
+        taskMoreButton.classList.add('task-more-btn');
+        taskMoreButton.textContent = "...";
+        taskMoreButton.addEventListener('click', () => {
+        });
+        taskItem.appendChild(taskMoreButton);
     }
     addUntilToDay(tasksManager) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -144,6 +162,17 @@ export class MainSideUI {
                 this.addItem(task, tasksManager);
             }
         });
+    }
+    dateToString(date) {
+        const dateNow = new Date();
+        let result = '';
+        if (date.getFullYear() !== dateNow.getFullYear())
+            result += `${date.getFullYear()} `;
+        if (date.getDate() !== dateNow.getDate() || date.getMonth() !== dateNow.getMonth())
+            result += `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
+        else
+            result += `${date.getHours()}:${date.getMinutes()}`;
+        return result;
     }
 }
 _MainSideUI_listName = new WeakMap();

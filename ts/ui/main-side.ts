@@ -89,12 +89,14 @@ export class MainSideUI {
     addItem(task: Task, tasksManager: TasksManager) {
         if (this.taskArrayList == null) return;
 
+        // body item
         const taskItem = document.createElement('li');
         taskItem.id = task.id;
         taskItem.classList.add('item');
 
         this.taskArrayList?.appendChild(taskItem);
 
+        // input item
         const taskInput = document.createElement('input') as HTMLInputElement;
         taskInput.type = 'text';
         taskInput.classList.add('task-name');
@@ -102,15 +104,43 @@ export class MainSideUI {
 
         taskItem.appendChild(taskInput);
 
-        const taskDelete = document.createElement('button') as HTMLButtonElement;
-        taskDelete.type = 'button';
-        taskDelete.classList.add('task-delete');
-        taskDelete.textContent = "🗑️";
-        taskDelete.addEventListener('click', () => {
-            tasksManager.deleteTask(task.id);
-        })
+        // date button item
+        const taskDateButton = document.createElement('button') as HTMLButtonElement;
+        taskDateButton.type = 'button';
+        taskDateButton.classList.add('task-date-btn');
+        taskDateButton.textContent = task.startDate != null ? this.dateToString(task.startDate) : '';
 
-        taskItem.appendChild(taskDelete);
+        const toDayDate = new Date();
+        toDayDate.setHours(0, 0, 0, 0);
+
+        if (task.startDate !== null && task.startDate < toDayDate) taskDateButton.style.color = 'red';
+        taskDateButton.addEventListener('click', () => {
+            // TODO
+        });
+
+        taskItem.appendChild(taskDateButton);
+
+        // delete button item
+        const taskDeleteButton = document.createElement('button') as HTMLButtonElement;
+        taskDeleteButton.type = 'button';
+        taskDeleteButton.classList.add('task-delete');
+        taskDeleteButton.textContent = "🗑️";
+        taskDeleteButton.addEventListener('click', () => {
+            tasksManager.deleteTask(task.id);
+        });
+
+        taskItem.appendChild(taskDeleteButton);
+
+        // more button item
+        const taskMoreButton = document.createElement('button') as HTMLButtonElement;
+        taskMoreButton.type = 'button';
+        taskMoreButton.classList.add('task-more-btn');
+        taskMoreButton.textContent = "...";
+        taskMoreButton.addEventListener('click', () => {
+            // TODO open more menu
+        });
+
+        taskItem.appendChild(taskMoreButton);
     }
 
     async addUntilToDay(tasksManager: TasksManager) {
@@ -143,5 +173,17 @@ export class MainSideUI {
         for (const task of tasks) {
             this.addItem(task, tasksManager);
         }
+    }
+
+    dateToString(date: Date): string {
+        const dateNow = new Date();
+        let result = '';
+
+        if (date.getFullYear() !== dateNow.getFullYear()) result += `${date.getFullYear()} `;
+        if (date.getDate() !== dateNow.getDate() || date.getMonth() !== dateNow.getMonth())
+            result += `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
+        else result += `${date.getHours()}:${date.getMinutes()}`;
+
+        return result;
     }
 }
