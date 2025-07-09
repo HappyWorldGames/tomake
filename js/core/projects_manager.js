@@ -38,7 +38,8 @@ export class ProjectsManager {
             const tasksStore = transaction.objectStore(DatabaseManager.storeProjectsName);
             const request = tasksStore.get(id);
             request.onsuccess = (event) => {
-                resolve(Project.fromDB(event.target.result));
+                const projectRes = event.target.result;
+                resolve(projectRes ? Project.fromDB(projectRes) : null);
             };
             request.onerror = (e) => { reject(e.target.error); };
         });

@@ -24,7 +24,7 @@ export class ProjectsManager {
         request.onerror = (e) => { reject((e.target as IDBTransaction).error); }
     });}
 
-    getProjectFromId(id: string): Promise<Project> { return new Promise((resolve, reject) => {
+    getProjectFromId(id: string): Promise<Project | null> { return new Promise((resolve, reject) => {
         if (!this.db) {
             reject(new Error("Database not initialized. Call initDB() first."));
             return;
@@ -36,7 +36,8 @@ export class ProjectsManager {
         const request = tasksStore.get(id);
 
         request.onsuccess = (event) => {
-            resolve(Project.fromDB((event.target as IDBRequest).result));
+            const projectRes = (event.target as IDBRequest).result;
+            resolve(projectRes ? Project.fromDB(projectRes) : null);
         }
         request.onerror = (e) => { reject((e.target as IDBTransaction).error); }
     });}

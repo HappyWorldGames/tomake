@@ -112,7 +112,7 @@ export class MainSideUI {
 
         const project = await projectsManager.getProjectFromId(task.listNameId);
 
-        taskListNameButton.textContent = project.name;
+        taskListNameButton.textContent = project ? project.name : '';
         taskListNameButton.addEventListener('click', () => {
             // TODO open listName
         });

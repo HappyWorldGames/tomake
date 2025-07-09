@@ -108,7 +108,7 @@ export class MainSideUI {
             taskListNameButton.type = 'button';
             taskListNameButton.classList.add('task-list-name-btn');
             const project = yield projectsManager.getProjectFromId(task.listNameId);
-            taskListNameButton.textContent = project.name;
+            taskListNameButton.textContent = project ? project.name : '';
             taskListNameButton.addEventListener('click', () => {
             });
             taskItem.appendChild(taskListNameButton);
