@@ -14,7 +14,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
 var _MainSideUI_listName;
-import { Task } from "../core/task.js";
+import { Task, TaskStatus } from "../core/task.js";
 export class MainSideUI {
     constructor() {
         _MainSideUI_listName.set(this, '');
@@ -92,7 +92,7 @@ export class MainSideUI {
     }
     addItem(task, tasksManager) {
         var _a;
-        if (this.taskArrayList == null)
+        if (this.taskArrayList == null || task.status === TaskStatus.Deleted)
             return;
         const taskItem = document.createElement('li');
         taskItem.id = task.id;

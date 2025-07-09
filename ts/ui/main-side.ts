@@ -1,4 +1,4 @@
-import { Task } from "../core/task.js";
+import { Task, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
 
 export class MainSideUI {
@@ -87,7 +87,7 @@ export class MainSideUI {
     }
 
     addItem(task: Task, tasksManager: TasksManager) {
-        if (this.taskArrayList == null) return;
+        if (this.taskArrayList == null || task.status === TaskStatus.Deleted) return;
 
         // body item
         const taskItem = document.createElement('li');
