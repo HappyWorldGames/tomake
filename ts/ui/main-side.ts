@@ -141,7 +141,7 @@ export class MainSideUI {
         taskDeleteButton.classList.add('task-delete');
         taskDeleteButton.textContent = "🗑️";
         taskDeleteButton.addEventListener('click', () => {
-            tasksManager.deleteTask(task.id);
+            tasksManager.deleteTask(task.id).then(() => this.renderMainSide(tasksManager, projectsManager));
         });
 
         taskItem.appendChild(taskDeleteButton);
