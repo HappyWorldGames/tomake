@@ -19,10 +19,10 @@ export class App {
     init() {
         return __awaiter(this, void 0, void 0, function* () {
             this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportData, this.dbManager.importData);
-            this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager);
+            this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager, this.dbManager.projectsManager);
             this.mainSideUI.clearAll();
             yield this.dbManager.initDB();
-            this.mainSideUI.renderMainSide(this.dbManager.tasksManager);
+            this.mainSideUI.renderMainSide(this.dbManager.tasksManager, this.dbManager.projectsManager);
         });
     }
 }

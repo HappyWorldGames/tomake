@@ -1,3 +1,4 @@
+import { ProjectsManager } from "../core/projects_manager.js";
 import { Task, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
 
@@ -22,7 +23,7 @@ export class MainSideUI {
         if (!this.taskArrayList) alert('error init taskArrayList');
     }
 
-    setOnTaskAddButtonClickListener(tasksManager: TasksManager) {
+    setOnTaskAddButtonClickListener(tasksManager: TasksManager, projectsManager: ProjectsManager) {
         this.taskAddButton?.addEventListener('click', () => {
             if (this.taskAddInput == null) return;
 
@@ -32,11 +33,11 @@ export class MainSideUI {
 
             tasksManager.addTask(task);
             this.taskAddInput.value = '';
-            this.renderMainSide(tasksManager);
+            this.renderMainSide(tasksManager, projectsManager);
         });
     }
 
-    renderMainSide(tasksManager: TasksManager, listName: string = '', sysListName = 'today') {
+    renderMainSide(tasksManager: TasksManager, projectsManager: ProjectsManager, listName: string = '', sysListName = 'today') {
         if (listName !== '') this.#listName = listName;
         this.clearAll();
 
@@ -45,8 +46,8 @@ export class MainSideUI {
         if (listName !== '') return;
         switch(sysListName) {
             case 'today':
-                this.addUntilToDay(tasksManager);
-                this.addToDay(tasksManager);
+                this.addUntilToDay(tasksManager, projectsManager);
+                this.addToDay(tasksManager, projectsManager);
                 break;
         }
     }
@@ -86,7 +87,7 @@ export class MainSideUI {
         this.taskArrayList.appendChild(taskListName);
     }
 
-    addItem(task: Task, tasksManager: TasksManager) {
+    async addItem(task: Task, tasksManager: TasksManager, projectsManager: ProjectsManager) {
         if (this.taskArrayList == null || task.status === TaskStatus.Deleted) return;
 
         // body item
@@ -104,6 +105,20 @@ export class MainSideUI {
 
         taskItem.appendChild(taskInput);
 
+        // listName button item
+        const taskListNameButton = document.createElement('button') as HTMLButtonElement;
+        taskListNameButton.type = 'button';
+        taskListNameButton.classList.add('task-list-name-btn');
+
+        const project = await projectsManager.getProjectFromId(task.listNameId);
+
+        taskListNameButton.textContent = project.name;
+        taskListNameButton.addEventListener('click', () => {
+            // TODO open listName
+        });
+
+        taskItem.appendChild(taskListNameButton);
+
         // date button item
         const taskDateButton = document.createElement('button') as HTMLButtonElement;
         taskDateButton.type = 'button';
@@ -115,7 +130,7 @@ export class MainSideUI {
 
         if (task.startDate !== null && task.startDate < toDayDate) taskDateButton.style.color = 'red';
         taskDateButton.addEventListener('click', () => {
-            // TODO
+            // TODO edit date
         });
 
         taskItem.appendChild(taskDateButton);
@@ -143,7 +158,7 @@ export class MainSideUI {
         taskItem.appendChild(taskMoreButton);
     }
 
-    async addUntilToDay(tasksManager: TasksManager) {
+    async addUntilToDay(tasksManager: TasksManager, projectsManager: ProjectsManager) {
         const endDate = new Date();
         endDate.setHours(0, 0, 0, 0);
 
@@ -155,11 +170,11 @@ export class MainSideUI {
 
         this.addTaskListName('Overdue');
         for (const task of tasks) {
-            this.addItem(task, tasksManager);
+            this.addItem(task, tasksManager, projectsManager);
         }
     }
 
-    async addToDay(tasksManager: TasksManager) {
+    async addToDay(tasksManager: TasksManager, projectsManager: ProjectsManager) {
         const startDate = new Date();
         startDate.setHours(0, 0, 0, 0);
 
@@ -171,7 +186,7 @@ export class MainSideUI {
 
         this.addTaskListName('ToDay');
         for (const task of tasks) {
-            this.addItem(task, tasksManager);
+            this.addItem(task, tasksManager, projectsManager);
         }
     }
 

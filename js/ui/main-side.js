@@ -28,7 +28,7 @@ export class MainSideUI {
         if (!this.taskArrayList)
             alert('error init taskArrayList');
     }
-    setOnTaskAddButtonClickListener(tasksManager) {
+    setOnTaskAddButtonClickListener(tasksManager, projectsManager) {
         var _a;
         (_a = this.taskAddButton) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
             if (this.taskAddInput == null)
@@ -38,10 +38,10 @@ export class MainSideUI {
             task.startDate = new Date();
             tasksManager.addTask(task);
             this.taskAddInput.value = '';
-            this.renderMainSide(tasksManager);
+            this.renderMainSide(tasksManager, projectsManager);
         });
     }
-    renderMainSide(tasksManager, listName = '', sysListName = 'today') {
+    renderMainSide(tasksManager, projectsManager, listName = '', sysListName = 'today') {
         if (listName !== '')
             __classPrivateFieldSet(this, _MainSideUI_listName, listName, "f");
         this.clearAll();
@@ -49,8 +49,8 @@ export class MainSideUI {
             return;
         switch (sysListName) {
             case 'today':
-                this.addUntilToDay(tasksManager);
-                this.addToDay(tasksManager);
+                this.addUntilToDay(tasksManager, projectsManager);
+                this.addToDay(tasksManager, projectsManager);
                 break;
         }
     }
@@ -90,47 +90,57 @@ export class MainSideUI {
         });
         this.taskArrayList.appendChild(taskListName);
     }
-    addItem(task, tasksManager) {
-        var _a;
-        if (this.taskArrayList == null || task.status === TaskStatus.Deleted)
-            return;
-        const taskItem = document.createElement('li');
-        taskItem.id = task.id;
-        taskItem.classList.add('item');
-        (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
-        const taskInput = document.createElement('input');
-        taskInput.type = 'text';
-        taskInput.classList.add('task-name');
-        taskInput.value = task.title;
-        taskItem.appendChild(taskInput);
-        const taskDateButton = document.createElement('button');
-        taskDateButton.type = 'button';
-        taskDateButton.classList.add('task-date-btn');
-        taskDateButton.textContent = task.startDate != null ? this.dateToString(task.startDate) : '';
-        const toDayDate = new Date();
-        toDayDate.setHours(0, 0, 0, 0);
-        if (task.startDate !== null && task.startDate < toDayDate)
-            taskDateButton.style.color = 'red';
-        taskDateButton.addEventListener('click', () => {
+    addItem(task, tasksManager, projectsManager) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            if (this.taskArrayList == null || task.status === TaskStatus.Deleted)
+                return;
+            const taskItem = document.createElement('li');
+            taskItem.id = task.id;
+            taskItem.classList.add('item');
+            (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
+            const taskInput = document.createElement('input');
+            taskInput.type = 'text';
+            taskInput.classList.add('task-name');
+            taskInput.value = task.title;
+            taskItem.appendChild(taskInput);
+            const taskListNameButton = document.createElement('button');
+            taskListNameButton.type = 'button';
+            taskListNameButton.classList.add('task-list-name-btn');
+            const project = yield projectsManager.getProjectFromId(task.listNameId);
+            taskListNameButton.textContent = project.name;
+            taskListNameButton.addEventListener('click', () => {
+            });
+            taskItem.appendChild(taskListNameButton);
+            const taskDateButton = document.createElement('button');
+            taskDateButton.type = 'button';
+            taskDateButton.classList.add('task-date-btn');
+            taskDateButton.textContent = task.startDate != null ? this.dateToString(task.startDate) : '';
+            const toDayDate = new Date();
+            toDayDate.setHours(0, 0, 0, 0);
+            if (task.startDate !== null && task.startDate < toDayDate)
+                taskDateButton.style.color = 'red';
+            taskDateButton.addEventListener('click', () => {
+            });
+            taskItem.appendChild(taskDateButton);
+            const taskDeleteButton = document.createElement('button');
+            taskDeleteButton.type = 'button';
+            taskDeleteButton.classList.add('task-delete');
+            taskDeleteButton.textContent = "🗑️";
+            taskDeleteButton.addEventListener('click', () => {
+                tasksManager.deleteTask(task.id);
+            });
+            taskItem.appendChild(taskDeleteButton);
+            const taskMoreButton = document.createElement('button');
+            taskMoreButton.type = 'button';
+            taskMoreButton.classList.add('task-more-btn');
+            taskMoreButton.textContent = "...";
+            taskMoreButton.addEventListener('click', () => {
+            });
+            taskItem.appendChild(taskMoreButton);
         });
-        taskItem.appendChild(taskDateButton);
-        const taskDeleteButton = document.createElement('button');
-        taskDeleteButton.type = 'button';
-        taskDeleteButton.classList.add('task-delete');
-        taskDeleteButton.textContent = "🗑️";
-        taskDeleteButton.addEventListener('click', () => {
-            tasksManager.deleteTask(task.id);
-        });
-        taskItem.appendChild(taskDeleteButton);
-        const taskMoreButton = document.createElement('button');
-        taskMoreButton.type = 'button';
-        taskMoreButton.classList.add('task-more-btn');
-        taskMoreButton.textContent = "...";
-        taskMoreButton.addEventListener('click', () => {
-        });
-        taskItem.appendChild(taskMoreButton);
     }
-    addUntilToDay(tasksManager) {
+    addUntilToDay(tasksManager, projectsManager) {
         return __awaiter(this, void 0, void 0, function* () {
             const endDate = new Date();
             endDate.setHours(0, 0, 0, 0);
@@ -144,11 +154,11 @@ export class MainSideUI {
                 return;
             this.addTaskListName('Overdue');
             for (const task of tasks) {
-                this.addItem(task, tasksManager);
+                this.addItem(task, tasksManager, projectsManager);
             }
         });
     }
-    addToDay(tasksManager) {
+    addToDay(tasksManager, projectsManager) {
         return __awaiter(this, void 0, void 0, function* () {
             const startDate = new Date();
             startDate.setHours(0, 0, 0, 0);
@@ -159,7 +169,7 @@ export class MainSideUI {
                 return;
             this.addTaskListName('ToDay');
             for (const task of tasks) {
-                this.addItem(task, tasksManager);
+                this.addItem(task, tasksManager, projectsManager);
             }
         });
     }
