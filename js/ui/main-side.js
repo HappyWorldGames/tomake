@@ -66,6 +66,28 @@ export class MainSideUI {
         const taskListName = document.createElement('div');
         taskListName.classList.add('task-list-name');
         taskListName.textContent = text;
+        taskListName.addEventListener('click', () => {
+            var _a;
+            const children = (_a = taskListName.parentElement) === null || _a === void 0 ? void 0 : _a.children;
+            if (children == null)
+                return;
+            let startHide = false;
+            for (let i = 0; i < children.length; i++) {
+                const childItem = children[i];
+                if (childItem instanceof HTMLDivElement) {
+                    if (startHide)
+                        return;
+                    else if (childItem.textContent === text)
+                        startHide = true;
+                }
+                else if (startHide) {
+                    if (childItem.style.display !== 'none')
+                        childItem.style.display = 'none';
+                    else
+                        childItem.style = '';
+                }
+            }
+        });
         this.taskArrayList.appendChild(taskListName);
     }
     addItem(task, tasksManager) {
@@ -93,8 +115,13 @@ export class MainSideUI {
     addUntilToDay(tasksManager) {
         return __awaiter(this, void 0, void 0, function* () {
             const endDate = new Date();
-            endDate.setHours(23, 59, 59, 999);
-            const tasks = yield tasksManager.getTasksFromIndex('startDate', IDBKeyRange.lowerBound(endDate));
+            endDate.setHours(0, 0, 0, 0);
+            const tasks = (yield tasksManager.getTasksFromIndex('startDate', null)).filter(task => {
+                if (task.startDate !== null && task.startDate < endDate)
+                    return true;
+                else
+                    return false;
+            });
             if (tasks.length === 0)
                 return;
             this.addTaskListName('Overdue');

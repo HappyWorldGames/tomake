@@ -23,7 +23,7 @@ export class TasksManager {
         request.onerror = (e) => { reject((e.target as IDBTransaction).error); }
     });}
 
-    getTasksFromIndex(index: string, keyRange: IDBKeyRange): Promise<Array<Task>> { return new Promise((resolve, reject) => {
+    getTasksFromIndex(index: string, keyRange: IDBKeyRange | null): Promise<Array<Task>> { return new Promise((resolve, reject) => {
         if (!this.db) {
             reject(new Error("Database not initialized. Call initDB() first."));
             return;

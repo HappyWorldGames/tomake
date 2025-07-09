@@ -65,6 +65,23 @@ export class MainSideUI {
 
         taskListName.classList.add('task-list-name');
         taskListName.textContent = text;
+        taskListName.addEventListener('click', () => {
+            const children = taskListName.parentElement?.children;
+            if (children == null) return;
+
+            let startHide = false;
+            for (let i = 0; i < children.length; i++) {
+                const childItem = children[i] as HTMLElement;
+                if (childItem instanceof HTMLDivElement){
+                    if (startHide) return;
+                    else if (childItem.textContent === text) startHide = true;
+                }else if (startHide) {
+                    if (childItem.style.display !== 'none')
+                        childItem.style.display = 'none';
+                    else childItem.style = '';
+                }
+            }
+        })
 
         this.taskArrayList.appendChild(taskListName);
     }
@@ -98,9 +115,12 @@ export class MainSideUI {
 
     async addUntilToDay(tasksManager: TasksManager) {
         const endDate = new Date();
-        endDate.setHours(23, 59, 59, 999);
+        endDate.setHours(0, 0, 0, 0);
 
-        const tasks = await tasksManager.getTasksFromIndex('startDate', IDBKeyRange.lowerBound(endDate));
+        const tasks = (await tasksManager.getTasksFromIndex('startDate', null)).filter( task => {
+            if (task.startDate !== null && task.startDate < endDate) return true;
+            else return false;
+        });
         if (tasks.length === 0) return;
 
         this.addTaskListName('Overdue');
