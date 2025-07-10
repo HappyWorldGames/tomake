@@ -9,7 +9,7 @@ export class MainSideUI {
 
     taskArrayList: HTMLElement | null;
 
-    #listName: string = '';
+    #projectId: string = '';
 
     constructor() {
         this.taskAddInput = document.getElementById('task-add-input') as HTMLInputElement;
@@ -37,17 +37,18 @@ export class MainSideUI {
         });
     }
 
-    renderMainSide(tasksManager: TasksManager, projectsManager: ProjectsManager, listName: string = '', sysListName = 'today') {
-        if (listName !== '') this.#listName = listName;
+    renderMainSide(tasksManager: TasksManager, projectsManager: ProjectsManager, projectId: string = '', sysListName = 'today') {
+        if (projectId !== '') this.#projectId = projectId;
         this.clearAll();
 
         // TODO listName load
 
-        if (listName !== '') return;
+        if (projectId !== '') return;
         switch(sysListName) {
             case 'today':
                 this.addUntilToDay(tasksManager, projectsManager);
                 this.addToDay(tasksManager, projectsManager);
+                this.addCompletedAndNoCompleted(tasksManager, projectsManager);
                 break;
         }
     }
@@ -119,6 +120,15 @@ export class MainSideUI {
         taskCheckbox.style.accentColor = priorityColor;
 
         taskCheckbox.checked = !!task.completedDate;
+
+        taskCheckbox.onchange = () => {
+            task.completedDate = taskCheckbox.checked ? new Date() : null;
+            task.status = taskCheckbox.checked ? TaskStatus.Completed : TaskStatus.Normal;
+
+            tasksManager.updateTask(task).then(() => {
+                this.renderMainSide(tasksManager, projectsManager);
+            });
+        }
 
         taskItem.appendChild(taskCheckbox);
 
@@ -195,7 +205,8 @@ export class MainSideUI {
 
         this.addTaskListName('Overdue');
         for (const task of tasks) {
-            this.addItem(task, tasksManager, projectsManager);
+            if (task.status !== TaskStatus.Completed && task.status !== TaskStatus.NoCompleted)
+                this.addItem(task, tasksManager, projectsManager);
         }
     }
 
@@ -211,7 +222,33 @@ export class MainSideUI {
 
         this.addTaskListName('ToDay');
         for (const task of tasks) {
-            this.addItem(task, tasksManager, projectsManager);
+            if (task.status !== TaskStatus.Completed && task.status !== TaskStatus.NoCompleted)
+                this.addItem(task, tasksManager, projectsManager);
+        }
+    }
+
+    async addCompletedAndNoCompleted(tasksManager: TasksManager, projectsManager: ProjectsManager) {
+        // TODO tasks
+        const startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
+
+        const endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
+
+        const tasks = await tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
+        if (tasks.length === 0) return;
+
+        const hasCompleted = tasks.map(task => task.status).includes(TaskStatus.Completed);
+        const hasNoCompleted = tasks.map(task => task.status).includes(TaskStatus.NoCompleted);
+        let titleTaskList = '';
+
+        if (hasCompleted) titleTaskList += 'Complete' + (hasNoCompleted ? ' and' : '');
+        if (hasNoCompleted) titleTaskList += 'No complete';
+
+        this.addTaskListName(titleTaskList);
+        for (const task of tasks) {
+            if (task.status === TaskStatus.Completed || task.status === TaskStatus.NoCompleted)
+                this.addItem(task, tasksManager, projectsManager);
         }
     }
 

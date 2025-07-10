@@ -13,11 +13,11 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _MainSideUI_listName;
+var _MainSideUI_projectId;
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 export class MainSideUI {
     constructor() {
-        _MainSideUI_listName.set(this, '');
+        _MainSideUI_projectId.set(this, '');
         this.taskAddInput = document.getElementById('task-add-input');
         this.taskAddButton = document.getElementById('add-task-btn');
         this.taskArrayList = document.getElementById('task-array-list');
@@ -41,16 +41,17 @@ export class MainSideUI {
             this.renderMainSide(tasksManager, projectsManager);
         });
     }
-    renderMainSide(tasksManager, projectsManager, listName = '', sysListName = 'today') {
-        if (listName !== '')
-            __classPrivateFieldSet(this, _MainSideUI_listName, listName, "f");
+    renderMainSide(tasksManager, projectsManager, projectId = '', sysListName = 'today') {
+        if (projectId !== '')
+            __classPrivateFieldSet(this, _MainSideUI_projectId, projectId, "f");
         this.clearAll();
-        if (listName !== '')
+        if (projectId !== '')
             return;
         switch (sysListName) {
             case 'today':
                 this.addUntilToDay(tasksManager, projectsManager);
                 this.addToDay(tasksManager, projectsManager);
+                this.addCompletedAndNoCompleted(tasksManager, projectsManager);
                 break;
         }
     }
@@ -117,6 +118,13 @@ export class MainSideUI {
             taskCheckbox.style.borderColor = priorityColor;
             taskCheckbox.style.accentColor = priorityColor;
             taskCheckbox.checked = !!task.completedDate;
+            taskCheckbox.onchange = () => {
+                task.completedDate = taskCheckbox.checked ? new Date() : null;
+                task.status = taskCheckbox.checked ? TaskStatus.Completed : TaskStatus.Normal;
+                tasksManager.updateTask(task).then(() => {
+                    this.renderMainSide(tasksManager, projectsManager);
+                });
+            };
             taskItem.appendChild(taskCheckbox);
             const taskInput = document.createElement('input');
             taskInput.type = 'text';
@@ -173,7 +181,8 @@ export class MainSideUI {
                 return;
             this.addTaskListName('Overdue');
             for (const task of tasks) {
-                this.addItem(task, tasksManager, projectsManager);
+                if (task.status !== TaskStatus.Completed && task.status !== TaskStatus.NoCompleted)
+                    this.addItem(task, tasksManager, projectsManager);
             }
         });
     }
@@ -188,7 +197,31 @@ export class MainSideUI {
                 return;
             this.addTaskListName('ToDay');
             for (const task of tasks) {
-                this.addItem(task, tasksManager, projectsManager);
+                if (task.status !== TaskStatus.Completed && task.status !== TaskStatus.NoCompleted)
+                    this.addItem(task, tasksManager, projectsManager);
+            }
+        });
+    }
+    addCompletedAndNoCompleted(tasksManager, projectsManager) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const startDate = new Date();
+            startDate.setHours(0, 0, 0, 0);
+            const endDate = new Date();
+            endDate.setHours(23, 59, 59, 999);
+            const tasks = yield tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
+            if (tasks.length === 0)
+                return;
+            const hasCompleted = tasks.map(task => task.status).includes(TaskStatus.Completed);
+            const hasNoCompleted = tasks.map(task => task.status).includes(TaskStatus.NoCompleted);
+            let titleTaskList = '';
+            if (hasCompleted)
+                titleTaskList += 'Complete' + (hasNoCompleted ? ' and' : '');
+            if (hasNoCompleted)
+                titleTaskList += 'No complete';
+            this.addTaskListName(titleTaskList);
+            for (const task of tasks) {
+                if (task.status === TaskStatus.Completed || task.status === TaskStatus.NoCompleted)
+                    this.addItem(task, tasksManager, projectsManager);
             }
         });
     }
@@ -203,4 +236,4 @@ export class MainSideUI {
         return result;
     }
 }
-_MainSideUI_listName = new WeakMap();
+_MainSideUI_projectId = new WeakMap();
