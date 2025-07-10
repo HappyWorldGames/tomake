@@ -14,7 +14,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
 var _MainSideUI_listName;
-import { Task, TaskStatus } from "../core/task.js";
+import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 export class MainSideUI {
     constructor() {
         _MainSideUI_listName.set(this, '');
@@ -99,6 +99,25 @@ export class MainSideUI {
             taskItem.id = task.id;
             taskItem.classList.add('item');
             (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
+            const taskCheckbox = document.createElement('input');
+            taskCheckbox.type = 'checkbox';
+            taskCheckbox.classList.add('task-checkbox');
+            const priorityColor = function () {
+                switch (task.priority) {
+                    case TaskPriority.High:
+                        return 'red';
+                    case TaskPriority.Medium:
+                        return 'yellow';
+                    case TaskPriority.Low:
+                        return 'RoyalBlue';
+                    default:
+                        return 'gray';
+                }
+            }();
+            taskCheckbox.style.borderColor = priorityColor;
+            taskCheckbox.style.accentColor = priorityColor;
+            taskCheckbox.checked = !!task.completedDate;
+            taskItem.appendChild(taskCheckbox);
             const taskInput = document.createElement('input');
             taskInput.type = 'text';
             taskInput.classList.add('task-name');

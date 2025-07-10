@@ -117,6 +117,21 @@
     background-color: var(--main-side-item-active-bg-color);
 }
 
+.main-side .item .task-checkbox {
+    appearance: none;
+    margin: 4px;
+    padding: 5px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--task-view-side-item-active-bg-color);
+    background-color: #fff0;
+    accent-color: var(--task-view-side-item-active-bg-color);
+}
+
+.main-side .item .task-checkbox:checked {
+    appearance: checkbox;
+}
+
 .main-side .item .task-name {
     margin: 2px;
     padding: 2px;

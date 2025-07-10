@@ -1,5 +1,5 @@
 import { ProjectsManager } from "../core/projects_manager.js";
-import { Task, TaskStatus } from "../core/task.js";
+import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
 
 export class MainSideUI {
@@ -96,6 +96,31 @@ export class MainSideUI {
         taskItem.classList.add('item');
 
         this.taskArrayList?.appendChild(taskItem);
+
+        // checkbox item
+        const taskCheckbox = document.createElement('input') as HTMLInputElement;
+        taskCheckbox.type = 'checkbox';
+        taskCheckbox.classList.add('task-checkbox');
+
+        const priorityColor: string = function(): string {
+            switch(task.priority) {
+                case TaskPriority.High:
+                    return 'red';
+                case TaskPriority.Medium:
+                    return 'yellow';
+                case TaskPriority.Low:
+                    return 'RoyalBlue';
+                default:
+                    return 'gray';
+            }
+        }();
+
+        taskCheckbox.style.borderColor = priorityColor;
+        taskCheckbox.style.accentColor = priorityColor;
+
+        taskCheckbox.checked = !!task.completedDate;
+
+        taskItem.appendChild(taskCheckbox);
 
         // input item
         const taskInput = document.createElement('input') as HTMLInputElement;
