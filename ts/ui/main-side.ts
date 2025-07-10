@@ -190,14 +190,13 @@ export class MainSideUI {
         }
     }
 
-    dateToString(date: Date): string {
-        const dateNow = new Date();
+    dateToString(date: Date, fromDate: Date = new Date()): string {
         let result = '';
 
-        if (date.getFullYear() !== dateNow.getFullYear()) result += `${date.getFullYear()} `;
-        if (date.getDate() !== dateNow.getDate() || date.getMonth() !== dateNow.getMonth())
+        if (date.getFullYear() !== fromDate.getFullYear()) result += `${date.getFullYear()} `;
+        if (date.getDate() !== fromDate.getDate() || date.getMonth() !== fromDate.getMonth())
             result += `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
-        else result += `${date.getHours()}:${date.getMinutes()}`;
+        else result += date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         return result;
     }
