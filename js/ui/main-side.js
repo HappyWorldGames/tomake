@@ -13,11 +13,17 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _MainSideUI_projectId;
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _MainSideUI_projectId, _MainSideUI_selectedTaskItemId;
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 export class MainSideUI {
     constructor() {
         _MainSideUI_projectId.set(this, '');
+        _MainSideUI_selectedTaskItemId.set(this, '');
         this.taskAddInput = document.getElementById('task-add-input');
         this.taskAddButton = document.getElementById('add-task-btn');
         this.taskArrayList = document.getElementById('task-array-list');
@@ -99,6 +105,17 @@ export class MainSideUI {
             const taskItem = document.createElement('li');
             taskItem.id = task.id;
             taskItem.classList.add('item');
+            if (__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f") === task.id)
+                taskItem.classList.add('selected');
+            taskItem.onclick = () => {
+                var _a;
+                if (__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f") === task.id)
+                    return;
+                (_a = document.getElementById(__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f"))) === null || _a === void 0 ? void 0 : _a.classList.remove('selected');
+                __classPrivateFieldSet(this, _MainSideUI_selectedTaskItemId, task.id, "f");
+                taskItem.classList.add('selected');
+                taskInput.focus();
+            };
             (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
             const taskCheckbox = document.createElement('input');
             taskCheckbox.type = 'checkbox';
@@ -130,20 +147,23 @@ export class MainSideUI {
             taskInput.type = 'text';
             taskInput.classList.add('task-name');
             taskInput.value = task.title;
+            taskInput.placeholder = 'No Title';
+            const saveTask = () => {
+                if (task.title === taskInput.value)
+                    return;
+                task.title = taskInput.value;
+                tasksManager.updateTask(task);
+            };
             let timerId;
-            const debouncedSave = () => {
+            taskInput.oninput = () => {
                 clearTimeout(timerId);
                 timerId = setTimeout(() => {
-                    if (task.title === taskInput.value)
-                        return;
-                    task.title = taskInput.value;
-                    tasksManager.updateTask(task);
-                }, 2000);
+                    saveTask();
+                }, 2500);
             };
-            taskInput.oninput = debouncedSave;
-            taskInput.onblur = debouncedSave;
+            taskInput.onblur = saveTask;
             window.onbeforeunload = () => {
-                debouncedSave();
+                saveTask();
             };
             taskItem.appendChild(taskInput);
             const taskListNameButton = document.createElement('button');
@@ -251,4 +271,4 @@ export class MainSideUI {
         return result;
     }
 }
-_MainSideUI_projectId = new WeakMap();
+_MainSideUI_projectId = new WeakMap(), _MainSideUI_selectedTaskItemId = new WeakMap();

@@ -10,6 +10,7 @@ export class MainSideUI {
     taskArrayList: HTMLElement | null;
 
     #projectId: string = '';
+    #selectedTaskItemId: string = '';
 
     constructor() {
         this.taskAddInput = document.getElementById('task-add-input') as HTMLInputElement;
@@ -95,6 +96,16 @@ export class MainSideUI {
         const taskItem = document.createElement('li');
         taskItem.id = task.id;
         taskItem.classList.add('item');
+        if (this.#selectedTaskItemId === task.id) taskItem.classList.add('selected');
+
+        taskItem.onclick = () => {
+            if (this.#selectedTaskItemId === task.id) return;
+
+            document.getElementById(this.#selectedTaskItemId)?.classList.remove('selected');
+            this.#selectedTaskItemId = task.id;
+            taskItem.classList.add('selected');
+            taskInput.focus();
+        }
 
         this.taskArrayList?.appendChild(taskItem);
 
@@ -137,24 +148,27 @@ export class MainSideUI {
         taskInput.type = 'text';
         taskInput.classList.add('task-name');
         taskInput.value = task.title;
+        taskInput.placeholder = 'No Title';
 
-        let timerId: number;
-        const debouncedSave = () => {
-            clearTimeout(timerId);
-            timerId = setTimeout(() => {
-                if (task.title === taskInput.value) return;
+        const saveTask = () => {
+            if (task.title === taskInput.value) return;
 
-                task.title = taskInput.value;
-                tasksManager.updateTask(task);
-            }, 2000);
+            task.title = taskInput.value;
+            tasksManager.updateTask(task);
         };
 
-        taskInput.oninput = debouncedSave;
-        taskInput.onblur = debouncedSave;
+        let timerId: number;
+        taskInput.oninput = () => {
+            clearTimeout(timerId);
+            timerId = setTimeout(() => {
+                saveTask();
+            }, 2500);
+        };
+        taskInput.onblur = saveTask;
         window.onbeforeunload = () => {
             // TODO move from here
-            debouncedSave();
-        }
+            saveTask();
+        };
 
         taskItem.appendChild(taskInput);
 

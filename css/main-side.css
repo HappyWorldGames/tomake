@@ -126,6 +126,7 @@
     border: 2px solid var(--task-view-side-item-active-bg-color);
     background-color: #fff0;
     accent-color: var(--task-view-side-item-active-bg-color);
+    cursor: pointer;
 }
 
 .main-side .item .task-checkbox:checked {
