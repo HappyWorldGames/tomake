@@ -57,7 +57,12 @@ export class MainSideUI {
             case 'today':
                 this.addUntilToDay(tasksManager, projectsManager);
                 this.addToDay(tasksManager, projectsManager);
-                this.addCompletedAndNoCompleted(tasksManager, projectsManager);
+                const startDate = new Date();
+                startDate.setHours(0, 0, 0, 0);
+                const endDate = new Date();
+                endDate.setHours(23, 59, 59, 999);
+                const dateRange = IDBKeyRange.bound(startDate, endDate);
+                this.addCompletedAndNoCompleted(tasksManager, projectsManager, dateRange);
                 break;
         }
     }
@@ -237,13 +242,9 @@ export class MainSideUI {
             }
         });
     }
-    addCompletedAndNoCompleted(tasksManager, projectsManager) {
+    addCompletedAndNoCompleted(tasksManager, projectsManager, dateRange) {
         return __awaiter(this, void 0, void 0, function* () {
-            const startDate = new Date();
-            startDate.setHours(0, 0, 0, 0);
-            const endDate = new Date();
-            endDate.setHours(23, 59, 59, 999);
-            const tasks = yield tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
+            const tasks = yield tasksManager.getTasksFromIndex('completedDate', dateRange);
             if (tasks.length === 0)
                 return;
             const hasCompleted = tasks.map(task => task.status).includes(TaskStatus.Completed);
