@@ -142,6 +142,8 @@ export class MainSideUI {
         const debouncedSave = () => {
             clearTimeout(timerId);
             timerId = setTimeout(() => {
+                if (task.title === taskInput.value) return;
+
                 task.title = taskInput.value;
                 tasksManager.updateTask(task);
             }, 2000);
