@@ -130,6 +130,19 @@ export class MainSideUI {
             taskInput.type = 'text';
             taskInput.classList.add('task-name');
             taskInput.value = task.title;
+            let timerId;
+            const debouncedSave = () => {
+                clearTimeout(timerId);
+                timerId = setTimeout(() => {
+                    task.title = taskInput.value;
+                    tasksManager.updateTask(task);
+                }, 2000);
+            };
+            taskInput.oninput = debouncedSave;
+            taskInput.onblur = debouncedSave;
+            window.onbeforeunload = () => {
+                debouncedSave();
+            };
             taskItem.appendChild(taskInput);
             const taskListNameButton = document.createElement('button');
             taskListNameButton.type = 'button';
