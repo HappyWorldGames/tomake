@@ -19,6 +19,21 @@ export class TasksManager {
             request.onerror = (e) => { reject(e.target.error); };
         });
     }
+    getTaskFromId(id) {
+        return new Promise((resolve, reject) => {
+            if (!this.db) {
+                reject(new Error("Database not initialized. Call initDB() first."));
+                return;
+            }
+            const transaction = this.db.transaction(DatabaseManager.storeTasksName);
+            const tasksStore = transaction.objectStore(DatabaseManager.storeTasksName);
+            const request = tasksStore.get(id);
+            request.onsuccess = (event) => {
+                resolve(Task.fromDB(event.target.result));
+            };
+            request.onerror = (e) => { reject(e.target.error); };
+        });
+    }
     getTasksFromIndex(index, keyRange) {
         return new Promise((resolve, reject) => {
             if (!this.db) {
@@ -71,15 +86,13 @@ export class TasksManager {
                 reject(new Error("Database not initialized. Call initDB() first."));
                 return;
             }
-            this.getTasksFromIndex('taskId', IDBKeyRange.only(parentId)).then(tasks => {
-                if (tasks.length === 0)
+            this.getTaskFromId(parentId).then(parentTask => {
+                if (!parentTask)
                     reject(new Error(`No parent with parentId: ${parentId}.`));
-                const parentTask = tasks[0];
                 if (task.parentId !== '') {
-                    this.getTasksFromIndex('taskId', IDBKeyRange.only(task.parentId)).then(tasks => {
-                        if (tasks.length === 0)
+                    this.getTaskFromId(task.parentId).then(oldParentTask => {
+                        if (!oldParentTask)
                             return;
-                        const oldParentTask = tasks[0];
                         const index = oldParentTask.childIdList.indexOf(task.id);
                         if (index > -1) {
                             oldParentTask.childIdList = oldParentTask.childIdList.slice(index, 1);
@@ -90,8 +103,8 @@ export class TasksManager {
                 task.parentId = parentId;
                 parentTask.childIdList.push(task.id);
                 this.updateTask(parentTask);
-                this.getTasksFromIndex('taskId', IDBKeyRange.only(task.id)).then(tasks => {
-                    if (tasks.length === 0)
+                this.getTaskFromId(task.id).then(subTask => {
+                    if (!subTask)
                         this.addTask(task);
                     resolve(task.id);
                 });
@@ -114,14 +127,14 @@ export class TasksManager {
                 if (task instanceof Task) {
                     task.status = TaskStatus.Deleted;
                     if (task.parentId !== '') {
-                        this.getTasksFromIndex('taskId', IDBKeyRange.only(task.parentId)).then(tasks => {
-                            this.deleteTask(tasks[0].id, permanently);
+                        this.getTaskFromId(task.parentId).then(task => {
+                            this.deleteTask(task.id, permanently);
                         });
                     }
                     if (task.childIdList.length > 0) {
                         for (const taskId of task.childIdList) {
-                            this.getTasksFromIndex('taskId', IDBKeyRange.only(taskId)).then(tasks => {
-                                this.deleteTask(tasks[0].id, permanently);
+                            this.getTaskFromId(taskId).then(task => {
+                                this.deleteTask(task.id, permanently);
                             });
                         }
                     }
