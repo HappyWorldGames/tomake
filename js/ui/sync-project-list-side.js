@@ -7,8 +7,6 @@ export class SyncProjectListSideUI {
         this.importButton = document.getElementById('importButton');
         if (this.authButton == null)
             alert('error init authButton');
-        if (!this.themeToggleButton)
-            alert('error init themeToggleButton');
         if (!this.syncButton)
             alert('error init syncButton');
         if (!this.exportButton)

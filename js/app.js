@@ -10,10 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { SyncProjectListSideUI } from "./ui/sync-project-list-side.js";
 import { MainSideUI } from "./ui/main-side.js";
 import { DatabaseManager } from "./core/database_manager.js";
+import { ThemeManager } from "./ui/theme_manager.js";
 export class App {
     constructor() {
         this.syncProjectListSideUI = new SyncProjectListSideUI();
         this.mainSideUI = new MainSideUI();
+        this.themreManager = new ThemeManager(this.syncProjectListSideUI.themeToggleButton);
         this.dbManager = new DatabaseManager();
     }
     init() {
