@@ -68,7 +68,16 @@
     </div>
 
     <div class="task-view-side" id="task-view-side">
-        <div class="header" id="task-header">Header</div>
+        <div class="header" id="task-header">
+            <input type="checkbox" id="task-checkbox-complete">
+            <button type="button" id="task-date-button">Date</button>
+            <select id="task-priority-select">
+                <option value="nope">Nope</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
         <div class="main">
             <input type="text" id="task-title-input" placeholder="No Title">
             <textarea type="text" id="task-description-input" placeholder="Description..."></textarea>

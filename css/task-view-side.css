@@ -37,6 +37,52 @@
     margin: 4px;
     padding: 5px;
     height: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#task-checkbox-complete {
+    appearance: none;
+    margin: 4px;
+    padding: 5px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--task-view-side-item-active-bg-color);
+    background-color: #fff0;
+    accent-color: var(--task-view-side-item-active-bg-color);
+    cursor: pointer;
+}
+
+#task-checkbox-complete:checked {
+    appearance: checkbox;
+}
+
+#task-date-button {
+    margin: 5px;
+    height: 20px;
+    border: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    text-align: center;
+    cursor: pointer;
+}
+
+#task-priority-select {
+    margin: 5px;
+    height: 20px;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    text-align: left;
+}
+
+#task-priority-select option {
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: var(--task-view-side-bg-color);
 }
 
 .task-view-side .main {
