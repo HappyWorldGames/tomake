@@ -67,14 +67,16 @@
         </ul>
     </div>
 
-    <div class="task-view-side">
-        <div class="header">Header</div>
+    <div class="task-view-side" id="task-view-side">
+        <div class="header" id="task-header">Header</div>
         <div class="main">
-            <textarea type="text" id="task-view-description-input" placeholder="Описание..."></textarea>
-            <ul class="checkbox-list">
+            <input type="text" id="task-title-input" placeholder="No Title">
+            <textarea type="text" id="task-description-input" placeholder="Description..."></textarea>
+            <ul class="checkbox-list" id="subtask-list">
                 <li><input type="checkbox" class="check-field"><input type="text" class="text-field" value="Test 1"><button class="delete-btn" title="Удалить">🗑</button></li>
                 <li><input type="checkbox" class="check-field"><input type="text" class="text-field" value="Test 2"><button class="delete-btn" title="Удалить">🗑</button></li>
             </ul>
+            <button type="button" id="add-subtask-btn">Add Subtask</button>
             <div class="space"></div>
         </div>
         <div class="footer">Footer</div>

@@ -18,21 +18,17 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _MainSideUI_projectId, _MainSideUI_selectedTaskItemId;
+var _MainSideUI_taskViewSideUI, _MainSideUI_projectId, _MainSideUI_selectedTaskItemId;
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 export class MainSideUI {
-    constructor() {
+    constructor(taskViewSideUI) {
+        _MainSideUI_taskViewSideUI.set(this, void 0);
         _MainSideUI_projectId.set(this, '');
         _MainSideUI_selectedTaskItemId.set(this, '');
         this.taskAddInput = document.getElementById('task-add-input');
         this.taskAddButton = document.getElementById('add-task-btn');
         this.taskArrayList = document.getElementById('task-array-list');
-        if (!this.taskAddInput)
-            alert('error init taskArrayList');
-        if (!this.taskAddButton)
-            alert('error init taskAddButton');
-        if (!this.taskArrayList)
-            alert('error init taskArrayList');
+        __classPrivateFieldSet(this, _MainSideUI_taskViewSideUI, taskViewSideUI, "f");
     }
     setOnTaskAddButtonClickListener(tasksManager, projectsManager) {
         var _a;
@@ -44,7 +40,6 @@ export class MainSideUI {
             task.startDate = new Date();
             tasksManager.addTask(task);
             this.taskAddInput.value = '';
-            this.renderMainSide(tasksManager, projectsManager);
         });
     }
     renderMainSide(tasksManager, projectsManager, projectId = '', sysListName = 'today') {
@@ -67,8 +62,6 @@ export class MainSideUI {
         }
     }
     clearAll() {
-        if (this.taskArrayList == null)
-            return;
         while (this.taskArrayList.firstChild)
             this.taskArrayList.removeChild(this.taskArrayList.firstChild);
     }
@@ -119,7 +112,8 @@ export class MainSideUI {
                 (_a = document.getElementById(__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f"))) === null || _a === void 0 ? void 0 : _a.classList.remove('selected');
                 __classPrivateFieldSet(this, _MainSideUI_selectedTaskItemId, task.id, "f");
                 taskItem.classList.add('selected');
-                taskInput.focus();
+                taskTitleInput.focus();
+                __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(task, tasksManager);
             };
             (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
             const taskCheckbox = document.createElement('input');
@@ -148,29 +142,13 @@ export class MainSideUI {
                 });
             };
             taskItem.appendChild(taskCheckbox);
-            const taskInput = document.createElement('input');
-            taskInput.type = 'text';
-            taskInput.classList.add('task-name');
-            taskInput.value = task.title;
-            taskInput.placeholder = 'No Title';
-            const saveTask = () => {
-                if (task.title === taskInput.value)
-                    return;
-                task.title = taskInput.value;
-                tasksManager.updateTask(task);
-            };
-            let timerId;
-            taskInput.oninput = () => {
-                clearTimeout(timerId);
-                timerId = setTimeout(() => {
-                    saveTask();
-                }, 2500);
-            };
-            taskInput.onblur = saveTask;
-            window.onbeforeunload = () => {
-                saveTask();
-            };
-            taskItem.appendChild(taskInput);
+            const taskTitleInput = document.createElement('input');
+            taskTitleInput.type = 'text';
+            taskTitleInput.classList.add('task-name');
+            taskTitleInput.value = task.title;
+            taskTitleInput.placeholder = 'No Title';
+            taskTitleInput.readOnly = true;
+            taskItem.appendChild(taskTitleInput);
             const taskListNameButton = document.createElement('button');
             taskListNameButton.type = 'button';
             taskListNameButton.classList.add('task-list-name-btn');
@@ -272,4 +250,4 @@ export class MainSideUI {
         return result;
     }
 }
-_MainSideUI_projectId = new WeakMap(), _MainSideUI_selectedTaskItemId = new WeakMap();
+_MainSideUI_taskViewSideUI = new WeakMap(), _MainSideUI_projectId = new WeakMap(), _MainSideUI_selectedTaskItemId = new WeakMap();

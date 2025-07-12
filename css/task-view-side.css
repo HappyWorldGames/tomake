@@ -30,6 +30,7 @@
     background-color: var(--task-view-side-bg-color);
     flex: 1;
     flex-direction: column;
+    visibility: hidden;
 }
 
 .task-view-side .header {
@@ -46,7 +47,19 @@
     flex-direction: column;
 }
 
-#task-view-description-input {
+#task-title-input {
+    margin: 5px 0;
+    width: 100%;
+    height: auto;
+    color: var(--text-color);
+    background-color: #fff0;
+    font-size: large;
+    border: none;
+    outline: none;
+}
+
+#task-description-input {
+    margin: 5px 0;
     width: 100%;
     height: auto;
     overflow: hidden;
@@ -103,6 +116,15 @@
 
 .task-view-side .main .checkbox-list li .delete-btn:active {
     background-color: #ffffff34;
+}
+
+#add-subtask-btn {
+    margin: 5px;
+    border: none;
+    text-align: start;
+    color: var(--primary-color);
+    background-color: #fff0;
+    cursor: pointer;
 }
 
 .task-view-side .main .space {

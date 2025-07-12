@@ -1,27 +1,26 @@
 import { ProjectsManager } from "../core/projects_manager.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
+import { TaskViewSideUI } from "./task-view-side.js";
 
 export class MainSideUI {
 
-    taskAddInput: HTMLInputElement | null;
-    taskAddButton: HTMLElement | null;
+    taskAddInput: HTMLInputElement;
+    taskAddButton: HTMLElement;
 
-    taskArrayList: HTMLElement | null;
+    taskArrayList: HTMLElement;
+
+    #taskViewSideUI: TaskViewSideUI;
 
     #projectId: string = '';
     #selectedTaskItemId: string = '';
 
-    constructor() {
+    constructor(taskViewSideUI: TaskViewSideUI) {
         this.taskAddInput = document.getElementById('task-add-input') as HTMLInputElement;
-        this.taskAddButton = document.getElementById('add-task-btn');
+        this.taskAddButton = document.getElementById('add-task-btn') as HTMLButtonElement;
+        this.taskArrayList = document.getElementById('task-array-list') as HTMLUListElement;
 
-        this.taskArrayList = document.getElementById('task-array-list');
-
-        if (!this.taskAddInput) alert('error init taskArrayList');
-        if (!this.taskAddButton) alert('error init taskAddButton');
-
-        if (!this.taskArrayList) alert('error init taskArrayList');
+        this.#taskViewSideUI = taskViewSideUI;
     }
 
     setOnTaskAddButtonClickListener(tasksManager: TasksManager, projectsManager: ProjectsManager) {
@@ -34,7 +33,6 @@ export class MainSideUI {
 
             tasksManager.addTask(task);
             this.taskAddInput.value = '';
-            this.renderMainSide(tasksManager, projectsManager);
         });
     }
 
@@ -64,8 +62,7 @@ export class MainSideUI {
     }
 
     clearAll() {
-        if (this.taskArrayList == null) return;
-
+        // clear tasks
         while(this.taskArrayList.firstChild)
             this.taskArrayList.removeChild(this.taskArrayList.firstChild);
     }
@@ -114,7 +111,9 @@ export class MainSideUI {
             document.getElementById(this.#selectedTaskItemId)?.classList.remove('selected');
             this.#selectedTaskItemId = task.id;
             taskItem.classList.add('selected');
-            taskInput.focus();
+            taskTitleInput.focus();
+
+            this.#taskViewSideUI.renderTaskViewSide(task, tasksManager);
         }
 
         this.taskArrayList?.appendChild(taskItem);
@@ -154,33 +153,35 @@ export class MainSideUI {
         taskItem.appendChild(taskCheckbox);
 
         // input item
-        const taskInput = document.createElement('input') as HTMLInputElement;
-        taskInput.type = 'text';
-        taskInput.classList.add('task-name');
-        taskInput.value = task.title;
-        taskInput.placeholder = 'No Title';
+        const taskTitleInput = document.createElement('input') as HTMLInputElement;
+        taskTitleInput.type = 'text';
+        taskTitleInput.classList.add('task-name');
+        taskTitleInput.value = task.title;
+        taskTitleInput.placeholder = 'No Title';
 
-        const saveTask = () => {
-            if (task.title === taskInput.value) return;
+        taskTitleInput.readOnly = true;
+        // TODO make save with taskViewSide
+        // const saveTask = () => {
+        //     if (task.title === taskTitleInput.value) return;
 
-            task.title = taskInput.value;
-            tasksManager.updateTask(task);
-        };
+        //     task.title = taskTitleInput.value;
+        //     tasksManager.updateTask(task);
+        // };
 
-        let timerId: number;
-        taskInput.oninput = () => {
-            clearTimeout(timerId);
-            timerId = setTimeout(() => {
-                saveTask();
-            }, 2500);
-        };
-        taskInput.onblur = saveTask;
-        window.onbeforeunload = () => {
-            // TODO move from here
-            saveTask();
-        };
+        // let timerId: number;
+        // taskTitleInput.oninput = () => {
+        //     clearTimeout(timerId);
+        //     timerId = setTimeout(() => {
+        //         saveTask();
+        //     }, 2500);
+        // };
+        // taskTitleInput.onblur = saveTask;
+        // window.onbeforeunload = () => {
+        //     // TODO move from here
+        //     saveTask();
+        // };
 
-        taskItem.appendChild(taskInput);
+        taskItem.appendChild(taskTitleInput);
 
         // listName button item
         const taskListNameButton = document.createElement('button') as HTMLButtonElement;

@@ -2,12 +2,14 @@ import { SyncProjectListSideUI } from "./ui/sync-project-list-side.js";
 import { MainSideUI } from "./ui/main-side.js";
 
 import { DatabaseManager } from "./core/database_manager.js";
+import { TaskViewSideUI } from "./ui/task-view-side.js";
 import { ThemeManager } from "./ui/theme_manager.js";
 
 export class App {
 
     syncProjectListSideUI: SyncProjectListSideUI;
     mainSideUI: MainSideUI;
+    taskViewSideUI: TaskViewSideUI;
 
     themreManager: ThemeManager;
 
@@ -15,7 +17,8 @@ export class App {
 
     constructor() {
         this.syncProjectListSideUI = new SyncProjectListSideUI();
-        this.mainSideUI = new MainSideUI();
+        this.taskViewSideUI = new TaskViewSideUI();
+        this.mainSideUI = new MainSideUI(this.taskViewSideUI);
 
         this.themreManager = new ThemeManager(this.syncProjectListSideUI.themeToggleButton);
 
@@ -36,6 +39,10 @@ export class App {
             for (const task of tasks)
                 this.mainSideUI.addItem(task);
         });*/
+
+        window.onbeforeunload = () => {
+            this.taskViewSideUI.saveTask(this.dbManager.tasksManager);
+        };
     }
 }
 
