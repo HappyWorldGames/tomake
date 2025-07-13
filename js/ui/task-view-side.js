@@ -12,18 +12,21 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
 var _TaskViewSideUI_selectedTask;
 import { TaskStatus } from "../core/task.js";
 export class TaskViewSideUI {
-    constructor() {
+    constructor(tasksManager) {
         _TaskViewSideUI_selectedTask.set(this, null);
         this.taskViewSide = document.getElementById('task-view-side');
         this.taskHeader = document.getElementById('task-header');
         this.taskCheckboxComplete = document.getElementById('task-checkbox-complete');
-        this.taskDateButton = document.getElementById('task-date-button');
+        this.taskDateTimeInput = document.getElementById('task-date-button');
         this.taskPrioritySelect = document.getElementById('task-priority-select');
         this.taskTitleInput = document.getElementById('task-title-input');
         this.taskDescriptionInput = document.getElementById('task-description-input');
         this.taskSubtaskList = document.getElementById('subtask-list');
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn');
-        this.taskPrioritySelect.onselect = () => {
+        this.taskDateTimeInput.onchange = () => {
+            this.saveTask(tasksManager);
+        };
+        this.taskPrioritySelect.onchange = () => {
             this.saveTask(tasksManager);
         };
         this.taskDescriptionInput.oninput = () => {
@@ -42,7 +45,7 @@ export class TaskViewSideUI {
         this.clearAll();
         this.taskCheckboxComplete.checked = !!task.completedDate;
         if (task.startDate)
-            this.taskDateButton.textContent = task.startDate.toDateString();
+            this.taskDateTimeInput.value = task.startDate.toISOString().slice(0, 16);
         this.taskPrioritySelect.selectedIndex = task.priority;
         this.taskTitleInput.value = task.title;
         let saveTimerId;
@@ -95,8 +98,13 @@ export class TaskViewSideUI {
         if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
             return;
         let isEdited = false;
-        if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority !== TaskStatus[parseInt(this.taskPrioritySelect.value)]) {
-            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority = TaskStatus[parseInt(this.taskPrioritySelect.value)];
+        const dateTime = new Date(this.taskDateTimeInput.value);
+        if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate !== dateTime) {
+            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate = dateTime;
+            isEdited = true;
+        }
+        if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority !== +this.taskPrioritySelect.value) {
+            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority = Number(this.taskPrioritySelect.value);
             isEdited = true;
         }
         if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").title !== this.taskTitleInput.value) {

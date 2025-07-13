@@ -6,7 +6,7 @@ export class TaskViewSideUI {
     taskViewSide: HTMLDivElement;
     taskHeader: HTMLDivElement;
     taskCheckboxComplete: HTMLInputElement;
-    taskDateButton: HTMLButtonElement;
+    taskDateTimeInput: HTMLInputElement;
     taskPrioritySelect: HTMLSelectElement;
 
     taskTitleInput: HTMLInputElement;
@@ -16,11 +16,11 @@ export class TaskViewSideUI {
 
     #selectedTask: Task | null = null;
 
-    constructor() {
+    constructor(tasksManager: TasksManager) {
         this.taskViewSide = document.getElementById('task-view-side') as HTMLDivElement;
         this.taskHeader = document.getElementById('task-header') as HTMLDivElement;
         this.taskCheckboxComplete = document.getElementById('task-checkbox-complete') as HTMLInputElement;
-        this.taskDateButton = document.getElementById('task-date-button') as HTMLButtonElement;
+        this.taskDateTimeInput = document.getElementById('task-date-button') as HTMLInputElement;
         this.taskPrioritySelect = document.getElementById('task-priority-select') as HTMLSelectElement;
 
         this.taskTitleInput = document.getElementById('task-title-input') as HTMLInputElement;
@@ -28,7 +28,10 @@ export class TaskViewSideUI {
         this.taskSubtaskList = document.getElementById('subtask-list') as HTMLUListElement;
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn') as HTMLButtonElement;
 
-        this.taskPrioritySelect.onselect = () => {
+        this.taskDateTimeInput.onchange = () => {
+            this.saveTask(tasksManager);
+        }
+        this.taskPrioritySelect.onchange = () => {
             this.saveTask(tasksManager);
         };
         this.taskDescriptionInput.oninput = () => {
@@ -52,7 +55,7 @@ export class TaskViewSideUI {
 
         // Button date
         if (task.startDate)
-            this.taskDateButton.textContent = task.startDate.toDateString();
+            this.taskDateTimeInput.value = task.startDate.toISOString().slice(0, 16);
 
         // Priority select
         this.taskPrioritySelect.selectedIndex = task.priority;
@@ -130,9 +133,16 @@ export class TaskViewSideUI {
         if (!this.#selectedTask) return;
         let isEdited = false;
 
+        // check datetime
+        const dateTime = new Date(this.taskDateTimeInput.value); // TODO fix not correctly value
+        if (this.#selectedTask.startDate !== dateTime) {
+            this.#selectedTask.startDate = dateTime;
+            isEdited = true;
+        }
+
         // check priority
-        if (this.#selectedTask.priority !== TaskStatus[parseInt(this.taskPrioritySelect.value)]) {
-            this.#selectedTask.priority = TaskStatus[parseInt(this.taskPrioritySelect.value)];
+        if (this.#selectedTask.priority !== +this.taskPrioritySelect.value) {
+            this.#selectedTask.priority = Number(this.taskPrioritySelect.value) as TaskPriority;
             isEdited = true;
         }
 

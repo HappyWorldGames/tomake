@@ -78,12 +78,23 @@
     text-align: left;
 }
 
+#task-priority-select:has(option[value="0"]:checked) { color: gray; }
+#task-priority-select:has(option[value="1"]:checked) { color: RoyalBlue; }
+#task-priority-select:has(option[value="2"]:checked) { color: yellow; }
+#task-priority-select:has(option[value="3"]:checked) { color: red; }
+
 #task-priority-select option {
     border: none;
     outline: none;
     color: var(--text-color);
-    background-color: var(--task-view-side-bg-color);
+    background-color: #000;
+    /* background-color: var(--task-view-side-bg-color); */
 }
+
+#task-priority-select option[value="0"] { color: gray; }
+#task-priority-select option[value="1"] { color: RoyalBlue; }
+#task-priority-select option[value="2"] { color: yellow; }
+#task-priority-select option[value="3"] { color: red; }
 
 .task-view-side .main {
     margin: 4px;

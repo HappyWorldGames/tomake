@@ -110,7 +110,7 @@ export class Task {
             obj.reminder.map((date: string) => new Date(date)),
             obj.repeat.map((date: string) => new Date(date)),
 
-            obj.priority,
+            Number(obj.priority || 0) as TaskPriority,
             obj.status
         )
     }

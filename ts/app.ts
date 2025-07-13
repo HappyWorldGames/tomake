@@ -16,13 +16,13 @@ export class App {
     dbManager: DatabaseManager;
 
     constructor() {
+        this.dbManager = new DatabaseManager();
+
         this.syncProjectListSideUI = new SyncProjectListSideUI();
-        this.taskViewSideUI = new TaskViewSideUI();
+        this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager);
         this.mainSideUI = new MainSideUI(this.taskViewSideUI);
 
         this.themreManager = new ThemeManager(this.syncProjectListSideUI.themeToggleButton);
-
-        this.dbManager = new DatabaseManager();
     }
 
     async init() {

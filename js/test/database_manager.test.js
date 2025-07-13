@@ -1,38 +1,25 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { DatabaseManager } from "../core/database_manager.js";
 import { Task, TaskStatus } from "../core/task.js";
 export class DatabaseManagerTest {
     constructor() {
         this.dbManager = null;
     }
-    test() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.initDBTest();
-            this.addDBTest();
-            this.getDBTest();
-            this.removeDBTest();
-        });
+    async test() {
+        await this.initDBTest();
+        this.addDBTest();
+        this.getDBTest();
+        this.removeDBTest();
     }
-    initDBTest() {
-        return __awaiter(this, void 0, void 0, function* () {
-            indexedDB.deleteDatabase(DatabaseManager.dbName);
-            this.dbManager = new DatabaseManager();
-            yield this.dbManager.initDB().then(db => {
-                var _a;
-                (_a = this.dbManager) === null || _a === void 0 ? void 0 : _a.tasksManager.getAllTasks().then(result => {
-                    console.assert(result.length === 0, 'WTF, how?');
-                });
-            }, error => {
-                console.log(error);
+    async initDBTest() {
+        indexedDB.deleteDatabase(DatabaseManager.dbName);
+        this.dbManager = new DatabaseManager();
+        await this.dbManager.initDB().then(db => {
+            var _a;
+            (_a = this.dbManager) === null || _a === void 0 ? void 0 : _a.tasksManager.getAllTasks().then(result => {
+                console.assert(result.length === 0, 'WTF, how?');
             });
+        }, error => {
+            console.log(error);
         });
     }
     addDBTest() {
@@ -61,20 +48,18 @@ export class DatabaseManagerTest {
             return;
         }
     }
-    removeDBTest() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.dbManager == null) {
-                console.log('No init DB in addDBTest');
+    async removeDBTest() {
+        if (this.dbManager == null) {
+            console.log('No init DB in addDBTest');
+            return;
+        }
+        this.dbManager.tasksManager.getAllTasks().then(result => {
+            if (this.dbManager === null) {
+                console.log('How on earth did this happen?!');
                 return;
             }
-            this.dbManager.tasksManager.getAllTasks().then(result => {
-                if (this.dbManager === null) {
-                    console.log('How on earth did this happen?!');
-                    return;
-                }
-                const deletedId = this.dbManager.tasksManager.deleteTask(result[0].id).then(taskId => {
-                    console.log(`Deleted ID: ${taskId}`);
-                });
+            const deletedId = this.dbManager.tasksManager.deleteTask(result[0].id).then(taskId => {
+                console.log(`Deleted ID: ${taskId}`);
             });
         });
     }

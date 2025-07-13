@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
@@ -23,13 +14,13 @@ export class DatabaseManager {
         this.db = null;
         this.tasksManager = new TasksManager();
         this.projectsManager = new ProjectsManager();
-        this.exportData = () => __awaiter(this, void 0, void 0, function* () {
+        this.exportData = async () => {
             if (!confirm('Export all tasks to file?'))
                 return;
             try {
                 this.garbageCleaner();
-                const tasks = yield this.tasksManager.getAllTasks();
-                const projects = yield this.projectsManager.getAllProjects();
+                const tasks = await this.tasksManager.getAllTasks();
+                const projects = await this.projectsManager.getAllProjects();
                 if (tasks.length === 0 && projects.length === 0) {
                     alert('No data to export!');
                     return;
@@ -40,21 +31,21 @@ export class DatabaseManager {
                 console.error('Export error:', error);
                 alert('Export failed!');
             }
-        });
-        this.importData = () => __awaiter(this, void 0, void 0, function* () {
+        };
+        this.importData = async () => {
             if (!confirm('Current data will be replaced. Continue?'))
                 return;
-            const file = yield __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_selectFile).call(this, '.json');
+            const file = await __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_selectFile).call(this, '.json');
             if (!file)
                 return;
             try {
-                const readed = yield __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_readFile).call(this, file);
+                const readed = await __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_readFile).call(this, file);
                 const tasks = readed[0].map(task => Task.fromDB(task));
                 const projects = readed[1].map(project => Project.fromDB(project));
-                yield this.tasksManager.clear();
-                yield this.projectsManager.clear();
-                yield Promise.all(tasks.map(task => this.tasksManager.addTask(task, true)));
-                yield Promise.all(projects.map(project => this.projectsManager.addProject(project, true)));
+                await this.tasksManager.clear();
+                await this.projectsManager.clear();
+                await Promise.all(tasks.map(task => this.tasksManager.addTask(task, true)));
+                await Promise.all(projects.map(project => this.projectsManager.addProject(project, true)));
                 this.garbageCleaner();
                 alert('Data imported successfully!');
                 return true;
@@ -64,30 +55,28 @@ export class DatabaseManager {
                 alert('Invalid file format!');
                 return false;
             }
-        });
+        };
     }
-    initDB() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                let request = indexedDB.open(_a.dbName, 1);
-                request.onblocked = (event) => {
-                    alert('Upgrade blocked - Please close other tabs displaying this site.');
-                    console.log('Upgrade blocked - Please close other tabs displaying this site.');
-                };
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    db.onerror = reject;
-                    __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_initTasksStore).call(this, db);
-                    __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_initProjectsStore).call(this, db);
-                };
-                request.onsuccess = (event) => {
-                    this.db = event.target.result;
-                    this.tasksManager.db = this.db;
-                    this.projectsManager.db = this.db;
-                    resolve(this.db);
-                };
-                request.onerror = reject;
-            });
+    async initDB() {
+        return new Promise((resolve, reject) => {
+            let request = indexedDB.open(_a.dbName, 1);
+            request.onblocked = (event) => {
+                alert('Upgrade blocked - Please close other tabs displaying this site.');
+                console.log('Upgrade blocked - Please close other tabs displaying this site.');
+            };
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                db.onerror = reject;
+                __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_initTasksStore).call(this, db);
+                __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_initProjectsStore).call(this, db);
+            };
+            request.onsuccess = (event) => {
+                this.db = event.target.result;
+                this.tasksManager.db = this.db;
+                this.projectsManager.db = this.db;
+                resolve(this.db);
+            };
+            request.onerror = reject;
         });
     }
     garbageCleaner() {
