@@ -38,8 +38,10 @@ export class MainSideUI {
             const titleTask = this.taskAddInput.value;
             const task = new Task(titleTask);
             task.startDate = new Date();
-            tasksManager.addTask(task);
-            this.taskAddInput.value = '';
+            tasksManager.addTask(task).then(() => {
+                this.renderMainSide(tasksManager, projectsManager);
+                this.taskAddInput.value = '';
+            });
         });
     }
     renderMainSide(tasksManager, projectsManager, projectId = '', sysListName = 'today') {
