@@ -1,10 +1,13 @@
-import { Task, TaskStatus } from "../core/task.js";
+import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
 
 export class TaskViewSideUI {
 
     taskViewSide: HTMLDivElement;
     taskHeader: HTMLDivElement;
+    taskCheckboxComplete: HTMLInputElement;
+    taskDateButton: HTMLButtonElement;
+    taskPrioritySelect: HTMLSelectElement;
 
     taskTitleInput: HTMLInputElement;
     taskDescriptionInput: HTMLTextAreaElement;
@@ -16,12 +19,18 @@ export class TaskViewSideUI {
     constructor() {
         this.taskViewSide = document.getElementById('task-view-side') as HTMLDivElement;
         this.taskHeader = document.getElementById('task-header') as HTMLDivElement;
+        this.taskCheckboxComplete = document.getElementById('task-checkbox-complete') as HTMLInputElement;
+        this.taskDateButton = document.getElementById('task-date-button') as HTMLButtonElement;
+        this.taskPrioritySelect = document.getElementById('task-priority-select') as HTMLSelectElement;
 
         this.taskTitleInput = document.getElementById('task-title-input') as HTMLInputElement;
         this.taskDescriptionInput = document.getElementById('task-description-input') as HTMLTextAreaElement;
         this.taskSubtaskList = document.getElementById('subtask-list') as HTMLUListElement;
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn') as HTMLButtonElement;
 
+        this.taskPrioritySelect.onselect = () => {
+            this.saveTask(tasksManager);
+        };
         this.taskDescriptionInput.oninput = () => {
             this.taskDescriptionInput.style.height = 'auto';
             this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}`;
@@ -37,6 +46,16 @@ export class TaskViewSideUI {
         if (!task) return;
         if (task !== this.#selectedTask) this.#selectedTask = task;
         this.clearAll();
+
+        // Checkbox complete
+        this.taskCheckboxComplete.checked = !!task.completedDate;
+
+        // Button date
+        if (task.startDate)
+            this.taskDateButton.textContent = task.startDate.toDateString();
+
+        // Priority select
+        this.taskPrioritySelect.selectedIndex = task.priority;
 
         // Title
         this.taskTitleInput.value = task.title;
@@ -110,6 +129,12 @@ export class TaskViewSideUI {
     saveTask(tasksManager: TasksManager) {
         if (!this.#selectedTask) return;
         let isEdited = false;
+
+        // check priority
+        if (this.#selectedTask.priority !== TaskStatus[parseInt(this.taskPrioritySelect.value)]) {
+            this.#selectedTask.priority = TaskStatus[parseInt(this.taskPrioritySelect.value)];
+            isEdited = true;
+        }
 
         // check title
         if (this.#selectedTask.title !== this.taskTitleInput.value) {

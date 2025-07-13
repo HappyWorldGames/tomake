@@ -16,13 +16,21 @@ export class TaskViewSideUI {
         _TaskViewSideUI_selectedTask.set(this, null);
         this.taskViewSide = document.getElementById('task-view-side');
         this.taskHeader = document.getElementById('task-header');
+        this.taskCheckboxComplete = document.getElementById('task-checkbox-complete');
+        this.taskDateButton = document.getElementById('task-date-button');
+        this.taskPrioritySelect = document.getElementById('task-priority-select');
         this.taskTitleInput = document.getElementById('task-title-input');
         this.taskDescriptionInput = document.getElementById('task-description-input');
         this.taskSubtaskList = document.getElementById('subtask-list');
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn');
+        this.taskPrioritySelect.onselect = () => {
+            this.saveTask(tasksManager);
+        };
         this.taskDescriptionInput.oninput = () => {
             this.taskDescriptionInput.style.height = 'auto';
             this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}`;
+        };
+        this.taskSubtaskAddButton.onclick = () => {
         };
     }
     renderTaskViewSide(task, tasksManager) {
@@ -32,6 +40,10 @@ export class TaskViewSideUI {
         if (task !== __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
             __classPrivateFieldSet(this, _TaskViewSideUI_selectedTask, task, "f");
         this.clearAll();
+        this.taskCheckboxComplete.checked = !!task.completedDate;
+        if (task.startDate)
+            this.taskDateButton.textContent = task.startDate.toDateString();
+        this.taskPrioritySelect.selectedIndex = task.priority;
         this.taskTitleInput.value = task.title;
         let saveTimerId;
         this.taskTitleInput.oninput = () => {
@@ -83,6 +95,10 @@ export class TaskViewSideUI {
         if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
             return;
         let isEdited = false;
+        if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority !== TaskStatus[parseInt(this.taskPrioritySelect.value)]) {
+            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority = TaskStatus[parseInt(this.taskPrioritySelect.value)];
+            isEdited = true;
+        }
         if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").title !== this.taskTitleInput.value) {
             __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").title = this.taskTitleInput.value;
             isEdited = true;
