@@ -11,6 +11,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
 };
 var _TaskViewSideUI_selectedTask;
 import { TaskStatus } from "../core/task.js";
+import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
 export class TaskViewSideUI {
     constructor(tasksManager) {
         _TaskViewSideUI_selectedTask.set(this, null);
@@ -45,7 +46,7 @@ export class TaskViewSideUI {
         this.clearAll();
         this.taskCheckboxComplete.checked = !!task.completedDate;
         if (task.startDate)
-            this.taskDateTimeInput.value = task.startDate.toISOString().slice(0, 16);
+            this.taskDateTimeInput.value = convertToDateTimeLocalString(task.startDate);
         this.taskPrioritySelect.selectedIndex = task.priority;
         this.taskTitleInput.value = task.title;
         let saveTimerId;
@@ -98,10 +99,11 @@ export class TaskViewSideUI {
         if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
             return;
         let isEdited = false;
-        const dateTime = new Date(this.taskDateTimeInput.value);
+        const dateTime = getUTCDateFromLocal(this.taskDateTimeInput.value);
         if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate !== dateTime) {
+            console.log(`old: ${__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate}`);
             __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate = dateTime;
-            isEdited = true;
+            console.log(`new: ${new Date()}, set: ${new Date(this.taskDateTimeInput.value)}`);
         }
         if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority !== +this.taskPrioritySelect.value) {
             __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority = Number(this.taskPrioritySelect.value);

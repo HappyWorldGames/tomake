@@ -1,5 +1,6 @@
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
+import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
 
 export class TaskViewSideUI {
 
@@ -53,9 +54,9 @@ export class TaskViewSideUI {
         // Checkbox complete
         this.taskCheckboxComplete.checked = !!task.completedDate;
 
-        // Button date
+        // Input date
         if (task.startDate)
-            this.taskDateTimeInput.value = task.startDate.toISOString().slice(0, 16);
+            this.taskDateTimeInput.value = convertToDateTimeLocalString(task.startDate);
 
         // Priority select
         this.taskPrioritySelect.selectedIndex = task.priority;
@@ -134,10 +135,12 @@ export class TaskViewSideUI {
         let isEdited = false;
 
         // check datetime
-        const dateTime = new Date(this.taskDateTimeInput.value); // TODO fix not correctly value
+        const dateTime = getUTCDateFromLocal(this.taskDateTimeInput.value); // TODO fix not correctly value
         if (this.#selectedTask.startDate !== dateTime) {
+            console.log(`old: ${this.#selectedTask.startDate}`)
             this.#selectedTask.startDate = dateTime;
-            isEdited = true;
+            //isEdited = true;
+            console.log(`new: ${new Date()}, set: ${new Date(this.taskDateTimeInput.value)}`);
         }
 
         // check priority
