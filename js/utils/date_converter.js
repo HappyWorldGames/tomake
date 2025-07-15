@@ -7,8 +7,5 @@ export function convertToDateTimeLocalString(date) {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 export function getUTCDateFromLocal(dateTimeValue) {
-    const localDate = new Date(dateTimeValue);
-    const offsetMs = localDate.getTimezoneOffset() * 60000;
-    const utcDate = new Date(localDate.getTime() - offsetMs);
-    return utcDate;
+    return dateTimeValue !== '' ? new Date(dateTimeValue) : null;
 }

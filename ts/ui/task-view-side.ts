@@ -55,8 +55,7 @@ export class TaskViewSideUI {
         this.taskCheckboxComplete.checked = !!task.completedDate;
 
         // Input date
-        if (task.startDate)
-            this.taskDateTimeInput.value = convertToDateTimeLocalString(task.startDate);
+        this.taskDateTimeInput.value = task.startDate ? convertToDateTimeLocalString(task.startDate) : '';
 
         // Priority select
         this.taskPrioritySelect.selectedIndex = task.priority;
@@ -135,12 +134,10 @@ export class TaskViewSideUI {
         let isEdited = false;
 
         // check datetime
-        const dateTime = getUTCDateFromLocal(this.taskDateTimeInput.value); // TODO fix not correctly value
+        const dateTime = getUTCDateFromLocal(this.taskDateTimeInput.value);
         if (this.#selectedTask.startDate !== dateTime) {
-            console.log(`old: ${this.#selectedTask.startDate}`)
             this.#selectedTask.startDate = dateTime;
-            //isEdited = true;
-            console.log(`new: ${new Date()}, set: ${new Date(this.taskDateTimeInput.value)}`);
+            isEdited = true;
         }
 
         // check priority

@@ -45,8 +45,7 @@ export class TaskViewSideUI {
             __classPrivateFieldSet(this, _TaskViewSideUI_selectedTask, task, "f");
         this.clearAll();
         this.taskCheckboxComplete.checked = !!task.completedDate;
-        if (task.startDate)
-            this.taskDateTimeInput.value = convertToDateTimeLocalString(task.startDate);
+        this.taskDateTimeInput.value = task.startDate ? convertToDateTimeLocalString(task.startDate) : '';
         this.taskPrioritySelect.selectedIndex = task.priority;
         this.taskTitleInput.value = task.title;
         let saveTimerId;
@@ -101,9 +100,8 @@ export class TaskViewSideUI {
         let isEdited = false;
         const dateTime = getUTCDateFromLocal(this.taskDateTimeInput.value);
         if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate !== dateTime) {
-            console.log(`old: ${__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate}`);
             __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate = dateTime;
-            console.log(`new: ${new Date()}, set: ${new Date(this.taskDateTimeInput.value)}`);
+            isEdited = true;
         }
         if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority !== +this.taskPrioritySelect.value) {
             __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority = Number(this.taskPrioritySelect.value);

@@ -9,9 +9,5 @@ export function convertToDateTimeLocalString(date: Date): string {
 }
 
 export function getUTCDateFromLocal(dateTimeValue: string): Date | null {
-    const localDate = new Date(dateTimeValue);
-    const offsetMs = localDate.getTimezoneOffset() * 60000;
-    const utcDate = new Date(localDate.getTime() - offsetMs);
-
-    return utcDate;
+    return dateTimeValue !== '' ? new Date(dateTimeValue) : null;
 }
