@@ -29,6 +29,10 @@ export class TaskViewSideUI {
         this.taskSubtaskList = document.getElementById('subtask-list') as HTMLUListElement;
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn') as HTMLButtonElement;
 
+        this.taskCheckboxComplete.onchange = () => {
+            if (!this.#selectedTask) return;
+            this.saveTask(tasksManager);
+        }
         this.taskDateTimeInput.onchange = () => {
             this.saveTask(tasksManager);
         }
@@ -132,6 +136,13 @@ export class TaskViewSideUI {
     saveTask(tasksManager: TasksManager) {
         if (!this.#selectedTask) return;
         let isEdited = false;
+
+        // check complete
+        if (!!this.#selectedTask.completedDate !== this.taskCheckboxComplete.checked) {
+            this.#selectedTask.completedDate = this.taskCheckboxComplete.checked ? new Date() : null;
+            this.#selectedTask.status = this.taskCheckboxComplete.checked ? TaskStatus.Completed : TaskStatus.Normal;
+            isEdited = true;
+        }
 
         // check datetime
         const dateTime = getUTCDateFromLocal(this.taskDateTimeInput.value);

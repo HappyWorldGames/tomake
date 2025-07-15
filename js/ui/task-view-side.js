@@ -24,6 +24,11 @@ export class TaskViewSideUI {
         this.taskDescriptionInput = document.getElementById('task-description-input');
         this.taskSubtaskList = document.getElementById('subtask-list');
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn');
+        this.taskCheckboxComplete.onchange = () => {
+            if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
+                return;
+            this.saveTask(tasksManager);
+        };
         this.taskDateTimeInput.onchange = () => {
             this.saveTask(tasksManager);
         };
@@ -98,6 +103,11 @@ export class TaskViewSideUI {
         if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
             return;
         let isEdited = false;
+        if (!!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").completedDate !== this.taskCheckboxComplete.checked) {
+            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").completedDate = this.taskCheckboxComplete.checked ? new Date() : null;
+            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").status = this.taskCheckboxComplete.checked ? TaskStatus.Completed : TaskStatus.Normal;
+            isEdited = true;
+        }
         const dateTime = getUTCDateFromLocal(this.taskDateTimeInput.value);
         if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate !== dateTime) {
             __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate = dateTime;
