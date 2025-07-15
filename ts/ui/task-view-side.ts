@@ -39,6 +39,7 @@ export class TaskViewSideUI {
         this.taskPrioritySelect.onchange = () => {
             this.saveTask(tasksManager);
         };
+        // TODO auto height descruption
         this.taskDescriptionInput.oninput = () => {
             this.taskDescriptionInput.style.height = 'auto';
             this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}`;
@@ -74,6 +75,7 @@ export class TaskViewSideUI {
         // Title
         this.taskTitleInput.value = task.title;
 
+        // move to init
         let saveTimerId: number;
         this.taskTitleInput.oninput = () => {
             clearTimeout(saveTimerId);
@@ -116,6 +118,16 @@ export class TaskViewSideUI {
                 subTaskTitle.type = 'text';
                 subTaskTitle.classList.add('text-field');
                 subTaskTitle.value = subTask.title;
+
+                let saveTimerId: number;
+                subTaskTitle.oninput = () => {
+                    clearTimeout(saveTimerId);
+                    saveTimerId = setTimeout(() => {
+                        // fix save for subtask
+                        this.saveTask(tasksManager);
+                    }, 2500);
+                };
+                subTaskTitle.onblur = () => this.saveTask(tasksManager);
 
                 subTaskItem.appendChild(subTaskTitle);
 
