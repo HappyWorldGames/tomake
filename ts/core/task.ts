@@ -22,7 +22,7 @@ export class Task {
     status: TaskStatus;
 
     constructor(
-        title: string,
+        title: string = '',
         description: string = "",
 
         id: string = self.crypto.randomUUID(),
@@ -69,7 +69,7 @@ export class Task {
         return {
         taskId: this.id,
         parentId: this.parentId,
-        childIdList: this.childIdList,
+        childIdList: JSON.stringify(this.childIdList),
         listNameId: this.listNameId,
 
         title: this.title,
@@ -97,7 +97,7 @@ export class Task {
 
             obj.taskId,
             obj.parentId,
-            obj.childIdList,
+            JSON.parse(obj.childIdList),
             obj.listNameId,
 
             new Date(obj.createdDate),

@@ -45,6 +45,13 @@ export class TaskViewSideUI {
         };
         this.taskSubtaskAddButton.onclick = () => {
             // TODO add subtask and render
+            if (!this.#selectedTask) return;
+            tasksManager.addSubTask(this.#selectedTask.id, new Task()).then( subTaskId => {
+                if (!this.#selectedTask) return;
+
+                this.#selectedTask.childIdList.push(subTaskId);
+                this.renderTaskViewSide(this.#selectedTask, tasksManager);
+            })
         }
     }
 
@@ -133,6 +140,7 @@ export class TaskViewSideUI {
             this.taskSubtaskList.removeChild(this.taskSubtaskList.firstChild);
     }
 
+    // TODO move to tasksManager
     saveTask(tasksManager: TasksManager) {
         if (!this.#selectedTask) return;
         let isEdited = false;

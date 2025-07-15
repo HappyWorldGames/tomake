@@ -35,7 +35,12 @@ export class TasksManager {
         const request = tasksStore.get(id);
 
         request.onsuccess = (event) => {
-            resolve(Task.fromDB((event.target as IDBRequest).result));
+            if (event.target instanceof IDBRequest) {
+                if (event.target.result) resolve(Task.fromDB((event.target as IDBRequest).result));
+                else reject(new Error('Target is undefined'));
+            } else {
+                reject(new Error('Target not IDBRequest'));
+            }
         }
         request.onerror = (e) => { reject((e.target as IDBTransaction).error); }
     });}
@@ -92,7 +97,7 @@ export class TasksManager {
         return this.updateTask(task, isImportData);
     }
 
-    addSubTask(parentId: string, task: Task) { return new Promise((resolve, reject) => {
+    addSubTask(parentId: string, task: Task): Promise<string> { return new Promise((resolve, reject) => {
         if (!this.db) {
             reject(new Error("Database not initialized. Call initDB() first."));
             return;
@@ -119,9 +124,14 @@ export class TasksManager {
             this.updateTask(parentTask);
 
             // Check if a task exists in the database
-            this.getTaskFromId(task.id).then( subTask => {
-                if (!subTask) this.addTask(task);
-                resolve(task.id);
+            this.getTaskFromId(task.id).then( () => {
+                this.updateTask(task).then( () => {
+                    resolve(task.id);
+                });
+            }, () => {
+                this.addTask(task).then( () => {
+                    resolve(task.id);
+                });
             });
         });
     });}

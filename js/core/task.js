@@ -1,5 +1,5 @@
 export class Task {
-    constructor(title, description = "", id = self.crypto.randomUUID(), parentId = '', childIdList = [], listName = "inbox", createdDate = new Date(), updatedDate = new Date(), completedDate = null, startDate = null, dueDate = null, reminder = [], repeat = [], priority = TaskPriority.Nope, status = TaskStatus.Normal) {
+    constructor(title = '', description = "", id = self.crypto.randomUUID(), parentId = '', childIdList = [], listName = "inbox", createdDate = new Date(), updatedDate = new Date(), completedDate = null, startDate = null, dueDate = null, reminder = [], repeat = [], priority = TaskPriority.Nope, status = TaskStatus.Normal) {
         this.id = id;
         this.parentId = parentId;
         this.childIdList = childIdList;
@@ -20,7 +20,7 @@ export class Task {
         return {
             taskId: this.id,
             parentId: this.parentId,
-            childIdList: this.childIdList,
+            childIdList: JSON.stringify(this.childIdList),
             listNameId: this.listNameId,
             title: this.title,
             description: this.description,
@@ -36,7 +36,7 @@ export class Task {
         };
     }
     static fromDB(obj) {
-        return new Task(obj.title, obj.description, obj.taskId, obj.parentId, obj.childIdList, obj.listNameId, new Date(obj.createdDate), new Date(obj.updatedDate), obj.completedDate && new Date(obj.completedDate), obj.startDate && new Date(obj.startDate), obj.dueDate && new Date(obj.dueDate), obj.reminder.map((date) => new Date(date)), obj.repeat.map((date) => new Date(date)), Number(obj.priority || 0), obj.status);
+        return new Task(obj.title, obj.description, obj.taskId, obj.parentId, JSON.parse(obj.childIdList), obj.listNameId, new Date(obj.createdDate), new Date(obj.updatedDate), obj.completedDate && new Date(obj.completedDate), obj.startDate && new Date(obj.startDate), obj.dueDate && new Date(obj.dueDate), obj.reminder.map((date) => new Date(date)), obj.repeat.map((date) => new Date(date)), Number(obj.priority || 0), obj.status);
     }
 }
 export var TaskPriority;

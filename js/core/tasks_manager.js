@@ -29,7 +29,15 @@ export class TasksManager {
             const tasksStore = transaction.objectStore(DatabaseManager.storeTasksName);
             const request = tasksStore.get(id);
             request.onsuccess = (event) => {
-                resolve(Task.fromDB(event.target.result));
+                if (event.target instanceof IDBRequest) {
+                    if (event.target.result)
+                        resolve(Task.fromDB(event.target.result));
+                    else
+                        reject(new Error('Target is undefined'));
+                }
+                else {
+                    reject(new Error('Target not IDBRequest'));
+                }
             };
             request.onerror = (e) => { reject(e.target.error); };
         });
@@ -103,10 +111,14 @@ export class TasksManager {
                 task.parentId = parentId;
                 parentTask.childIdList.push(task.id);
                 this.updateTask(parentTask);
-                this.getTaskFromId(task.id).then(subTask => {
-                    if (!subTask)
-                        this.addTask(task);
-                    resolve(task.id);
+                this.getTaskFromId(task.id).then(() => {
+                    this.updateTask(task).then(() => {
+                        resolve(task.id);
+                    });
+                }, () => {
+                    this.addTask(task).then(() => {
+                        resolve(task.id);
+                    });
                 });
             });
         });

@@ -10,7 +10,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
 var _TaskViewSideUI_selectedTask;
-import { TaskStatus } from "../core/task.js";
+import { Task, TaskStatus } from "../core/task.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
 export class TaskViewSideUI {
     constructor(tasksManager) {
@@ -40,6 +40,14 @@ export class TaskViewSideUI {
             this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}`;
         };
         this.taskSubtaskAddButton.onclick = () => {
+            if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
+                return;
+            tasksManager.addSubTask(__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").id, new Task()).then(subTaskId => {
+                if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
+                    return;
+                __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").childIdList.push(subTaskId);
+                this.renderTaskViewSide(__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"), tasksManager);
+            });
         };
     }
     renderTaskViewSide(task, tasksManager) {
