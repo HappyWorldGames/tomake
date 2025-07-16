@@ -159,11 +159,6 @@ export class TasksManager {
             if (task instanceof Task) {
                 task.status = TaskStatus.Deleted;
 
-                if (task.parentId !== '') {
-                    this.getTaskFromId(task.parentId).then( task => {
-                        this.deleteTask(task.id, permanently);
-                    });
-                }
                 if (task.childIdList.length > 0) {
                     for (const taskId of task.childIdList) {
                         this.getTaskFromId(taskId).then( task => {
