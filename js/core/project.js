@@ -20,7 +20,7 @@ export class Project {
         };
     }
     static fromDB(obj) {
-        return new Project(obj.name, obj.order, obj.color, obj.createDate, obj.updatedDate, obj.id, obj.status);
+        return new Project(obj.name, obj.order, obj.color, new Date(obj.createDate), new Date(obj.updatedDate), obj.id, obj.status);
     }
 }
 export var ProjectStatus;

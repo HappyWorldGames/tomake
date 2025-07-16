@@ -25,7 +25,7 @@ export class DatabaseManager {
                     alert('No data to export!');
                     return;
                 }
-                __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_downloadFile).call(this, JSON.stringify([tasks, projects], null, 2), `tomake_backup_${new Date().toISOString().slice(0, 10)}.json`, 'application/json');
+                __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_downloadFile).call(this, JSON.stringify([tasks.map(task => task.toDB()), projects.map(project => project.toDB())], null, 2), `tomake_backup_${new Date().toISOString().slice(0, 10)}.json`, 'application/json');
             }
             catch (error) {
                 console.error('Export error:', error);

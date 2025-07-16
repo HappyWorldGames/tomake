@@ -56,8 +56,8 @@ export class Project {
             obj.order,
             obj.color,
 
-            obj.createDate,
-            obj.updatedDate,
+            new Date(obj.createDate),
+            new Date(obj.updatedDate),
 
             obj.id,
 

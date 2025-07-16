@@ -105,7 +105,7 @@ export class DatabaseManager {
             }
 
             this.#downloadFile(
-                JSON.stringify([tasks, projects], null, 2),
+                JSON.stringify([tasks.map(task => task.toDB()), projects.map(project => project.toDB())], null, 2),
                 `tomake_backup_${new Date().toISOString().slice(0,10)}.json`,
                 'application/json'
             );
