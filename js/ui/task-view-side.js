@@ -110,6 +110,7 @@ export class TaskViewSideUI {
                 subTaskDeleteButton.title = 'delete';
                 subTaskDeleteButton.textContent = '🗑';
                 subTaskDeleteButton.onclick = () => {
+                    tasksManager.deleteTask(subTask.id).then(() => subTaskItem.remove());
                 };
                 subTaskItem.appendChild(subTaskDeleteButton);
             });
