@@ -10,7 +10,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
 var _TaskViewSideUI_selectedTask;
-import { Task, TaskStatus } from "../core/task.js";
+import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
 export class TaskViewSideUI {
     constructor(tasksManager) {
@@ -57,6 +57,20 @@ export class TaskViewSideUI {
         if (task !== __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
             __classPrivateFieldSet(this, _TaskViewSideUI_selectedTask, task, "f");
         this.clearAll();
+        const priorityColor = function () {
+            switch (task.priority) {
+                case TaskPriority.High:
+                    return 'red';
+                case TaskPriority.Medium:
+                    return 'yellow';
+                case TaskPriority.Low:
+                    return 'RoyalBlue';
+                default:
+                    return 'gray';
+            }
+        }();
+        this.taskCheckboxComplete.style.borderColor = priorityColor;
+        this.taskCheckboxComplete.style.accentColor = priorityColor;
         this.taskCheckboxComplete.checked = !!task.completedDate;
         this.taskDateTimeInput.value = task.startDate ? convertToDateTimeLocalString(task.startDate) : '';
         this.taskPrioritySelect.selectedIndex = task.priority;

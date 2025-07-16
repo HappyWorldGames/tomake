@@ -64,6 +64,22 @@ export class TaskViewSideUI {
         this.clearAll();
 
         // Checkbox complete
+        const priorityColor: string = function(): string {
+            switch(task.priority) {
+                case TaskPriority.High:
+                    return 'red';
+                case TaskPriority.Medium:
+                    return 'yellow';
+                case TaskPriority.Low:
+                    return 'RoyalBlue';
+                default:
+                    return 'gray';
+            }
+        }();
+
+        this.taskCheckboxComplete.style.borderColor = priorityColor;
+        this.taskCheckboxComplete.style.accentColor = priorityColor;
+
         this.taskCheckboxComplete.checked = !!task.completedDate;
 
         // Input date
