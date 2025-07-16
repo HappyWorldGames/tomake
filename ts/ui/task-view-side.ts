@@ -111,6 +111,9 @@ export class TaskViewSideUI {
                 subTaskCheckbox.type = 'checkbox';
                 subTaskCheckbox.classList.add('check-field');
                 subTaskCheckbox.checked = !!subTask.completedDate;
+                subTaskCheckbox.onchange = () => {
+                    this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
+                }
 
                 subTaskItem.appendChild(subTaskCheckbox);
 
