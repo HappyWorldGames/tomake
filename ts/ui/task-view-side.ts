@@ -102,6 +102,7 @@ export class TaskViewSideUI {
                 if (subTask.status === TaskStatus.Deleted) return;
 
                 const subTaskItem = document.createElement('li') as HTMLLIElement;
+                subTaskItem.id = subTask.id;
 
                 this.taskSubtaskList.appendChild(subTaskItem);
 
@@ -123,11 +124,10 @@ export class TaskViewSideUI {
                 subTaskTitle.oninput = () => {
                     clearTimeout(saveTimerId);
                     saveTimerId = setTimeout(() => {
-                        // fix save for subtask
-                        this.saveTask(tasksManager);
+                        subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
                     }, 2500);
                 };
-                subTaskTitle.onblur = () => this.saveTask(tasksManager);
+                subTaskTitle.onblur = () => subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
 
                 subTaskItem.appendChild(subTaskTitle);
 
@@ -152,7 +152,6 @@ export class TaskViewSideUI {
             this.taskSubtaskList.removeChild(this.taskSubtaskList.firstChild);
     }
 
-    // TODO move to tasksManager
     saveTask(tasksManager: TasksManager) {
         if (!this.#selectedTask) return;
         let isEdited = false;
@@ -190,5 +189,25 @@ export class TaskViewSideUI {
         }
 
         if (isEdited) tasksManager.updateTask(this.#selectedTask);
+    }
+
+    saveSubTask(subTask: Task, checkBoxView: HTMLInputElement, titleView: HTMLInputElement, tasksManager: TasksManager): Task {
+        let isEdited = false;
+
+        // check checkBox
+        if (!!subTask.completedDate !== checkBoxView.checked) {
+            subTask.completedDate = checkBoxView.checked ? new Date() : null;
+            subTask.status = checkBoxView.checked ? TaskStatus.Completed : TaskStatus.Normal;
+            isEdited = true;
+        }
+
+        // check title
+        if (subTask.title !== titleView.value) {
+            subTask.title = titleView.value;
+            isEdited = true;
+        }
+
+        if (isEdited) tasksManager.updateTask(subTask);
+        return subTask;
     }
 }

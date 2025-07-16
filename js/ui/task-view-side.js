@@ -82,6 +82,7 @@ export class TaskViewSideUI {
                 if (subTask.status === TaskStatus.Deleted)
                     return;
                 const subTaskItem = document.createElement('li');
+                subTaskItem.id = subTask.id;
                 this.taskSubtaskList.appendChild(subTaskItem);
                 const subTaskCheckbox = document.createElement('input');
                 subTaskCheckbox.type = 'checkbox';
@@ -92,6 +93,14 @@ export class TaskViewSideUI {
                 subTaskTitle.type = 'text';
                 subTaskTitle.classList.add('text-field');
                 subTaskTitle.value = subTask.title;
+                let saveTimerId;
+                subTaskTitle.oninput = () => {
+                    clearTimeout(saveTimerId);
+                    saveTimerId = setTimeout(() => {
+                        subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
+                    }, 2500);
+                };
+                subTaskTitle.onblur = () => subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
                 subTaskItem.appendChild(subTaskTitle);
                 const subTaskDeleteButton = document.createElement('button');
                 subTaskDeleteButton.classList.add('delete-btn');
@@ -135,6 +144,21 @@ export class TaskViewSideUI {
         }
         if (isEdited)
             tasksManager.updateTask(__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"));
+    }
+    saveSubTask(subTask, checkBoxView, titleView, tasksManager) {
+        let isEdited = false;
+        if (!!subTask.completedDate !== checkBoxView.checked) {
+            subTask.completedDate = checkBoxView.checked ? new Date() : null;
+            subTask.status = checkBoxView.checked ? TaskStatus.Completed : TaskStatus.Normal;
+            isEdited = true;
+        }
+        if (subTask.title !== titleView.value) {
+            subTask.title = titleView.value;
+            isEdited = true;
+        }
+        if (isEdited)
+            tasksManager.updateTask(subTask);
+        return subTask;
     }
 }
 _TaskViewSideUI_selectedTask = new WeakMap();
