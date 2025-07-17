@@ -113,56 +113,82 @@ export class TaskViewSideUI {
         this.taskDescriptionInput.onblur = () => this.saveTask(tasksManager);
 
         // Subtask list
-        for (const taskChildId of task.childIdList) {
-            tasksManager.getTaskFromId(taskChildId).then( subTask => {
-                if (subTask.status === TaskStatus.Deleted) return;
+        const completeSubTasks: Task[] = [];
+        const addMainSubTask = async() => { return new Promise(resolve => {
+            let count = 0;
+            for (const taskChildId of task.childIdList) {
+                tasksManager.getTaskFromId(taskChildId).then( subTask => {
+                    switch(subTask.status) {
+                        case TaskStatus.Deleted:
+                            break;
+                        case TaskStatus.Completed:
+                        case TaskStatus.NoCompleted:
+                            completeSubTasks.push(subTask);
+                            break;
+                        default:
+                            this.addSubTask(subTask, tasksManager);
+                            break;
+                    }
+                    count++;
+                    if (count >= task.childIdList.length) resolve('');
+                });
+            }
+        });};
 
-                const subTaskItem = document.createElement('li') as HTMLLIElement;
-                subTaskItem.id = subTask.id;
+        addMainSubTask().then(() => {
+            if (completeSubTasks.length === 0) return;
+            for (const subTask of completeSubTasks) {
+                this.addSubTask(subTask, tasksManager);
+            }
+        });
+    }
 
-                this.taskSubtaskList.appendChild(subTaskItem);
+    addSubTask(subTask: Task, tasksManager: TasksManager) {
+        const subTaskItem = document.createElement('li') as HTMLLIElement;
+        subTaskItem.id = subTask.id;
 
-                // Checkbox
-                const subTaskCheckbox = document.createElement('input') as HTMLInputElement;
-                subTaskCheckbox.type = 'checkbox';
-                subTaskCheckbox.classList.add('check-field');
-                subTaskCheckbox.checked = !!subTask.completedDate;
-                subTaskCheckbox.onchange = () => {
-                    this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
-                }
+        this.taskSubtaskList.appendChild(subTaskItem);
 
-                subTaskItem.appendChild(subTaskCheckbox);
-
-                // Title
-                const subTaskTitle = document.createElement('input') as HTMLInputElement;
-                subTaskTitle.type = 'text';
-                subTaskTitle.classList.add('text-field');
-                subTaskTitle.value = subTask.title;
-
-                let saveTimerId: number;
-                subTaskTitle.oninput = () => {
-                    clearTimeout(saveTimerId);
-                    saveTimerId = setTimeout(() => {
-                        subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
-                    }, 2500);
-                };
-                subTaskTitle.onblur = () => subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
-
-                subTaskItem.appendChild(subTaskTitle);
-
-                // Delete Button
-                const subTaskDeleteButton = document.createElement('button') as HTMLButtonElement;
-                subTaskDeleteButton.classList.add('delete-btn');
-                subTaskDeleteButton.title = 'delete';
-                subTaskDeleteButton.textContent = '🗑';
-
-                subTaskDeleteButton.onclick = () => {
-                    tasksManager.deleteTask(subTask.id).then(() => subTaskItem.remove() );
-                }
-
-                subTaskItem.appendChild(subTaskDeleteButton);
-            });
+        // Checkbox
+        const subTaskCheckbox = document.createElement('input') as HTMLInputElement;
+        subTaskCheckbox.type = 'checkbox';
+        subTaskCheckbox.classList.add('check-field');
+        subTaskCheckbox.checked = !!subTask.completedDate;
+        subTaskCheckbox.onchange = () => {
+            this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
+            if (this.#selectedTask) this.renderTaskViewSide(this.#selectedTask, tasksManager);
         }
+
+        subTaskItem.appendChild(subTaskCheckbox);
+
+        // Title
+        const subTaskTitle = document.createElement('input') as HTMLInputElement;
+        subTaskTitle.type = 'text';
+        subTaskTitle.classList.add('text-field');
+        subTaskTitle.value = subTask.title;
+
+        let saveTimerId: number;
+        subTaskTitle.oninput = () => {
+            clearTimeout(saveTimerId);
+            saveTimerId = setTimeout(() => {
+                subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
+            }, 2500);
+        };
+        subTaskTitle.onblur = () => subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
+
+        subTaskItem.appendChild(subTaskTitle);
+
+        // Delete Button
+        const subTaskDeleteButton = document.createElement('button') as HTMLButtonElement;
+        subTaskDeleteButton.classList.add('delete-btn');
+        subTaskDeleteButton.title = 'delete';
+        subTaskDeleteButton.textContent = '🗑';
+
+        subTaskDeleteButton.onclick = () => {
+            tasksManager.deleteTask(subTask.id).then(() => subTaskItem.remove() );
+        }
+
+        subTaskItem.appendChild(subTaskDeleteButton);
     }
 
     clearAll() {
