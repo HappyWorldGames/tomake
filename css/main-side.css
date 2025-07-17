@@ -15,6 +15,7 @@
 }
 
 .main-side {
+    max-height: 100vh;
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -80,6 +81,20 @@
 .main-side #task-form #add-task-btn:active {
     background-color: #a34f00;
 }
+
+.main-side #task-array-list {
+    transition: .5s;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+    scrollbar-color: #fff0 #fff0;
+}
+
+.main-side #task-array-list:hover {
+    transition: .5s;
+    scrollbar-color: var(--main-side-item-selected-bg-color) #fff0;
+}
+
 
 .main-side .task-list-name {
     margin: 5px;

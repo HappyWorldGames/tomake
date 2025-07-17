@@ -27,10 +27,20 @@
 }
 
 .task-view-side {
+    transition: .5s;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+    scrollbar-color: #fff0 #fff0;
+    max-height: 100h;
     background-color: var(--task-view-side-bg-color);
     flex: 1;
     flex-direction: column;
     visibility: hidden;
+}
+
+.task-view-side:hover {
+    scrollbar-color: var(--task-view-side-item-selected-bg-color) #fff0;
 }
 
 .task-view-side .header {
