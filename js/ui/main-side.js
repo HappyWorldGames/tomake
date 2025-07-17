@@ -43,14 +43,7 @@ export class MainSideUI {
             return;
         switch (sysListName) {
             case 'today':
-                this.addUntilToDay(tasksManager, projectsManager);
-                this.addToDay(tasksManager, projectsManager);
-                const startDate = new Date();
-                startDate.setHours(0, 0, 0, 0);
-                const endDate = new Date();
-                endDate.setHours(23, 59, 59, 999);
-                const dateRange = IDBKeyRange.bound(startDate, endDate);
-                this.addCompletedAndNoCompleted(tasksManager, projectsManager, dateRange);
+                this.addSysToDay(tasksManager, projectsManager);
                 break;
         }
     }
@@ -176,6 +169,14 @@ export class MainSideUI {
         });
         taskItem.appendChild(taskMoreButton);
     }
+    async addSysToDay(tasksManager, projectsManager) {
+        this.addUntilToDay(tasksManager, projectsManager);
+        const startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
+        this.addFiltredList(tasksManager, projectsManager, 'startDate', IDBKeyRange.bound(startDate, endDate), 'ToDay');
+    }
     async addUntilToDay(tasksManager, projectsManager) {
         const endDate = new Date();
         endDate.setHours(0, 0, 0, 0);
@@ -193,36 +194,37 @@ export class MainSideUI {
                 this.addItem(task, tasksManager, projectsManager);
         }
     }
-    async addToDay(tasksManager, projectsManager) {
-        const startDate = new Date();
-        startDate.setHours(0, 0, 0, 0);
-        const endDate = new Date();
-        endDate.setHours(23, 59, 59, 999);
-        const tasks = await tasksManager.getTasksFromIndex('startDate', IDBKeyRange.bound(startDate, endDate));
+    async addFiltredList(tasksManager, projectsManager, index, dateRange, taskListName, withCompleteTasks = true) {
+        const tasks = await tasksManager.getTasksFromIndex(index, dateRange);
         if (tasks.length === 0)
             return;
-        this.addTaskListName('ToDay');
+        const filtredTasks = [];
+        const completeTasks = [];
         for (const task of tasks) {
             if (task.status !== TaskStatus.Completed && task.status !== TaskStatus.NoCompleted)
+                filtredTasks.push(task);
+            else if (task.status === TaskStatus.Completed || task.status === TaskStatus.NoCompleted)
+                completeTasks.push(task);
+        }
+        if (filtredTasks.length !== 0) {
+            this.addTaskListName(taskListName);
+            for (const task of filtredTasks)
                 this.addItem(task, tasksManager, projectsManager);
         }
-    }
-    async addCompletedAndNoCompleted(tasksManager, projectsManager, dateRange) {
-        const tasks = await tasksManager.getTasksFromIndex('completedDate', dateRange);
-        if (tasks.length === 0)
+        if (!withCompleteTasks || completeTasks.length === 0)
             return;
-        const hasCompleted = tasks.map(task => task.status).includes(TaskStatus.Completed);
-        const hasNoCompleted = tasks.map(task => task.status).includes(TaskStatus.NoCompleted);
+        const hasCompleted = completeTasks.map(task => task.status).includes(TaskStatus.Completed);
+        const hasNoCompleted = completeTasks.map(task => task.status).includes(TaskStatus.NoCompleted);
         let titleTaskList = '';
         if (hasCompleted)
             titleTaskList += 'Complete' + (hasNoCompleted ? ' and' : '');
         if (hasNoCompleted)
             titleTaskList += 'No complete';
+        if (titleTaskList === '')
+            return;
         this.addTaskListName(titleTaskList);
-        for (const task of tasks) {
-            if (task.status === TaskStatus.Completed || task.status === TaskStatus.NoCompleted)
-                this.addItem(task, tasksManager, projectsManager);
-        }
+        for (const task of completeTasks)
+            this.addItem(task, tasksManager, projectsManager);
     }
     dateToString(date, fromDate = new Date()) {
         let result = '';
