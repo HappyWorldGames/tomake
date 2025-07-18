@@ -1,3 +1,4 @@
+import { getUUID } from "../utils/uuid.js";
 import { DatabaseManager } from "./database_manager.js";
 import { Task, TaskStatus } from "./task.js";
 
@@ -72,13 +73,7 @@ export class TasksManager {
         const transaction = this.db.transaction(DatabaseManager.storeTasksName, 'readwrite');
         const tasksStore = transaction.objectStore(DatabaseManager.storeTasksName);
 
-        if (task.id == '') {
-            if (typeof self.crypto.randomUUID !== 'function') {
-                alert("UUID generate error cant find self.crypto.randomUUID()");
-            }
-
-            task.id = self.crypto.randomUUID();
-        }
+        if (task.id == '') task.id = getUUID();
 
         if (!isImportData) task.updatedDate = new Date();
         const request = tasksStore.put(task.toDB());

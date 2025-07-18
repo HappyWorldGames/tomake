@@ -1,3 +1,5 @@
+import { getUUID } from "../utils/uuid.js";
+
 export class Task {
 
     id: string;
@@ -25,7 +27,7 @@ export class Task {
         title: string = '',
         description: string = "",
 
-        id: string = self.crypto.randomUUID(),
+        id: string = getUUID(),
         parentId: string = '',
         childIdList: string[] = [],
         listName: string = "inbox",

@@ -1,3 +1,4 @@
+import { getUUID } from "../utils/uuid.js";
 import { DatabaseManager } from "./database_manager.js";
 import { Project, ProjectStatus } from "./project.js";
 export class ProjectsManager {
@@ -59,12 +60,8 @@ export class ProjectsManager {
             }
             const transaction = this.db.transaction(DatabaseManager.storeProjectsName, 'readwrite');
             const projectsStore = transaction.objectStore(DatabaseManager.storeProjectsName);
-            if (project.id == '') {
-                if (typeof self.crypto.randomUUID !== 'function') {
-                    alert("UUID generate error cant find self.crypto.randomUUID()");
-                }
-                project.id = self.crypto.randomUUID();
-            }
+            if (project.id == '')
+                project.id = getUUID();
             if (!isImportData)
                 project.updatedDate = new Date();
             const request = projectsStore.put(project.toDB());

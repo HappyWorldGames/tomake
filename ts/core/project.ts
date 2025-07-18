@@ -1,3 +1,5 @@
+import { getUUID } from "../utils/uuid.js";
+
 export class Project {
 
     id: string;
@@ -16,7 +18,7 @@ export class Project {
         order: number,
         color: string = '',
 
-        id: string = self.crypto.randomUUID(),
+        id: string = getUUID(),
 
         createDate: Date = new Date(),
         updatedDate: Date = new Date(),
