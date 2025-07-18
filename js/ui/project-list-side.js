@@ -68,9 +68,15 @@ export class ProjectListSideUI {
             __classPrivateFieldGet(this, _ProjectListSideUI_mainSideUI, "f").renderMainSide(tasksManager, projectsManager, project.id);
         };
         this.insertChildAtIndex(isSys ? this.projectListSys : this.projectList, projectItem, project.order);
+        if (isSys)
+            return;
+        const buttons = document.createElement('div');
+        projectItem.appendChild(buttons);
         const editButton = document.createElement('button');
         editButton.type = 'button';
-        editButton.textContent = 'Edit';
+        editButton.classList.add('button');
+        editButton.title = 'Edit';
+        editButton.textContent = '✎';
         editButton.onclick = () => {
             const newName = prompt('List name:', project.name);
             if (newName === project.name || newName === null)
@@ -80,7 +86,18 @@ export class ProjectListSideUI {
                 this.renderProjectListSide(tasksManager, projectsManager);
             });
         };
-        projectItem.appendChild(editButton);
+        buttons.appendChild(editButton);
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.classList.add('button');
+        deleteButton.title = 'Delete';
+        deleteButton.textContent = '🗑';
+        deleteButton.onclick = () => {
+            if (confirm(`Delete ${project.name}?`)) {
+                projectsManager.deleteProject(project.id, tasksManager);
+            }
+        };
+        buttons.appendChild(deleteButton);
     }
     insertChildAtIndex(parent, child, index) {
         if (index >= parent.children.length || index === -1) {

@@ -84,25 +84,45 @@ export class ProjectListSideUI {
 
         this.insertChildAtIndex(isSys? this.projectListSys : this.projectList, projectItem, project.order);
 
+        if (isSys) return;
+
+        const buttons = document.createElement('div') as HTMLDivElement;
+        projectItem.appendChild(buttons);
+
         // Edit Button
         const editButton = document.createElement('button') as HTMLButtonElement;
         editButton.type = 'button';
-        editButton.textContent = 'Edit';
+        editButton.classList.add('button');
+        editButton.title = 'Edit';
+        editButton.textContent = '✎';
 
         editButton.onclick = () => {
             const newName = prompt('List name:', project.name);
             if (newName === project.name || newName === null) return;
 
-            // TODO project save function
+            // TODO make project save function
             project.name = newName;
             projectsManager.updateProject(project).then(() => {
                 this.renderProjectListSide(tasksManager, projectsManager);
             })
         }
 
-        projectItem.appendChild(editButton);
+        buttons.appendChild(editButton);
 
         // Delete Button
+        const deleteButton = document.createElement('button') as HTMLButtonElement;
+        deleteButton.type = 'button';
+        deleteButton.classList.add('button');
+        deleteButton.title = 'Delete';
+        deleteButton.textContent = '🗑';
+
+        deleteButton.onclick = () => {
+            if (confirm(`Delete ${project.name}?`)) {
+                projectsManager.deleteProject(project.id, tasksManager);
+            }
+        }
+
+        buttons.appendChild(deleteButton);
     }
 
     insertChildAtIndex(parent: HTMLElement, child: HTMLElement, index: number) {

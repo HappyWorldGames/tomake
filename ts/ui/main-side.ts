@@ -212,7 +212,7 @@ export class MainSideUI {
         const taskDeleteButton = document.createElement('button') as HTMLButtonElement;
         taskDeleteButton.type = 'button';
         taskDeleteButton.classList.add('task-delete');
-        taskDeleteButton.textContent = "🗑️";
+        taskDeleteButton.textContent = "🗑";
         taskDeleteButton.addEventListener('click', () => {
             tasksManager.deleteTask(task.id).then(() => this.renderMainSide(tasksManager, projectsManager));
         });

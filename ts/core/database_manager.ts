@@ -75,7 +75,7 @@ export class DatabaseManager {
             const tasksStore = db.createObjectStore(DatabaseManager.storeProjectsName, { keyPath: 'id', autoIncrement: false });
 
             tasksStore.createIndex('name', 'name', { unique: false });
-            tasksStore.createIndex('order', 'order', { unique: true });
+            tasksStore.createIndex('order', 'order', { unique: false });
             tasksStore.createIndex('color', 'color', { unique: false });
 
             tasksStore.createIndex('createdDate', 'createdDate', { unique: false });
