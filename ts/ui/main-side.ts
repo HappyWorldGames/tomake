@@ -41,18 +41,19 @@ export class MainSideUI {
 
     renderMainSide(tasksManager: TasksManager, projectsManager: ProjectsManager, projectId: string = '') {
         if (projectId !== '') this.#projectId = projectId;
-        this.#taskViewSideUI.renderTaskViewSide(null, tasksManager);
+        this.#taskViewSideUI.renderTaskViewSide(null, tasksManager, projectsManager);
+        this.#selectedTaskItemId = '';
         this.clearAll();
 
         // check system or not
-        if (projectId.length < 4) {
+        if (projectId.length < 4 && projectId !== SysProjectId.Inbox) {
             switch(this.#projectId) {
                 case SysProjectId.ToDay:
                     this.addSysToDay(tasksManager, projectsManager);
                     break;
             }
         } else {
-            // TODO listName load
+            this.addFiltredList(tasksManager, projectsManager, 'listNameId', IDBKeyRange.only(projectId));
         }
     }
 
@@ -108,7 +109,7 @@ export class MainSideUI {
             taskItem.classList.add('selected');
             taskTitleInput.focus();
 
-            this.#taskViewSideUI.renderTaskViewSide(task, tasksManager);
+            this.#taskViewSideUI.renderTaskViewSide(task, tasksManager, projectsManager);
         }
 
         this.taskArrayList?.appendChild(taskItem);
@@ -261,7 +262,7 @@ export class MainSideUI {
         }
     }
 
-    async addFiltredList(tasksManager: TasksManager, projectsManager: ProjectsManager, index: string, dateRange: IDBKeyRange, taskListName: string, withCompleteTasks = true) {
+    async addFiltredList(tasksManager: TasksManager, projectsManager: ProjectsManager, index: string, dateRange: IDBKeyRange, taskListName: string = '', withCompleteTasks = true) {
         const tasks = await tasksManager.getTasksFromIndex(index, dateRange);
         if (tasks.length === 0) return;
 
@@ -275,7 +276,7 @@ export class MainSideUI {
         }
 
         if (filtredTasks.length !== 0) {
-            this.addTaskListName(taskListName);
+            if (taskListName !== '') this.addTaskListName(taskListName);
             for (const task of filtredTasks)
                 this.addItem(task, tasksManager, projectsManager);
         }

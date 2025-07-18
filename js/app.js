@@ -8,7 +8,7 @@ export class App {
     constructor() {
         this.dbManager = new DatabaseManager();
         this.syncProjectListSideUI = new SyncProjectListSideUI();
-        this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager);
+        this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager, this.dbManager.projectsManager);
         this.mainSideUI = new MainSideUI(this.taskViewSideUI);
         this.projectListSideUI = new ProjectListSideUI(this.mainSideUI, this.dbManager.tasksManager, this.dbManager.projectsManager);
         this.themreManager = new ThemeManager(this.syncProjectListSideUI.themeToggleButton);

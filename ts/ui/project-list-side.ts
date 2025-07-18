@@ -1,6 +1,7 @@
 import { Project } from "../core/project.js";
 import { ProjectsManager } from "../core/projects_manager";
 import { TasksManager } from "../core/tasks_manager";
+import { insertChildAtIndex } from "../utils/html_functions.js";
 import { MainSideUI } from "./main-side";
 
 export class ProjectListSideUI {
@@ -82,7 +83,7 @@ export class ProjectListSideUI {
             this.#mainSideUI.renderMainSide(tasksManager, projectsManager, project.id);
         }
 
-        this.insertChildAtIndex(isSys? this.projectListSys : this.projectList, projectItem, project.order);
+        insertChildAtIndex(isSys? this.projectListSys : this.projectList, projectItem, project.order);
 
         if (isSys) return;
 
@@ -104,7 +105,7 @@ export class ProjectListSideUI {
             project.name = newName;
             projectsManager.updateProject(project).then(() => {
                 this.renderProjectListSide(tasksManager, projectsManager);
-            })
+            });
         }
 
         buttons.appendChild(editButton);
@@ -123,14 +124,6 @@ export class ProjectListSideUI {
         }
 
         buttons.appendChild(deleteButton);
-    }
-
-    insertChildAtIndex(parent: HTMLElement, child: HTMLElement, index: number) {
-        if (index >= parent.children.length || index === -1) {
-            parent.appendChild(child);
-        } else {
-            parent.insertBefore(child, parent.children[index]);
-        }
     }
 }
 

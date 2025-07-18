@@ -1,10 +1,11 @@
+import { SysProjectId } from "../ui/project-list-side.js";
 import { getUUID } from "../utils/uuid.js";
 export class Task {
-    constructor(title = '', description = "", id = getUUID(), parentId = '', childIdList = [], listName = "inbox", createdDate = new Date(), updatedDate = new Date(), completedDate = null, startDate = null, dueDate = null, reminder = [], repeat = [], priority = TaskPriority.Nope, status = TaskStatus.Normal) {
+    constructor(title = '', description = "", id = getUUID(), parentId = '', childIdList = [], listNameId = SysProjectId.Inbox, createdDate = new Date(), updatedDate = new Date(), completedDate = null, startDate = null, dueDate = null, reminder = [], repeat = [], priority = TaskPriority.Nope, status = TaskStatus.Normal) {
         this.id = id;
         this.parentId = parentId;
         this.childIdList = childIdList;
-        this.listNameId = listName;
+        this.listNameId = listNameId;
         this.title = title;
         this.description = description;
         this.createdDate = createdDate;

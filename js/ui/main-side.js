@@ -39,9 +39,10 @@ export class MainSideUI {
     renderMainSide(tasksManager, projectsManager, projectId = '') {
         if (projectId !== '')
             __classPrivateFieldSet(this, _MainSideUI_projectId, projectId, "f");
-        __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(null, tasksManager);
+        __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(null, tasksManager, projectsManager);
+        __classPrivateFieldSet(this, _MainSideUI_selectedTaskItemId, '', "f");
         this.clearAll();
-        if (projectId.length < 4) {
+        if (projectId.length < 4 && projectId !== SysProjectId.Inbox) {
             switch (__classPrivateFieldGet(this, _MainSideUI_projectId, "f")) {
                 case SysProjectId.ToDay:
                     this.addSysToDay(tasksManager, projectsManager);
@@ -49,6 +50,7 @@ export class MainSideUI {
             }
         }
         else {
+            this.addFiltredList(tasksManager, projectsManager, 'listNameId', IDBKeyRange.only(projectId));
         }
     }
     clearAll() {
@@ -102,7 +104,7 @@ export class MainSideUI {
             __classPrivateFieldSet(this, _MainSideUI_selectedTaskItemId, task.id, "f");
             taskItem.classList.add('selected');
             taskTitleInput.focus();
-            __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(task, tasksManager);
+            __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(task, tasksManager, projectsManager);
         };
         (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
         const taskCheckbox = document.createElement('input');
@@ -198,7 +200,7 @@ export class MainSideUI {
                 this.addItem(task, tasksManager, projectsManager);
         }
     }
-    async addFiltredList(tasksManager, projectsManager, index, dateRange, taskListName, withCompleteTasks = true) {
+    async addFiltredList(tasksManager, projectsManager, index, dateRange, taskListName = '', withCompleteTasks = true) {
         const tasks = await tasksManager.getTasksFromIndex(index, dateRange);
         if (tasks.length === 0)
             return;
@@ -211,7 +213,8 @@ export class MainSideUI {
                 completeTasks.push(task);
         }
         if (filtredTasks.length !== 0) {
-            this.addTaskListName(taskListName);
+            if (taskListName !== '')
+                this.addTaskListName(taskListName);
             for (const task of filtredTasks)
                 this.addItem(task, tasksManager, projectsManager);
         }

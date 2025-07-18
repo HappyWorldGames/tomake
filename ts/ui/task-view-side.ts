@@ -1,6 +1,9 @@
+import { ProjectsManager } from "../core/projects_manager.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
+import { insertChildAtIndex } from "../utils/html_functions.js";
+import { SysProjectId } from "./project-list-side.js";
 
 export class TaskViewSideUI {
 
@@ -15,9 +18,11 @@ export class TaskViewSideUI {
     taskSubtaskList: HTMLUListElement;
     taskSubtaskAddButton: HTMLButtonElement;
 
+    taskProjectSelect: HTMLSelectElement;
+
     #selectedTask: Task | null = null;
 
-    constructor(tasksManager: TasksManager) {
+    constructor(tasksManager: TasksManager, projectsManager: ProjectsManager) {
         this.taskViewSide = document.getElementById('task-view-side') as HTMLDivElement;
         this.taskHeader = document.getElementById('task-header') as HTMLDivElement;
         this.taskCheckboxComplete = document.getElementById('task-checkbox-complete') as HTMLInputElement;
@@ -29,6 +34,9 @@ export class TaskViewSideUI {
         this.taskSubtaskList = document.getElementById('subtask-list') as HTMLUListElement;
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn') as HTMLButtonElement;
 
+        this.taskProjectSelect = document.getElementById('task-project-select') as HTMLSelectElement;
+
+        // listeners to save
         this.taskCheckboxComplete.onchange = () => {
             if (!this.#selectedTask) return;
             this.saveTask(tasksManager);
@@ -39,26 +47,51 @@ export class TaskViewSideUI {
         this.taskPrioritySelect.onchange = () => {
             this.saveTask(tasksManager);
         };
+
+        let saveTimerId: number;
+        this.taskTitleInput.oninput = () => {
+            clearTimeout(saveTimerId);
+            saveTimerId = setTimeout(() => {
+                this.saveTask(tasksManager);
+            }, 2500);
+        };
+        this.taskTitleInput.onblur = () => this.saveTask(tasksManager);
+
         // TODO auto height descruption
         this.taskDescriptionInput.oninput = () => {
             this.taskDescriptionInput.style.height = 'auto';
             this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}`;
         };
+        this.taskDescriptionInput.oninput = () => {
+            clearTimeout(saveTimerId);
+            saveTimerId = setTimeout(() => {
+                this.saveTask(tasksManager);
+            }, 2500);
+        };
+        this.taskDescriptionInput.onblur = () => this.saveTask(tasksManager);
+
         this.taskSubtaskAddButton.onclick = () => {
             if (!this.#selectedTask) return;
             tasksManager.addSubTask(this.#selectedTask.id, new Task()).then( subTaskId => {
                 if (!this.#selectedTask) return;
 
                 this.#selectedTask.childIdList.push(subTaskId);
-                this.renderTaskViewSide(this.#selectedTask, tasksManager);
+                this.renderTaskViewSide(this.#selectedTask, tasksManager, projectsManager);
             })
+        }
+
+        this.taskProjectSelect.onchange = () => {
+            this.saveTask(tasksManager);
         }
     }
 
     // TODO make fun small
-    renderTaskViewSide(task: Task | null, tasksManager: TasksManager) {
+    renderTaskViewSide(task: Task | null, tasksManager: TasksManager, projectsManager: ProjectsManager) {
         this.taskViewSide.style.visibility = task ? 'visible' : 'hidden';
-        if (!task) return;
+        if (!task) {
+            this.#selectedTask = null;
+            return;
+        }
         if (task !== this.#selectedTask) this.#selectedTask = task;
         this.clearAll();
 
@@ -90,26 +123,8 @@ export class TaskViewSideUI {
         // Title
         this.taskTitleInput.value = task.title;
 
-        // move to init
-        let saveTimerId: number;
-        this.taskTitleInput.oninput = () => {
-            clearTimeout(saveTimerId);
-            saveTimerId = setTimeout(() => {
-                this.saveTask(tasksManager);
-            }, 2500);
-        };
-        this.taskTitleInput.onblur = () => this.saveTask(tasksManager);
-
         // Description
         this.taskDescriptionInput.value = task.description;
-
-        this.taskDescriptionInput.oninput = () => {
-            clearTimeout(saveTimerId);
-            saveTimerId = setTimeout(() => {
-                this.saveTask(tasksManager);
-            }, 2500);
-        };
-        this.taskDescriptionInput.onblur = () => this.saveTask(tasksManager);
 
         // Subtask list
         const completeSubTasks: Task[] = [];
@@ -125,7 +140,7 @@ export class TaskViewSideUI {
                             completeSubTasks.push(subTask);
                             break;
                         default:
-                            this.addSubTask(subTask, tasksManager);
+                            this.addSubTask(subTask, tasksManager, projectsManager);
                             break;
                     }
                     count++;
@@ -137,12 +152,31 @@ export class TaskViewSideUI {
         addMainSubTask().then(() => {
             if (completeSubTasks.length === 0) return;
             for (const subTask of completeSubTasks) {
-                this.addSubTask(subTask, tasksManager);
+                this.addSubTask(subTask, tasksManager, projectsManager);
             }
+        });
+
+        // Select ProjectList
+        projectsManager.getAllProjects().then(projects => {
+            // add system project
+            const inboxItem = document.createElement('option');
+            inboxItem.value = SysProjectId.Inbox;
+            inboxItem.text = 'Inbox';
+            this.taskProjectSelect.appendChild(inboxItem);
+
+            for (const project of projects) {
+                const selectItem = document.createElement('option') as HTMLOptionElement;
+                selectItem.value = project.id;
+                selectItem.text = project.name;
+
+                insertChildAtIndex(this.taskProjectSelect, selectItem, project.order);
+            }
+
+            this.taskProjectSelect.value = task.listNameId;
         });
     }
 
-    addSubTask(subTask: Task, tasksManager: TasksManager) {
+    addSubTask(subTask: Task, tasksManager: TasksManager, projectsManager: ProjectsManager) {
         const subTaskItem = document.createElement('li') as HTMLLIElement;
         subTaskItem.id = subTask.id;
 
@@ -155,7 +189,7 @@ export class TaskViewSideUI {
         subTaskCheckbox.checked = !!subTask.completedDate;
         subTaskCheckbox.onchange = () => {
             this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
-            if (this.#selectedTask) this.renderTaskViewSide(this.#selectedTask, tasksManager);
+            if (this.#selectedTask) this.renderTaskViewSide(this.#selectedTask, tasksManager, projectsManager);
         }
 
         subTaskItem.appendChild(subTaskCheckbox);
@@ -192,8 +226,12 @@ export class TaskViewSideUI {
 
     clearAll() {
         // clear subtasks
-        while(this.taskSubtaskList.firstChild)
+        while (this.taskSubtaskList.firstChild)
             this.taskSubtaskList.removeChild(this.taskSubtaskList.firstChild);
+
+        // clear projects
+        while (this.taskProjectSelect.firstChild)
+            this.taskProjectSelect.removeChild(this.taskProjectSelect.firstChild);
     }
 
     saveTask(tasksManager: TasksManager) {
@@ -229,6 +267,12 @@ export class TaskViewSideUI {
         // check description
         if (this.#selectedTask.description !== this.taskDescriptionInput.value) {
             this.#selectedTask.description = this.taskDescriptionInput.value;
+            isEdited = true;
+        }
+
+        // check project
+        if (this.#selectedTask.listNameId !== this.taskProjectSelect.value) {
+            this.#selectedTask.listNameId = this.taskProjectSelect.value;
             isEdited = true;
         }
 

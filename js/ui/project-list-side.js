@@ -11,6 +11,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 };
 var _ProjectListSideUI_mainSideUI, _ProjectListSideUI_selectedProject;
 import { Project } from "../core/project.js";
+import { insertChildAtIndex } from "../utils/html_functions.js";
 export class ProjectListSideUI {
     constructor(mainSideUI, tasksManager, projectsManager) {
         _ProjectListSideUI_mainSideUI.set(this, void 0);
@@ -67,7 +68,7 @@ export class ProjectListSideUI {
             __classPrivateFieldSet(this, _ProjectListSideUI_selectedProject, project, "f");
             __classPrivateFieldGet(this, _ProjectListSideUI_mainSideUI, "f").renderMainSide(tasksManager, projectsManager, project.id);
         };
-        this.insertChildAtIndex(isSys ? this.projectListSys : this.projectList, projectItem, project.order);
+        insertChildAtIndex(isSys ? this.projectListSys : this.projectList, projectItem, project.order);
         if (isSys)
             return;
         const buttons = document.createElement('div');
@@ -98,14 +99,6 @@ export class ProjectListSideUI {
             }
         };
         buttons.appendChild(deleteButton);
-    }
-    insertChildAtIndex(parent, child, index) {
-        if (index >= parent.children.length || index === -1) {
-            parent.appendChild(child);
-        }
-        else {
-            parent.insertBefore(child, parent.children[index]);
-        }
     }
 }
 _ProjectListSideUI_mainSideUI = new WeakMap(), _ProjectListSideUI_selectedProject = new WeakMap();

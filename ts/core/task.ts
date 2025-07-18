@@ -1,3 +1,4 @@
+import { SysProjectId } from "../ui/project-list-side.js";
 import { getUUID } from "../utils/uuid.js";
 
 export class Task {
@@ -30,7 +31,7 @@ export class Task {
         id: string = getUUID(),
         parentId: string = '',
         childIdList: string[] = [],
-        listName: string = "inbox",
+        listNameId: string = SysProjectId.Inbox,
 
         createdDate: Date = new Date(),
         updatedDate: Date = new Date(),
@@ -48,7 +49,7 @@ export class Task {
         this.id = id;
         this.parentId = parentId;
         this.childIdList = childIdList;
-        this.listNameId = listName;
+        this.listNameId = listNameId;
 
         this.title = title;
         this.description = description;

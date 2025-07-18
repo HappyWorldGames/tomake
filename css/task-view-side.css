@@ -201,5 +201,22 @@
 .task-view-side .footer {
     margin: 4px;
     padding: 5px;
-    height: 30px;
+    height: 40px;
+}
+
+#task-project-select {
+    margin: 5px;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    text-align: left;
+}
+
+#task-project-select option {
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #000;
+    /* background-color: var(--task-view-side-bg-color); */
 }
