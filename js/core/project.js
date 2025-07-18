@@ -1,5 +1,5 @@
 export class Project {
-    constructor(name, order, color = '', createDate = new Date(), updatedDate = new Date(), id = self.crypto.randomUUID(), status = ProjectStatus.Normal) {
+    constructor(name, order, color = '', id = self.crypto.randomUUID(), createDate = new Date(), updatedDate = new Date(), status = ProjectStatus.Normal) {
         this.id = id;
         this.createdDate = createDate;
         this.updatedDate = updatedDate;
@@ -20,7 +20,7 @@ export class Project {
         };
     }
     static fromDB(obj) {
-        return new Project(obj.name, obj.order, obj.color, new Date(obj.createDate), new Date(obj.updatedDate), obj.id, obj.status);
+        return new Project(obj.name, obj.order, obj.color, obj.id, new Date(obj.createDate), new Date(obj.updatedDate), obj.status);
     }
 }
 export var ProjectStatus;

@@ -11,6 +11,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 };
 var _MainSideUI_taskViewSideUI, _MainSideUI_projectId, _MainSideUI_selectedTaskItemId;
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
+import { SysProjectId } from "./project-list-side.js";
 export class MainSideUI {
     constructor(taskViewSideUI) {
         _MainSideUI_taskViewSideUI.set(this, void 0);
@@ -35,16 +36,19 @@ export class MainSideUI {
             });
         });
     }
-    renderMainSide(tasksManager, projectsManager, projectId = '', sysListName = 'today') {
+    renderMainSide(tasksManager, projectsManager, projectId = '') {
         if (projectId !== '')
             __classPrivateFieldSet(this, _MainSideUI_projectId, projectId, "f");
+        __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(null, tasksManager);
         this.clearAll();
-        if (projectId !== '')
-            return;
-        switch (sysListName) {
-            case 'today':
-                this.addSysToDay(tasksManager, projectsManager);
-                break;
+        if (projectId.length < 4) {
+            switch (__classPrivateFieldGet(this, _MainSideUI_projectId, "f")) {
+                case SysProjectId.ToDay:
+                    this.addSysToDay(tasksManager, projectsManager);
+                    break;
+            }
+        }
+        else {
         }
     }
     clearAll() {

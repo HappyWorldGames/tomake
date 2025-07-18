@@ -16,10 +16,10 @@ export class Project {
         order: number,
         color: string = '',
 
+        id: string = self.crypto.randomUUID(),
+
         createDate: Date = new Date(),
         updatedDate: Date = new Date(),
-
-        id: string = self.crypto.randomUUID(),
 
         status: ProjectStatus = ProjectStatus.Normal
     ) {
@@ -56,10 +56,10 @@ export class Project {
             obj.order,
             obj.color,
 
+            obj.id,
+
             new Date(obj.createDate),
             new Date(obj.updatedDate),
-
-            obj.id,
 
             obj.status
         )

@@ -45,7 +45,6 @@ export class TaskViewSideUI {
             this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}`;
         };
         this.taskSubtaskAddButton.onclick = () => {
-            // TODO add subtask and render
             if (!this.#selectedTask) return;
             tasksManager.addSubTask(this.#selectedTask.id, new Task()).then( subTaskId => {
                 if (!this.#selectedTask) return;
@@ -57,7 +56,7 @@ export class TaskViewSideUI {
     }
 
     // TODO make fun small
-    renderTaskViewSide(task: Task, tasksManager: TasksManager) {
+    renderTaskViewSide(task: Task | null, tasksManager: TasksManager) {
         this.taskViewSide.style.visibility = task ? 'visible' : 'hidden';
         if (!task) return;
         if (task !== this.#selectedTask) this.#selectedTask = task;

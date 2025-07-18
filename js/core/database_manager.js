@@ -105,7 +105,7 @@ _a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManag
 }, _DatabaseManager_initProjectsStore = function _DatabaseManager_initProjectsStore(db) {
     if (!db.objectStoreNames.contains(_a.storeProjectsName)) {
         const tasksStore = db.createObjectStore(_a.storeProjectsName, { keyPath: 'id', autoIncrement: false });
-        tasksStore.createIndex('name', 'name', { unique: true });
+        tasksStore.createIndex('name', 'name', { unique: false });
         tasksStore.createIndex('order', 'order', { unique: true });
         tasksStore.createIndex('color', 'color', { unique: false });
         tasksStore.createIndex('createdDate', 'createdDate', { unique: false });

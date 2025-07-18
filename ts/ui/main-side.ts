@@ -1,6 +1,7 @@
 import { ProjectsManager } from "../core/projects_manager.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
+import { SysProjectId } from "./project-list-side.js";
 import { TaskViewSideUI } from "./task-view-side.js";
 
 export class MainSideUI {
@@ -38,17 +39,20 @@ export class MainSideUI {
         });
     }
 
-    renderMainSide(tasksManager: TasksManager, projectsManager: ProjectsManager, projectId: string = '', sysListName = 'today') {
+    renderMainSide(tasksManager: TasksManager, projectsManager: ProjectsManager, projectId: string = '') {
         if (projectId !== '') this.#projectId = projectId;
+        this.#taskViewSideUI.renderTaskViewSide(null, tasksManager);
         this.clearAll();
 
-        // TODO listName load
-
-        if (projectId !== '') return;
-        switch(sysListName) {
-            case 'today':
-                this.addSysToDay(tasksManager, projectsManager);
-                break;
+        // check system or not
+        if (projectId.length < 4) {
+            switch(this.#projectId) {
+                case SysProjectId.ToDay:
+                    this.addSysToDay(tasksManager, projectsManager);
+                    break;
+            }
+        } else {
+            // TODO listName load
         }
     }
 

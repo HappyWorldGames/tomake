@@ -61,3 +61,18 @@
 .project-list-side .item.selected:active {
     background-color: var(--project-list-side-item-active-bg-color);
 }
+
+.project-list-side .project-list-name {
+    display: flex;
+    margin-top: 10px;
+    padding: 5px;
+    justify-content: space-between;
+    color: var(--text-color);
+}
+
+.project-list-side .project-list-name-add {
+    border: none;
+    background: none;
+    color: var(--text-color);
+    cursor: pointer;
+}

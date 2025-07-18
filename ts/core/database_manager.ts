@@ -74,7 +74,7 @@ export class DatabaseManager {
         if (!db.objectStoreNames.contains(DatabaseManager.storeProjectsName)) {
             const tasksStore = db.createObjectStore(DatabaseManager.storeProjectsName, { keyPath: 'id', autoIncrement: false });
 
-            tasksStore.createIndex('name', 'name', { unique: true });
+            tasksStore.createIndex('name', 'name', { unique: false });
             tasksStore.createIndex('order', 'order', { unique: true });
             tasksStore.createIndex('color', 'color', { unique: false });
 
