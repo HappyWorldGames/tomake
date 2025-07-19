@@ -184,11 +184,14 @@ export class MainSideUI {
         taskListNameButton.type = 'button';
         taskListNameButton.classList.add('task-list-name-btn');
 
-        const project = await projectsManager.getProjectFromId(task.listNameId);
+        if (task.listNameId === SysProjectId.Inbox) taskListNameButton.textContent = 'Inbox';
+        else projectsManager.getProjectFromId(task.listNameId).then(project => {
+            taskListNameButton.textContent = project ? project.name : '';
+        });
 
-        taskListNameButton.textContent = project ? project.name : '';
         taskListNameButton.addEventListener('click', () => {
-            // TODO open listName
+            // Open listName
+            this.renderMainSide(tasksManager, projectsManager, task.listNameId);
         });
 
         taskItem.appendChild(taskListNameButton);

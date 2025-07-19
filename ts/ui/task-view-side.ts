@@ -1,3 +1,4 @@
+import { ProjectStatus } from "../core/project.js";
 import { ProjectsManager } from "../core/projects_manager.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
@@ -165,6 +166,8 @@ export class TaskViewSideUI {
             this.taskProjectSelect.appendChild(inboxItem);
 
             for (const project of projects) {
+                if (project.status === ProjectStatus.Deleted) continue;
+
                 const selectItem = document.createElement('option') as HTMLOptionElement;
                 selectItem.value = project.id;
                 selectItem.text = project.name;

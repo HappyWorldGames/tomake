@@ -10,6 +10,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
 var _TaskViewSideUI_selectedTask;
+import { ProjectStatus } from "../core/project.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
@@ -136,6 +137,8 @@ export class TaskViewSideUI {
             inboxItem.text = 'Inbox';
             this.taskProjectSelect.appendChild(inboxItem);
             for (const project of projects) {
+                if (project.status === ProjectStatus.Deleted)
+                    continue;
                 const selectItem = document.createElement('option');
                 selectItem.value = project.id;
                 selectItem.text = project.name;

@@ -1,4 +1,4 @@
-import { Project } from "../core/project.js";
+import { Project, ProjectStatus } from "../core/project.js";
 import { ProjectsManager } from "../core/projects_manager";
 import { TasksManager } from "../core/tasks_manager";
 import { insertChildAtIndex } from "../utils/html_functions.js";
@@ -47,10 +47,11 @@ export class ProjectListSideUI {
             this.addProject(sysProject, tasksManager, projectsManager, true);
         }
 
-        // TODO Render project list
+        // Render project list
         projectsManager.getAllProjects().then(projects => {
             for (const project of projects)
-                this.addProject(project, tasksManager, projectsManager);
+                if (project.status !== ProjectStatus.Deleted)
+                    this.addProject(project, tasksManager, projectsManager);
         })
     }
 

@@ -10,7 +10,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _ProjectListSideUI_mainSideUI, _ProjectListSideUI_selectedProject;
-import { Project } from "../core/project.js";
+import { Project, ProjectStatus } from "../core/project.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
 export class ProjectListSideUI {
     constructor(mainSideUI, tasksManager, projectsManager) {
@@ -43,7 +43,8 @@ export class ProjectListSideUI {
         }
         projectsManager.getAllProjects().then(projects => {
             for (const project of projects)
-                this.addProject(project, tasksManager, projectsManager);
+                if (project.status !== ProjectStatus.Deleted)
+                    this.addProject(project, tasksManager, projectsManager);
         });
     }
     clearAll() {

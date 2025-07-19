@@ -143,9 +143,14 @@ export class MainSideUI {
         const taskListNameButton = document.createElement('button');
         taskListNameButton.type = 'button';
         taskListNameButton.classList.add('task-list-name-btn');
-        const project = await projectsManager.getProjectFromId(task.listNameId);
-        taskListNameButton.textContent = project ? project.name : '';
+        if (task.listNameId === SysProjectId.Inbox)
+            taskListNameButton.textContent = 'Inbox';
+        else
+            projectsManager.getProjectFromId(task.listNameId).then(project => {
+                taskListNameButton.textContent = project ? project.name : '';
+            });
         taskListNameButton.addEventListener('click', () => {
+            this.renderMainSide(tasksManager, projectsManager, task.listNameId);
         });
         taskItem.appendChild(taskListNameButton);
         const taskDateButton = document.createElement('button');

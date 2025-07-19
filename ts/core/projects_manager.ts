@@ -70,7 +70,7 @@ export class ProjectsManager {
         const transaction = this.db.transaction(DatabaseManager.storeProjectsName, 'readwrite');
         const projectsStore = transaction.objectStore(DatabaseManager.storeProjectsName);
 
-        if (project.id == '') project.id = getUUID();
+        if (project.id === '') project.id = getUUID();
 
         if (!isImportData) project.updatedDate = new Date();
         const request = projectsStore.put(project.toDB());
@@ -107,7 +107,7 @@ export class ProjectsManager {
 
         projectRequest.onsuccess = () => {
             if (projectRequest.result === undefined) return;
-            const project = projectRequest.result;
+            const project = Project.fromDB(projectRequest.result);
 
             if (project instanceof Project) {
                 project.status = ProjectStatus.Deleted;
