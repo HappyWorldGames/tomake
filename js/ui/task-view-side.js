@@ -9,7 +9,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _TaskViewSideUI_selectedTask;
+var _TaskViewSideUI_instances, _TaskViewSideUI_selectedTask, _TaskViewSideUI_updateHeightDescription;
 import { ProjectStatus } from "../core/project.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
@@ -17,6 +17,7 @@ import { insertChildAtIndex } from "../utils/html_functions.js";
 import { SysProjectId } from "./project-list-side.js";
 export class TaskViewSideUI {
     constructor(tasksManager, projectsManager, customContextMenuUI) {
+        _TaskViewSideUI_instances.add(this);
         _TaskViewSideUI_selectedTask.set(this, null);
         this.taskViewSide = document.getElementById('task-view-side');
         this.taskHeader = document.getElementById('task-header');
@@ -49,8 +50,7 @@ export class TaskViewSideUI {
         };
         this.taskTitleInput.onblur = () => this.saveTask(tasksManager);
         this.taskDescriptionInput.oninput = () => {
-            this.taskDescriptionInput.style.height = 'auto';
-            this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
+            __classPrivateFieldGet(this, _TaskViewSideUI_instances, "m", _TaskViewSideUI_updateHeightDescription).call(this);
             clearTimeout(saveTimerId);
             saveTimerId = setTimeout(() => {
                 this.saveTask(tasksManager);
@@ -104,7 +104,7 @@ export class TaskViewSideUI {
         this.taskPrioritySelect.selectedIndex = task.priority;
         this.taskTitleInput.value = task.title;
         this.taskDescriptionInput.value = task.description;
-        this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
+        __classPrivateFieldGet(this, _TaskViewSideUI_instances, "m", _TaskViewSideUI_updateHeightDescription).call(this);
         const completeSubTasks = [];
         const addMainSubTask = async () => {
             return new Promise(resolve => {
@@ -243,4 +243,9 @@ export class TaskViewSideUI {
         return subTask;
     }
 }
-_TaskViewSideUI_selectedTask = new WeakMap();
+_TaskViewSideUI_selectedTask = new WeakMap(), _TaskViewSideUI_instances = new WeakSet(), _TaskViewSideUI_updateHeightDescription = function _TaskViewSideUI_updateHeightDescription() {
+    this.taskDescriptionInput.style.height = 'auto';
+    this.taskDescriptionInput.style.minHeight = 'auto';
+    this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
+    this.taskDescriptionInput.style.minHeight = `${this.taskDescriptionInput.scrollHeight}px`;
+};

@@ -63,8 +63,7 @@ export class TaskViewSideUI {
 
         // TODO auto height descruption
         this.taskDescriptionInput.oninput = () => {
-            this.taskDescriptionInput.style.height = 'auto';
-            this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
+            this.#updateHeightDescription();
 
             clearTimeout(saveTimerId);
             saveTimerId = setTimeout(() => {
@@ -132,7 +131,7 @@ export class TaskViewSideUI {
 
         // Description
         this.taskDescriptionInput.value = task.description;
-        this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
+        this.#updateHeightDescription();
 
         // Subtask list
         const completeSubTasks: Task[] = [];
@@ -307,5 +306,12 @@ export class TaskViewSideUI {
 
         if (isEdited) tasksManager.updateTask(subTask);
         return subTask;
+    }
+
+    #updateHeightDescription() {
+        this.taskDescriptionInput.style.height = 'auto';
+        this.taskDescriptionInput.style.minHeight = 'auto';
+        this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
+        this.taskDescriptionInput.style.minHeight = `${this.taskDescriptionInput.scrollHeight}px`;
     }
 }

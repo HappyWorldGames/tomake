@@ -28,20 +28,11 @@
 
 /* FIXME scroll to .main */
 .task-view-side {
-    transition: .5s;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-gutter: stable;
-    scrollbar-color: #fff0 #fff0;
-    max-height: 100h;
+    max-height: 100vh;
     background-color: var(--task-view-side-bg-color);
     flex: 1;
     flex-direction: column;
     visibility: hidden;
-}
-
-.task-view-side:hover {
-    scrollbar-color: var(--task-view-side-item-selected-bg-color) #fff0;
 }
 
 .task-view-side .header {
@@ -108,11 +99,20 @@
 #task-priority-select option[value="3"] { color: red; }
 
 .task-view-side .main {
+    transition: .5s;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+    scrollbar-color: #fff0 #fff0;
     margin: 4px;
     padding: 5px;
     height: 100%;
     display: flex;
     flex-direction: column;
+}
+
+.task-view-side .main:hover {
+    scrollbar-color: var(--task-view-side-item-selected-bg-color) #fff0;
 }
 
 #task-title-input {
@@ -127,15 +127,19 @@
 }
 
 #task-description-input {
-    margin: 5px 0;
+    margin: 10px 0;
     width: 100%;
-    height: auto;
-    overflow: hidden;
+    /* height: auto; */
+    /* overflow: hidden; */
     color: var(--text-color);
     background-color: #ffffff00;
     border: none;
     outline: none;
     resize: none;
+}
+
+.task-view-side .main .checkbox-list {
+    margin-top: 10px;
 }
 
 .task-view-side .main .checkbox-list li {
