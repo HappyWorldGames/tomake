@@ -9,18 +9,20 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _MainSideUI_taskViewSideUI, _MainSideUI_projectId, _MainSideUI_selectedTaskItemId;
+var _MainSideUI_taskViewSideUI, _MainSideUI_customContextMenuUI, _MainSideUI_projectId, _MainSideUI_selectedTaskItemId;
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { SysProjectId } from "./project-list-side.js";
 export class MainSideUI {
-    constructor(taskViewSideUI) {
+    constructor(taskViewSideUI, customContextMenuUI) {
         _MainSideUI_taskViewSideUI.set(this, void 0);
+        _MainSideUI_customContextMenuUI.set(this, void 0);
         _MainSideUI_projectId.set(this, '');
         _MainSideUI_selectedTaskItemId.set(this, '');
         this.taskAddInput = document.getElementById('task-add-input');
         this.taskAddButton = document.getElementById('add-task-btn');
         this.taskArrayList = document.getElementById('task-array-list');
         __classPrivateFieldSet(this, _MainSideUI_taskViewSideUI, taskViewSideUI, "f");
+        __classPrivateFieldSet(this, _MainSideUI_customContextMenuUI, customContextMenuUI, "f");
     }
     setOnTaskAddButtonClickListener(tasksManager, projectsManager) {
         var _a;
@@ -164,19 +166,18 @@ export class MainSideUI {
         taskDateButton.addEventListener('click', () => {
         });
         taskItem.appendChild(taskDateButton);
-        const taskDeleteButton = document.createElement('button');
-        taskDeleteButton.type = 'button';
-        taskDeleteButton.classList.add('task-delete');
-        taskDeleteButton.textContent = "🗑";
-        taskDeleteButton.addEventListener('click', () => {
-            tasksManager.deleteTask(task.id).then(() => this.renderMainSide(tasksManager, projectsManager));
-        });
-        taskItem.appendChild(taskDeleteButton);
         const taskMoreButton = document.createElement('button');
         taskMoreButton.type = 'button';
         taskMoreButton.classList.add('task-more-btn');
-        taskMoreButton.textContent = "...";
-        taskMoreButton.addEventListener('click', () => {
+        taskMoreButton.textContent = "···";
+        taskMoreButton.addEventListener('click', (event) => {
+            __classPrivateFieldGet(this, _MainSideUI_customContextMenuUI, "f").showTask(event, task, () => {
+                this.renderMainSide(tasksManager, projectsManager);
+                __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(null, tasksManager, projectsManager);
+            }, null, () => {
+                taskItem.remove();
+                __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(null, tasksManager, projectsManager);
+            });
         });
         taskItem.appendChild(taskMoreButton);
     }
@@ -249,4 +250,4 @@ export class MainSideUI {
         return result;
     }
 }
-_MainSideUI_taskViewSideUI = new WeakMap(), _MainSideUI_projectId = new WeakMap(), _MainSideUI_selectedTaskItemId = new WeakMap();
+_MainSideUI_taskViewSideUI = new WeakMap(), _MainSideUI_customContextMenuUI = new WeakMap(), _MainSideUI_projectId = new WeakMap(), _MainSideUI_selectedTaskItemId = new WeakMap();

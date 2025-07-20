@@ -8,6 +8,7 @@ export class ThemeManager {
     }
 
     _init() {
+        // FIXME move onclick to main class(SyncProjectSide)
         this.toggleButton.addEventListener('click', () => this.toggleTheme());
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             localStorage.setItem('theme', 'dark');

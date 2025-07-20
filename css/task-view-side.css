@@ -26,6 +26,7 @@
     }
 }
 
+/* FIXME scroll to .main */
 .task-view-side {
     transition: .5s;
     overflow-y: auto;
@@ -199,6 +200,8 @@
 }
 
 .task-view-side .footer {
+    display: flex;
+    justify-content: space-between;
     margin: 4px;
     padding: 5px;
     height: 40px;
@@ -219,4 +222,14 @@
     color: var(--text-color);
     background-color: #000;
     /* background-color: var(--task-view-side-bg-color); */
+}
+
+#task-project-more-btn {
+    margin: 2px;
+    padding: 2px;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    cursor: pointer;
 }

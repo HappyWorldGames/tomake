@@ -127,6 +127,7 @@ export enum TaskPriority {
     High = 3
 }
 
+// TODO make support with "|"
 export enum TaskStatus {
     Normal = 0,
     Completed = 1,

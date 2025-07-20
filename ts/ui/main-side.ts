@@ -1,6 +1,7 @@
 import { ProjectsManager } from "../core/projects_manager.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
+import { CustomContextMenuUI } from "./custom-context-menu.js";
 import { SysProjectId } from "./project-list-side.js";
 import { TaskViewSideUI } from "./task-view-side.js";
 
@@ -12,16 +13,18 @@ export class MainSideUI {
     taskArrayList: HTMLElement;
 
     #taskViewSideUI: TaskViewSideUI;
+    #customContextMenuUI: CustomContextMenuUI;
 
     #projectId: string = '';
     #selectedTaskItemId: string = '';
 
-    constructor(taskViewSideUI: TaskViewSideUI) {
+    constructor(taskViewSideUI: TaskViewSideUI, customContextMenuUI: CustomContextMenuUI) {
         this.taskAddInput = document.getElementById('task-add-input') as HTMLInputElement;
         this.taskAddButton = document.getElementById('add-task-btn') as HTMLButtonElement;
         this.taskArrayList = document.getElementById('task-array-list') as HTMLUListElement;
 
         this.#taskViewSideUI = taskViewSideUI;
+        this.#customContextMenuUI = customContextMenuUI;
     }
 
     setOnTaskAddButtonClickListener(tasksManager: TasksManager, projectsManager: ProjectsManager) {
@@ -212,24 +215,21 @@ export class MainSideUI {
 
         taskItem.appendChild(taskDateButton);
 
-        // delete button item
-        const taskDeleteButton = document.createElement('button') as HTMLButtonElement;
-        taskDeleteButton.type = 'button';
-        taskDeleteButton.classList.add('task-delete');
-        taskDeleteButton.textContent = "🗑";
-        taskDeleteButton.addEventListener('click', () => {
-            tasksManager.deleteTask(task.id).then(() => this.renderMainSide(tasksManager, projectsManager));
-        });
-
-        taskItem.appendChild(taskDeleteButton);
-
         // more button item
         const taskMoreButton = document.createElement('button') as HTMLButtonElement;
         taskMoreButton.type = 'button';
         taskMoreButton.classList.add('task-more-btn');
-        taskMoreButton.textContent = "...";
-        taskMoreButton.addEventListener('click', () => {
-            // TODO open more menu
+        taskMoreButton.textContent = "···";
+        taskMoreButton.addEventListener('click', (event) => {
+            this.#customContextMenuUI.showTask(event, task,
+                () => {
+                    this.renderMainSide(tasksManager, projectsManager);
+                    this.#taskViewSideUI.renderTaskViewSide(null, tasksManager, projectsManager);
+                }, null,
+                () => {
+                taskItem.remove();
+                this.#taskViewSideUI.renderTaskViewSide(null, tasksManager, projectsManager);
+            });
         });
 
         taskItem.appendChild(taskMoreButton);

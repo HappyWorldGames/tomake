@@ -68,6 +68,7 @@ export class Project {
     }
 }
 
+// TODO make support with "|"
 export enum ProjectStatus {
     Normal = 0,
     Archived = 11,

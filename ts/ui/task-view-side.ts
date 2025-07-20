@@ -4,6 +4,7 @@ import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
+import { CustomContextMenuUI } from "./custom-context-menu.js";
 import { SysProjectId } from "./project-list-side.js";
 
 export class TaskViewSideUI {
@@ -20,10 +21,11 @@ export class TaskViewSideUI {
     taskSubtaskAddButton: HTMLButtonElement;
 
     taskProjectSelect: HTMLSelectElement;
+    taskProjectMoreButton: HTMLButtonElement;
 
     #selectedTask: Task | null = null;
 
-    constructor(tasksManager: TasksManager, projectsManager: ProjectsManager) {
+    constructor(tasksManager: TasksManager, projectsManager: ProjectsManager, customContextMenuUI: CustomContextMenuUI) {
         this.taskViewSide = document.getElementById('task-view-side') as HTMLDivElement;
         this.taskHeader = document.getElementById('task-header') as HTMLDivElement;
         this.taskCheckboxComplete = document.getElementById('task-checkbox-complete') as HTMLInputElement;
@@ -36,6 +38,7 @@ export class TaskViewSideUI {
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn') as HTMLButtonElement;
 
         this.taskProjectSelect = document.getElementById('task-project-select') as HTMLSelectElement;
+        this.taskProjectMoreButton = document.getElementById('task-project-more-btn') as HTMLButtonElement;
 
         // listeners to save
         this.taskCheckboxComplete.onchange = () => {
@@ -61,9 +64,8 @@ export class TaskViewSideUI {
         // TODO auto height descruption
         this.taskDescriptionInput.oninput = () => {
             this.taskDescriptionInput.style.height = 'auto';
-            this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}`;
-        };
-        this.taskDescriptionInput.oninput = () => {
+            this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
+
             clearTimeout(saveTimerId);
             saveTimerId = setTimeout(() => {
                 this.saveTask(tasksManager);
@@ -83,6 +85,10 @@ export class TaskViewSideUI {
 
         this.taskProjectSelect.onchange = () => {
             this.saveTask(tasksManager);
+        }
+        this.taskProjectMoreButton.onclick = (event) => {
+            if (!this.#selectedTask) return;
+            customContextMenuUI.showTask(event, this.#selectedTask, null, null, () => this.renderTaskViewSide(null, tasksManager, projectsManager));
         }
     }
 
@@ -126,6 +132,7 @@ export class TaskViewSideUI {
 
         // Description
         this.taskDescriptionInput.value = task.description;
+        this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
 
         // Subtask list
         const completeSubTasks: Task[] = [];

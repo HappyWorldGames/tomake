@@ -16,7 +16,7 @@ import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date
 import { insertChildAtIndex } from "../utils/html_functions.js";
 import { SysProjectId } from "./project-list-side.js";
 export class TaskViewSideUI {
-    constructor(tasksManager, projectsManager) {
+    constructor(tasksManager, projectsManager, customContextMenuUI) {
         _TaskViewSideUI_selectedTask.set(this, null);
         this.taskViewSide = document.getElementById('task-view-side');
         this.taskHeader = document.getElementById('task-header');
@@ -28,6 +28,7 @@ export class TaskViewSideUI {
         this.taskSubtaskList = document.getElementById('subtask-list');
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn');
         this.taskProjectSelect = document.getElementById('task-project-select');
+        this.taskProjectMoreButton = document.getElementById('task-project-more-btn');
         this.taskCheckboxComplete.onchange = () => {
             if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
                 return;
@@ -49,9 +50,7 @@ export class TaskViewSideUI {
         this.taskTitleInput.onblur = () => this.saveTask(tasksManager);
         this.taskDescriptionInput.oninput = () => {
             this.taskDescriptionInput.style.height = 'auto';
-            this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}`;
-        };
-        this.taskDescriptionInput.oninput = () => {
+            this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
             clearTimeout(saveTimerId);
             saveTimerId = setTimeout(() => {
                 this.saveTask(tasksManager);
@@ -70,6 +69,11 @@ export class TaskViewSideUI {
         };
         this.taskProjectSelect.onchange = () => {
             this.saveTask(tasksManager);
+        };
+        this.taskProjectMoreButton.onclick = (event) => {
+            if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
+                return;
+            customContextMenuUI.showTask(event, __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"), null, null, () => this.renderTaskViewSide(null, tasksManager, projectsManager));
         };
     }
     renderTaskViewSide(task, tasksManager, projectsManager) {
@@ -100,6 +104,7 @@ export class TaskViewSideUI {
         this.taskPrioritySelect.selectedIndex = task.priority;
         this.taskTitleInput.value = task.title;
         this.taskDescriptionInput.value = task.description;
+        this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
         const completeSubTasks = [];
         const addMainSubTask = async () => {
             return new Promise(resolve => {
