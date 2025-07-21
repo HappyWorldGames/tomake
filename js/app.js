@@ -29,6 +29,9 @@ export class App {
             if (this.customContextMenuUI.isOpen())
                 this.customContextMenuUI.dismiss();
         };
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+            throw new Error('ServiceWorker error: ' + err);
+        });
     }
 }
 document.addEventListener('DOMContentLoaded', () => {

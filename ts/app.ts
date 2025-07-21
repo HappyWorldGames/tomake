@@ -50,6 +50,13 @@ export class App {
             if (this.customContextMenuUI.isOpen())
                 this.customContextMenuUI.dismiss();
         }
+
+        // register ServiceWorker
+        navigator.serviceWorker.register(
+            '/sw.js'
+        ).catch(err => {
+            throw new Error('ServiceWorker error: ' + err);
+        })
     }
 }
 
