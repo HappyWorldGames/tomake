@@ -2,7 +2,7 @@ import { SysProjectId } from "../ui/project-list-side.js";
 import { getUUID } from "../utils/uuid.js";
 
 export class Task {
-
+    // TODO add order for move task
     id: string;
     parentId: string;
     childIdList: string[];

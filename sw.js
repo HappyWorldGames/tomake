@@ -54,7 +54,7 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
     if (e.request.method !== 'GET') return;
-
+    // TODO timeout to offline
     e.respondWith(
         fetch(e.request.clone()) // First access to the network
             .then(networkResponse => {
