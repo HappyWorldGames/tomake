@@ -62,7 +62,10 @@ export class TaskViewSideUI {
         this.taskSubtaskAddButton.onclick = () => {
             if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
                 return;
-            tasksManager.addSubTask(__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").id, new Task()).then(subTaskId => {
+            const subTaskTitle = prompt('SubTask Title:', '');
+            if (!subTaskTitle)
+                return;
+            tasksManager.addSubTask(__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").id, new Task(subTaskTitle)).then(subTaskId => {
                 if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
                     return;
                 __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").childIdList.push(subTaskId);

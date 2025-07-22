@@ -66,7 +66,7 @@ export class TaskViewSideUI {
         };
         this.taskTitleInput.onblur = () => this.saveTask(tasksManager);
 
-        // TODO auto height descruption
+        // Auto height descruption
         this.taskDescriptionInput.oninput = () => {
             this.#updateHeightDescription();
 
@@ -79,7 +79,10 @@ export class TaskViewSideUI {
 
         this.taskSubtaskAddButton.onclick = () => {
             if (!this.#selectedTask) return;
-            tasksManager.addSubTask(this.#selectedTask.id, new Task()).then( subTaskId => {
+            const subTaskTitle = prompt('SubTask Title:', '');
+            if (!subTaskTitle) return;
+
+            tasksManager.addSubTask(this.#selectedTask.id, new Task(subTaskTitle)).then( subTaskId => {
                 if (!this.#selectedTask) return;
 
                 this.#selectedTask.childIdList.push(subTaskId);
