@@ -24,7 +24,7 @@
 </head>
 <body>
     <div class="sync-project-list-side">
-        <div class="sync-side">
+        <div class="sync-side" id="sync-side">
             <button id="authButton" title="Login">👤</button>
             <button id="themeToggleButton">🌓</button>
 
@@ -33,7 +33,7 @@
             <button id="importButton" title="Import data">📥</button>
         </div>
 
-        <div class="project-list-side">
+        <div class="project-list-side" id="project-list-side">
             <div id="project-list-sys">
                 <div class="item">All</div>
                 <div class="item selected">Today</div>
@@ -49,11 +49,12 @@
                 <div>Projects...</div>
             </div>
         </div>
+        <div id="project-list-side-space"></div>
     </div>
 
     <div class="main-side">
         <header>
-            <button class="menu-btn">☰</button>
+            <button class="menu-btn" id="menu-btn">☰</button>
             <h2 class="top-text">Today</h2>
         </header>
         <div id="task-form">

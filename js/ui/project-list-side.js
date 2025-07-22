@@ -13,7 +13,7 @@ var _ProjectListSideUI_mainSideUI, _ProjectListSideUI_selectedProject;
 import { Project, ProjectStatus } from "../core/project.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
 export class ProjectListSideUI {
-    constructor(mainSideUI, tasksManager, projectsManager) {
+    constructor(mainSideUI, tasksManager, projectsManager, projectSpaceClick) {
         _ProjectListSideUI_mainSideUI.set(this, void 0);
         this.sysProjectList = [
             new Project('All', 0, '', SysProjectId.All),
@@ -23,10 +23,18 @@ export class ProjectListSideUI {
             new Project('Inbox', 4, '', SysProjectId.Inbox)
         ];
         _ProjectListSideUI_selectedProject.set(this, this.sysProjectList[1]);
+        this.projectListSide = document.getElementById('project-list-side');
+        this.projectListSideSpace = document.getElementById('project-list-side-space');
         this.projectListSys = document.getElementById('project-list-sys');
         this.projectList = document.getElementById('project-list');
         this.projectListAddButton = document.getElementById('project-list-add-button');
         __classPrivateFieldSet(this, _ProjectListSideUI_mainSideUI, mainSideUI, "f");
+        this.projectListSide.style.visibility = window.innerWidth <= 640 ? 'hidden' : 'visible';
+        this.projectListSideSpace.onclick = () => {
+            this.projectListSide.style.visibility = 'hidden';
+            this.updateStyle();
+            projectSpaceClick();
+        };
         this.projectListAddButton.onclick = () => {
             const name = prompt('List name:', '');
             if (!name)
@@ -100,6 +108,26 @@ export class ProjectListSideUI {
             }
         };
         buttons.appendChild(deleteButton);
+    }
+    updateStyle() {
+        if (this.projectListSide.style.visibility === 'visible') {
+            if (window.innerWidth <= 640) {
+                this.projectListSide.style.position = 'absolute';
+                this.projectListSideSpace.style.display = 'block';
+            }
+            else {
+                this.projectListSide.style.position = '';
+                this.projectListSideSpace.style.display = 'none';
+            }
+            this.projectListSide.style.left = '50px';
+            this.projectListSide.style.display = 'flex';
+        }
+        else {
+            this.projectListSideSpace.style.display = 'none';
+            this.projectListSide.style.position = '';
+            this.projectListSide.style.left = '';
+            this.projectListSide.style.display = 'none';
+        }
     }
 }
 _ProjectListSideUI_mainSideUI = new WeakMap(), _ProjectListSideUI_selectedProject = new WeakMap();

@@ -13,16 +13,20 @@ var _MainSideUI_taskViewSideUI, _MainSideUI_customContextMenuUI, _MainSideUI_pro
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { SysProjectId } from "./project-list-side.js";
 export class MainSideUI {
-    constructor(taskViewSideUI, customContextMenuUI) {
+    constructor(taskViewSideUI, customContextMenuUI, menuButtonClick) {
         _MainSideUI_taskViewSideUI.set(this, void 0);
         _MainSideUI_customContextMenuUI.set(this, void 0);
         _MainSideUI_projectId.set(this, '');
         _MainSideUI_selectedTaskItemId.set(this, '');
+        this.menuButton = document.getElementById('menu-btn');
         this.taskAddInput = document.getElementById('task-add-input');
         this.taskAddButton = document.getElementById('add-task-btn');
         this.taskArrayList = document.getElementById('task-array-list');
         __classPrivateFieldSet(this, _MainSideUI_taskViewSideUI, taskViewSideUI, "f");
         __classPrivateFieldSet(this, _MainSideUI_customContextMenuUI, customContextMenuUI, "f");
+        this.menuButton.onclick = () => {
+            menuButtonClick();
+        };
     }
     setOnTaskAddButtonClickListener(tasksManager, projectsManager) {
         var _a;

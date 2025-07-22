@@ -7,6 +7,8 @@ import { TaskViewSideUI } from "./task-view-side.js";
 
 export class MainSideUI {
 
+    menuButton: HTMLButtonElement;
+
     taskAddInput: HTMLInputElement;
     taskAddButton: HTMLElement;
 
@@ -18,13 +20,20 @@ export class MainSideUI {
     #projectId: string = '';
     #selectedTaskItemId: string = '';
 
-    constructor(taskViewSideUI: TaskViewSideUI, customContextMenuUI: CustomContextMenuUI) {
+    constructor(taskViewSideUI: TaskViewSideUI, customContextMenuUI: CustomContextMenuUI, menuButtonClick: Function) {
+        this.menuButton = document.getElementById('menu-btn') as HTMLButtonElement;
+
         this.taskAddInput = document.getElementById('task-add-input') as HTMLInputElement;
         this.taskAddButton = document.getElementById('add-task-btn') as HTMLButtonElement;
+
         this.taskArrayList = document.getElementById('task-array-list') as HTMLUListElement;
 
         this.#taskViewSideUI = taskViewSideUI;
         this.#customContextMenuUI = customContextMenuUI;
+
+        this.menuButton.onclick = () => {
+            menuButtonClick();
+        }
     }
 
     setOnTaskAddButtonClickListener(tasksManager: TasksManager, projectsManager: ProjectsManager) {

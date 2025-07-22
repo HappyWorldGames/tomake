@@ -1,5 +1,5 @@
 :root {
-    --project-list-side-bg-color: #ffc0cbee;
+    --project-list-side-bg-color: #ffc0cbff;
     --project-list-side-item-bg-color: #ffbd33;
     --project-list-side-item-hover-bg-color: #e9b826;
     --project-list-side-item-active-bg-color: #bb9c00;
@@ -7,7 +7,7 @@
 }
 
 .dark-theme {
-    --project-list-side-bg-color: #ffa2b1dc;
+    --project-list-side-bg-color: #ffa2b1ff;
     --project-list-side-item-bg-color: #ffb820c5;
     --project-list-side-item-hover-bg-color: #ddac19c5;
     --project-list-side-item-active-bg-color: #ddac198c;
@@ -27,10 +27,22 @@
 }
 
 .project-list-side {
+    height: 100vh;
     min-width: 200px;
     background-color: var(--project-list-side-bg-color);
     flex-direction: column;
     padding: 10px;
+    z-index: 2;
+}
+
+#project-list-side-space {
+    display: none;
+    width: calc(100vw - 200px);
+    height: 100vh;
+    position: absolute;
+    left: 200px;
+    background-color: #fff5;
+    z-index: 1;
 }
 
 .project-list-side .item {

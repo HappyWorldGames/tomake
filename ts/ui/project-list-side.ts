@@ -6,6 +6,9 @@ import { MainSideUI } from "./main-side";
 
 export class ProjectListSideUI {
 
+    projectListSide: HTMLDivElement;
+    projectListSideSpace: HTMLDivElement;
+
     projectListSys: HTMLDivElement;
     projectList: HTMLDivElement;
 
@@ -22,13 +25,23 @@ export class ProjectListSideUI {
     ]
     #selectedProject: Project = this.sysProjectList[1];
 
-    constructor(mainSideUI: MainSideUI, tasksManager: TasksManager, projectsManager: ProjectsManager) {
+    constructor(mainSideUI: MainSideUI, tasksManager: TasksManager, projectsManager: ProjectsManager, projectSpaceClick: Function) {
+        this.projectListSide = document.getElementById('project-list-side') as HTMLDivElement;
+        this.projectListSideSpace = document.getElementById('project-list-side-space') as HTMLDivElement;
+
         this.projectListSys = document.getElementById('project-list-sys') as HTMLDivElement;
         this.projectList = document.getElementById('project-list') as HTMLDivElement;
 
         this.projectListAddButton = document.getElementById('project-list-add-button') as HTMLButtonElement;
 
         this.#mainSideUI = mainSideUI;
+
+        this.projectListSide.style.visibility = window.innerWidth <= 640 ? 'hidden' : 'visible';
+        this.projectListSideSpace.onclick = () => {
+            this.projectListSide.style.visibility = 'hidden';
+            this.updateStyle();
+            projectSpaceClick();
+        }
 
         this.projectListAddButton.onclick = () => {
             const name = prompt('List name:', '');
@@ -125,6 +138,25 @@ export class ProjectListSideUI {
         }
 
         buttons.appendChild(deleteButton);
+    }
+
+    updateStyle() {
+        if (this.projectListSide.style.visibility === 'visible') {
+            if (window.innerWidth <= 640){
+                this.projectListSide.style.position = 'absolute';
+                this.projectListSideSpace.style.display = 'block';
+            }else {
+                this.projectListSide.style.position = '';
+                this.projectListSideSpace.style.display = 'none';
+            }
+            this.projectListSide.style.left = '50px';
+            this.projectListSide.style.display = 'flex';
+        } else {
+            this.projectListSideSpace.style.display = 'none';
+            this.projectListSide.style.position = '';
+            this.projectListSide.style.left = '';
+            this.projectListSide.style.display = 'none';
+        }
     }
 }
 

@@ -26,8 +26,22 @@ export class App {
 
         this.syncProjectListSideUI = new SyncProjectListSideUI();
         this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager, this.dbManager.projectsManager, this.customContextMenuUI);
-        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI);
-        this.projectListSideUI = new ProjectListSideUI(this.mainSideUI, this.dbManager.tasksManager, this.dbManager.projectsManager);
+        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI, () => {
+            this.projectListSideUI.projectListSide.style.visibility = this.projectListSideUI.projectListSide.style.visibility === 'visible' ? 'hidden' : 'visible';
+            this.projectListSideUI.updateStyle();
+
+            this.syncProjectListSideUI.syncSide.classList.toggle('visible');
+            this.syncProjectListSideUI.updateStyle();
+        });
+        this.projectListSideUI = new ProjectListSideUI(
+            this.mainSideUI,
+            this.dbManager.tasksManager,
+            this.dbManager.projectsManager,
+            () => {
+                this.syncProjectListSideUI.syncSide.classList.remove('visible');
+                this.syncProjectListSideUI.updateStyle();
+            }
+        );
 
         this.themreManager = new ThemeManager(this.syncProjectListSideUI.themeToggleButton);
     }
@@ -61,9 +75,12 @@ export class App {
         ).catch(err => {
             throw new Error('ServiceWorker error: ' + err);
         })
+
+        this.updateWidthStyle();
     }
 
     updateWidthStyle() {
+        this.projectListSideUI.updateStyle();
         this.taskViewSideUI.updateStyle();
     }
 }

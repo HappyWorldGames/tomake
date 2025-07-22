@@ -250,7 +250,7 @@ export class TaskViewSideUI {
         return subTask;
     }
     updateStyle(closeTaskButtonMethod = null) {
-        if (this.taskViewSide.style.visibility === 'visible') {
+        if (this.taskViewSide.style.visibility === 'visible' && window.innerWidth <= 960) {
             this.taskViewSide.style.zIndex = '4';
             if (window.innerWidth <= 640) {
                 this.taskViewSide.style.position = 'absolute';
@@ -258,11 +258,11 @@ export class TaskViewSideUI {
                 this.taskViewSide.style.width = '100vw';
                 this.taskCloseButton.style.display = 'block';
             }
-            else if (window.innerWidth <= 960) {
+            else {
                 this.taskViewSide.style.position = 'absolute';
                 this.taskViewSide.style.right = '0';
                 this.taskViewSide.style.display = 'flex';
-                this.taskViewSide.style.width = '50vw';
+                this.taskViewSide.style.width = '400px';
                 this.taskCloseButton.style.display = 'block';
             }
         }
