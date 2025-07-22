@@ -29,9 +29,15 @@ export class App {
             if (this.customContextMenuUI.isOpen())
                 this.customContextMenuUI.dismiss();
         };
+        window.onresize = () => {
+            this.updateWidthStyle();
+        };
         navigator.serviceWorker.register('/sw.js').catch(err => {
             throw new Error('ServiceWorker error: ' + err);
         });
+    }
+    updateWidthStyle() {
+        this.taskViewSideUI.updateStyle();
     }
 }
 document.addEventListener('DOMContentLoaded', () => {

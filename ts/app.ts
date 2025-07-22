@@ -51,12 +51,20 @@ export class App {
                 this.customContextMenuUI.dismiss();
         }
 
+        window.onresize = () => {
+            this.updateWidthStyle();
+        }
+
         // register ServiceWorker
         navigator.serviceWorker.register(
             '/sw.js'
         ).catch(err => {
             throw new Error('ServiceWorker error: ' + err);
         })
+    }
+
+    updateWidthStyle() {
+        this.taskViewSideUI.updateStyle();
     }
 }
 

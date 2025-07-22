@@ -9,7 +9,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _TaskViewSideUI_instances, _TaskViewSideUI_selectedTask, _TaskViewSideUI_updateHeightDescription;
+var _TaskViewSideUI_instances, _TaskViewSideUI_selectedTask, _TaskViewSideUI_closeTaskButtonMethod, _TaskViewSideUI_updateHeightDescription;
 import { ProjectStatus } from "../core/project.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
@@ -19,8 +19,10 @@ export class TaskViewSideUI {
     constructor(tasksManager, projectsManager, customContextMenuUI) {
         _TaskViewSideUI_instances.add(this);
         _TaskViewSideUI_selectedTask.set(this, null);
+        _TaskViewSideUI_closeTaskButtonMethod.set(this, () => { });
         this.taskViewSide = document.getElementById('task-view-side');
         this.taskHeader = document.getElementById('task-header');
+        this.taskCloseButton = document.getElementById('task-close-btn');
         this.taskCheckboxComplete = document.getElementById('task-checkbox-complete');
         this.taskDateTimeInput = document.getElementById('task-date-button');
         this.taskPrioritySelect = document.getElementById('task-priority-select');
@@ -85,6 +87,11 @@ export class TaskViewSideUI {
         if (task !== __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
             __classPrivateFieldSet(this, _TaskViewSideUI_selectedTask, task, "f");
         this.clearAll();
+        this.taskCloseButton.onclick = () => {
+            this.renderTaskViewSide(null, tasksManager, projectsManager);
+            __classPrivateFieldGet(this, _TaskViewSideUI_closeTaskButtonMethod, "f").call(this);
+            this.updateStyle();
+        };
         const priorityColor = function () {
             switch (task.priority) {
                 case TaskPriority.High:
@@ -242,8 +249,37 @@ export class TaskViewSideUI {
             tasksManager.updateTask(subTask);
         return subTask;
     }
+    updateStyle(closeTaskButtonMethod = null) {
+        if (this.taskViewSide.style.visibility === 'visible') {
+            this.taskViewSide.style.zIndex = '4';
+            if (window.innerWidth <= 640) {
+                this.taskViewSide.style.position = 'absolute';
+                this.taskViewSide.style.display = 'flex';
+                this.taskViewSide.style.width = '100vw';
+                this.taskCloseButton.style.display = 'block';
+            }
+            else if (window.innerWidth <= 960) {
+                this.taskViewSide.style.position = 'absolute';
+                this.taskViewSide.style.right = '0';
+                this.taskViewSide.style.display = 'flex';
+                this.taskViewSide.style.width = '50vw';
+                this.taskCloseButton.style.display = 'block';
+            }
+        }
+        else {
+            this.taskViewSide.style.zIndex = '';
+            this.taskViewSide.style.position = '';
+            this.taskViewSide.style.right = '';
+            this.taskViewSide.style.display = '';
+            this.taskViewSide.style.width = '';
+            this.taskCloseButton.style.display = '';
+        }
+        if (closeTaskButtonMethod)
+            __classPrivateFieldSet(this, _TaskViewSideUI_closeTaskButtonMethod, closeTaskButtonMethod, "f");
+        __classPrivateFieldGet(this, _TaskViewSideUI_instances, "m", _TaskViewSideUI_updateHeightDescription).call(this);
+    }
 }
-_TaskViewSideUI_selectedTask = new WeakMap(), _TaskViewSideUI_instances = new WeakSet(), _TaskViewSideUI_updateHeightDescription = function _TaskViewSideUI_updateHeightDescription() {
+_TaskViewSideUI_selectedTask = new WeakMap(), _TaskViewSideUI_closeTaskButtonMethod = new WeakMap(), _TaskViewSideUI_instances = new WeakSet(), _TaskViewSideUI_updateHeightDescription = function _TaskViewSideUI_updateHeightDescription() {
     this.taskDescriptionInput.style.height = 'auto';
     this.taskDescriptionInput.style.minHeight = 'auto';
     this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;

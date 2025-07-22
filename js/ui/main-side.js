@@ -107,6 +107,7 @@ export class MainSideUI {
             taskItem.classList.add('selected');
             taskTitleInput.focus();
             __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(task, tasksManager, projectsManager);
+            __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").updateStyle(() => this.renderMainSide(tasksManager, projectsManager));
         };
         (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
         const taskCheckbox = document.createElement('input');

@@ -113,6 +113,7 @@ export class MainSideUI {
             taskTitleInput.focus();
 
             this.#taskViewSideUI.renderTaskViewSide(task, tasksManager, projectsManager);
+            this.#taskViewSideUI.updateStyle(() => this.renderMainSide(tasksManager, projectsManager));
         }
 
         this.taskArrayList?.appendChild(taskItem);

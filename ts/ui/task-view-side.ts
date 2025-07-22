@@ -11,6 +11,8 @@ export class TaskViewSideUI {
 
     taskViewSide: HTMLDivElement;
     taskHeader: HTMLDivElement;
+
+    taskCloseButton: HTMLButtonElement;
     taskCheckboxComplete: HTMLInputElement;
     taskDateTimeInput: HTMLInputElement;
     taskPrioritySelect: HTMLSelectElement;
@@ -24,10 +26,13 @@ export class TaskViewSideUI {
     taskProjectMoreButton: HTMLButtonElement;
 
     #selectedTask: Task | null = null;
+    #closeTaskButtonMethod: Function = ()=>{}
 
     constructor(tasksManager: TasksManager, projectsManager: ProjectsManager, customContextMenuUI: CustomContextMenuUI) {
         this.taskViewSide = document.getElementById('task-view-side') as HTMLDivElement;
         this.taskHeader = document.getElementById('task-header') as HTMLDivElement;
+
+        this.taskCloseButton = document.getElementById('task-close-btn') as HTMLButtonElement;
         this.taskCheckboxComplete = document.getElementById('task-checkbox-complete') as HTMLInputElement;
         this.taskDateTimeInput = document.getElementById('task-date-button') as HTMLInputElement;
         this.taskPrioritySelect = document.getElementById('task-priority-select') as HTMLSelectElement;
@@ -100,6 +105,13 @@ export class TaskViewSideUI {
         }
         if (task !== this.#selectedTask) this.#selectedTask = task;
         this.clearAll();
+
+        // Close Button
+        this.taskCloseButton.onclick = () => {
+            this.renderTaskViewSide(null, tasksManager, projectsManager);
+            this.#closeTaskButtonMethod();
+            this.updateStyle();
+        }
 
         // Checkbox complete
         const priorityColor: string = function(): string {
@@ -306,6 +318,35 @@ export class TaskViewSideUI {
 
         if (isEdited) tasksManager.updateTask(subTask);
         return subTask;
+    }
+
+    updateStyle(closeTaskButtonMethod: Function | null = null) {
+        if (this.taskViewSide.style.visibility === 'visible') {
+            this.taskViewSide.style.zIndex = '4';
+
+            if (window.innerWidth <= 640) {
+                this.taskViewSide.style.position = 'absolute';
+                this.taskViewSide.style.display = 'flex';
+                this.taskViewSide.style.width = '100vw';
+                this.taskCloseButton.style.display = 'block';
+            }else if (window.innerWidth <= 960) {
+                this.taskViewSide.style.position = 'absolute';
+                this.taskViewSide.style.right = '0';
+                this.taskViewSide.style.display = 'flex';
+                this.taskViewSide.style.width = '50vw';
+                this.taskCloseButton.style.display = 'block';
+            }
+        } else {
+            this.taskViewSide.style.zIndex = '';
+            this.taskViewSide.style.position = '';
+            this.taskViewSide.style.right = '';
+            this.taskViewSide.style.display = '';
+            this.taskViewSide.style.width = '';
+            this.taskCloseButton.style.display = '';
+        }
+
+        if (closeTaskButtonMethod) this.#closeTaskButtonMethod = closeTaskButtonMethod;
+        this.#updateHeightDescription();
     }
 
     #updateHeightDescription() {
