@@ -5,6 +5,7 @@ import { TasksManager } from "./tasks_manager.js";
 
 export class DatabaseManager {
 
+    static version = 2;
     static dbName: string = 'ToMake';
     static storeTasksName: string = 'tasks';
     static storeProjectsName: string = 'projects';
@@ -17,7 +18,7 @@ export class DatabaseManager {
     constructor() {}
 
     async initDB(): Promise<IDBDatabase> { return new Promise((resolve, reject) => {
-        let request = indexedDB.open(DatabaseManager.dbName, 1);
+        let request = indexedDB.open(DatabaseManager.dbName, DatabaseManager.version);
 
         request.onblocked = (event) => {
             alert('Upgrade blocked - Please close other tabs displaying this site.');
@@ -67,6 +68,13 @@ export class DatabaseManager {
 
             tasksStore.createIndex('priority', 'priority', { unique: false });
             tasksStore.createIndex('status', 'status', { unique: false });
+        }
+        if (db.version < DatabaseManager.version) {
+            const tasksStore = db.transaction(DatabaseManager.storeTasksName, 'readwrite').objectStore(DatabaseManager.storeTasksName);
+            if (db.version < 2) {
+                tasksStore.createIndex('order', 'order', { unique: false });
+                tasksStore.createIndex('tags', 'tags', { unique: false, multiEntry: true });
+            }
         }
     }
 

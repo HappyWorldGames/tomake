@@ -59,7 +59,7 @@ export class DatabaseManager {
     }
     async initDB() {
         return new Promise((resolve, reject) => {
-            let request = indexedDB.open(_a.dbName, 1);
+            let request = indexedDB.open(_a.dbName, _a.version);
             request.onblocked = (event) => {
                 alert('Upgrade blocked - Please close other tabs displaying this site.');
                 console.log('Upgrade blocked - Please close other tabs displaying this site.');
@@ -101,6 +101,13 @@ _a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManag
         tasksStore.createIndex('repeat', 'repeat', { unique: false, multiEntry: true });
         tasksStore.createIndex('priority', 'priority', { unique: false });
         tasksStore.createIndex('status', 'status', { unique: false });
+    }
+    if (db.version < _a.version) {
+        const tasksStore = db.transaction(_a.storeTasksName, 'readwrite').objectStore(_a.storeTasksName);
+        if (db.version < 2) {
+            tasksStore.createIndex('order', 'order', { unique: false });
+            tasksStore.createIndex('tags', 'tags', { unique: false, multiEntry: true });
+        }
     }
 }, _DatabaseManager_initProjectsStore = function _DatabaseManager_initProjectsStore(db) {
     if (!db.objectStoreNames.contains(_a.storeProjectsName)) {
@@ -162,6 +169,7 @@ _a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManag
         reader.readAsText(file);
     });
 };
+DatabaseManager.version = 2;
 DatabaseManager.dbName = 'ToMake';
 DatabaseManager.storeTasksName = 'tasks';
 DatabaseManager.storeProjectsName = 'projects';

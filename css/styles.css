@@ -65,6 +65,7 @@ body {
     display: none;
     position: absolute;
     border: 1px solid #ccc;
+    width: 200px;
     background-color: var(--bg-color);
     padding: 5px;
 }

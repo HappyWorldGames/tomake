@@ -65,8 +65,18 @@ export class CustomContextMenuUI {
         __classPrivateFieldSet(this, _CustomContextMenuUI_selectedDeleteMethod, deleteMethod, "f");
         setTimeout(() => {
             this.customContextMenuDiv.style.display = 'block';
-            this.customContextMenuDiv.style.left = event.clientX + 'px';
-            this.customContextMenuDiv.style.top = event.clientY + 'px';
+            let posX = event.clientX;
+            let posY = event.clientY;
+            const width = this.customContextMenuDiv.clientWidth;
+            const height = this.customContextMenuDiv.clientHeight;
+            if (posX + width > window.innerWidth)
+                posX -= width;
+            if (posY + height > window.innerHeight)
+                posY -= height;
+            if (posY < 0)
+                posY = 0;
+            this.customContextMenuDiv.style.left = posX + 'px';
+            this.customContextMenuDiv.style.top = posY + 'px';
         }, 5);
     }
     showProject(project) {

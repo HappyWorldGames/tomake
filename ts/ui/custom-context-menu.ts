@@ -66,12 +66,20 @@ export class CustomContextMenuUI {
         this.#selectedDuplicateMethod = duplicateMethod;
         this.#selectedDeleteMethod = deleteMethod;
 
-        setTimeout(() => { // FIXME Kludge
+        setTimeout(() => { // FIXME Kludge Timeout
             this.customContextMenuDiv.style.display = 'block';
             // Position the context menu relative to the button
-            // FIXME going abroad
-            this.customContextMenuDiv.style.left = event.clientX + 'px';
-            this.customContextMenuDiv.style.top = event.clientY + 'px';
+            let posX = event.clientX;
+            let posY = event.clientY;
+            const width = this.customContextMenuDiv.clientWidth;
+            const height = this.customContextMenuDiv.clientHeight;
+
+            if (posX + width > window.innerWidth) posX -= width;
+            if (posY + height > window.innerHeight) posY -= height;
+            if (posY < 0) posY = 0;
+
+            this.customContextMenuDiv.style.left = posX + 'px';
+            this.customContextMenuDiv.style.top = posY + 'px';
         }, 5);
     }
 

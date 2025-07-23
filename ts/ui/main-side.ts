@@ -113,8 +113,8 @@ export class MainSideUI {
         taskItem.classList.add('item');
         if (this.#selectedTaskItemId === task.id) taskItem.classList.add('selected');
 
-        taskItem.onclick = () => {
-            if (this.#selectedTaskItemId === task.id) return;
+        taskItem.onclick = (event) => {
+            if (this.#selectedTaskItemId === task.id || event.target === taskMoreButton) return;
 
             document.getElementById(this.#selectedTaskItemId)?.classList.remove('selected');
             this.#selectedTaskItemId = task.id;

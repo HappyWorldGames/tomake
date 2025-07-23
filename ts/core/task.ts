@@ -2,7 +2,7 @@ import { SysProjectId } from "../ui/project-list-side.js";
 import { getUUID } from "../utils/uuid.js";
 
 export class Task {
-    // TODO add order for move task
+
     id: string;
     parentId: string;
     childIdList: string[];
@@ -23,6 +23,8 @@ export class Task {
 
     priority: TaskPriority;
     status: TaskStatus;
+    order: number;
+    tags: string[];
 
     constructor(
         title: string = '',
@@ -44,7 +46,9 @@ export class Task {
         repeat: Date[] = [],
 
         priority: TaskPriority = TaskPriority.Nope,
-        status: TaskStatus = TaskStatus.Normal
+        status: TaskStatus = TaskStatus.Normal,
+        order: number = -1,
+        tags: string[] = []
     ) {
         this.id = id;
         this.parentId = parentId;
@@ -66,30 +70,34 @@ export class Task {
 
         this.priority = priority;
         this.status = status;
+        this.order = order;
+        this.tags = tags;
     }
 
     toDB(): Object {
         return {
-        taskId: this.id,
-        parentId: this.parentId,
-        childIdList: JSON.stringify(this.childIdList),
-        listNameId: this.listNameId,
+            taskId: this.id,
+            parentId: this.parentId,
+            childIdList: JSON.stringify(this.childIdList),
+            listNameId: this.listNameId,
 
-        title: this.title,
-        description: this.description,
+            title: this.title,
+            description: this.description,
 
-        createdDate: this.createdDate,
-        updatedDate: this.updatedDate,
-        completedDate: this.completedDate,
+            createdDate: this.createdDate,
+            updatedDate: this.updatedDate,
+            completedDate: this.completedDate,
 
-        startDate: this.startDate,
-        dueDate: this.dueDate,
+            startDate: this.startDate,
+            dueDate: this.dueDate,
 
-        reminder: this.reminder,
-        repeat: this.repeat,
+            reminder: this.reminder,
+            repeat: this.repeat,
 
-        priority: this.priority,
-        status: this.status
+            priority: this.priority,
+            status: this.status,
+            order: this.order,
+            tags: JSON.stringify(this.tags)
         }
     }
 
@@ -114,7 +122,9 @@ export class Task {
             obj.repeat.map((date: string) => new Date(date)),
 
             Number(obj.priority || 0) as TaskPriority,
-            obj.status
+            obj.status,
+            obj.order ? obj.order : -1,
+            obj.tags ? JSON.parse(obj.tags) : []
         )
     }
 

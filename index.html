@@ -61,18 +61,7 @@
             <input type="text" id="task-add-input" placeholder="Добавить задачу..." required>
             <button type="button" id="add-task-btn">Add</button>
         </div>
-        <ul id="task-array-list">
-            <div class="task-list-name">Name</div>
-            <li class="item selected"><input type="text" class="task-name" value="Test 1"></li>
-            <li class="item"><input type="text" class="task-name" value="Test 2"></li>
-            <div class="task-list">
-                <h6 class="task-list-name">Name</h6>
-                <ul class="item-list">
-                    <li class="item selected"><input type="text" class="task-name" value="Test 1"></li>
-                    <li class="item"><input type="text" class="task-name" value="Test 2"></li>
-                </ul>
-            </div>
-        </ul>
+        <ul id="task-array-list"></ul>
     </div>
 
     <div class="task-view-side" id="task-view-side">
@@ -107,8 +96,9 @@
 
     <div id="custom-context-menu">
         <ul>
+            <li id="custom-context-menu-tags-button" style="display: none;">Tags</li>
             <li id="custom-context-menu-wontdo-button">Won`t Do</li>
-            <li id="custom-context-menu-duplicate-button">Duplicate</li>
+            <li id="custom-context-menu-duplicate-button" style="display: none;">Duplicate</li>
             <li id="custom-context-menu-delete-button">🗑 Delete</li>
         </ul>
     </div>

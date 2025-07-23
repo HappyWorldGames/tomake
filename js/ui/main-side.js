@@ -102,9 +102,9 @@ export class MainSideUI {
         taskItem.classList.add('item');
         if (__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f") === task.id)
             taskItem.classList.add('selected');
-        taskItem.onclick = () => {
+        taskItem.onclick = (event) => {
             var _a;
-            if (__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f") === task.id)
+            if (__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f") === task.id || event.target === taskMoreButton)
                 return;
             (_a = document.getElementById(__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f"))) === null || _a === void 0 ? void 0 : _a.classList.remove('selected');
             __classPrivateFieldSet(this, _MainSideUI_selectedTaskItemId, task.id, "f");
