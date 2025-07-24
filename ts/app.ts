@@ -70,13 +70,24 @@ export class App {
         }
 
         // register ServiceWorker
-        navigator.serviceWorker.register(
-            '/sw.js'
-        ).catch(err => {
-            throw new Error('ServiceWorker error: ' + err);
-        })
+        if (navigator.serviceWorker) {
+            navigator.serviceWorker.register(
+                '/tomake/sw.js', {scope: '/tomake/'}
+            ).catch(err => {
+                throw new Error('ServiceWorker error: ' + err);
+            })
+        }
 
         this.updateWidthStyle();
+
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().then((persistent) => {
+                if (!persistent) {
+                    alert('Storage may be cleared by the UA under storage pressure.')
+                }
+            });
+        }
+
     }
 
     updateWidthStyle() {
