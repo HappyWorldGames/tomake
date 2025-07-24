@@ -1,0 +1,16 @@
+{
+  "name": "ToMake your TODO list",
+  "short_name": "ToMake",
+  "description": "To-do list.",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "48x48",
+      "type": "image/ico"
+    }
+  ],
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "theme_color": "#b12a34",
+  "background_color": "#b12a34"
+}
