@@ -71,7 +71,7 @@ export class App {
 
         // register ServiceWorker
         navigator.serviceWorker.register(
-            '/sw.js'
+            'sw.js'
         ).catch(err => {
             throw new Error('ServiceWorker error: ' + err);
         })

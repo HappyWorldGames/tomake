@@ -40,7 +40,7 @@ export class App {
         window.onresize = () => {
             this.updateWidthStyle();
         };
-        navigator.serviceWorker.register('/sw.js').catch(err => {
+        navigator.serviceWorker.register('sw.js').catch(err => {
             throw new Error('ServiceWorker error: ' + err);
         });
         this.updateWidthStyle();
