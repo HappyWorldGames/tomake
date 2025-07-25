@@ -1,5 +1,6 @@
+const APP_PREFIX = 'tomake'
 const VERSION = 2
-const CACHE_NAME = `tomake-cache-v${VERSION}`;
+const CACHE_NAME = `${APP_PREFIX}-v${VERSION}`;
 const ASSETS = [
     '/',
     '/favicon.ico',
@@ -44,7 +45,7 @@ self.addEventListener('activate', e => {
     e.waitUntil(
         caches.keys().then(keys => Promise.all(
             keys.map(key => {
-                if (key !== CACHE_NAME) {
+                if (key.indexOf(APP_PREFIX) && key !== CACHE_NAME) {
                     return caches.delete(key);
                 }
             })
