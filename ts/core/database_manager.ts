@@ -98,22 +98,56 @@ export class DatabaseManager {
         this.tasksManager.garbageCleaner();
     }
 
-    exportData = async () => {
+    merge = (jsonString: string) => {
+        const [remoteTasksData, remoteProjectsData] = DatabaseManager.convertFromJsonStringToArray(jsonString);
+        this.garbageCleaner();
+
+        this.tasksManager.merge(remoteTasksData);
+        this.projectsManager.merge(remoteProjectsData);
+    }
+
+    exportDataToJsonString = async (): Promise<string> => {
+        this.garbageCleaner();
+
+        const tasks = await this.tasksManager.getAllTasks();
+        const projects = await this.projectsManager.getAllProjects();
+
+        return JSON.stringify([
+            tasks.map(task => task.toDB()),
+            projects.map(project => project.toDB())
+        ], null, 2);
+    }
+
+    importDataFromJsonString = (jsonString: string) => {
+        const [tasks, projects] = DatabaseManager.convertFromJsonStringToArray(jsonString);
+
+        this.tasksManager.clear().then(() =>
+            Promise.all(tasks.map(task => this.tasksManager.addTask(task, true))).then(() =>
+                this.tasksManager.garbageCleaner()
+            )
+        );
+        this.projectsManager.clear().then(() =>
+            Promise.all(projects.map(project => this.projectsManager.addProject(project, true))).then(() =>
+                this.projectsManager.garbageCleaner(this.tasksManager)
+            )
+        );
+    }
+
+    static convertFromJsonStringToArray(jsonString: string): [Task[], Project[]] {
+        const jsonArrayObj = JSON.parse(jsonString) as Array<Object[]>;
+
+        return [
+            jsonArrayObj[0].map(task => Task.fromDB(task)),
+            jsonArrayObj[1].map(project => Project.fromDB(project))
+        ]
+    }
+
+    exportDataToFile = async () => {
         if (!confirm('Export all tasks to file?')) return;
 
         try {
-            this.garbageCleaner();
-
-            const tasks = await this.tasksManager.getAllTasks();
-            const projects = await this.projectsManager.getAllProjects();
-
-            if (tasks.length === 0 && projects.length === 0) {
-                alert('No data to export!');
-                return;
-            }
-
             this.#downloadFile(
-                JSON.stringify([tasks.map(task => task.toDB()), projects.map(project => project.toDB())], null, 2),
+                await this.exportDataToJsonString(),
                 `tomake_backup_${new Date().toISOString().slice(0,10)}.json`,
                 'application/json'
             );
@@ -123,28 +157,18 @@ export class DatabaseManager {
         }
     }
 
-    importData = async () => {
+    importDataFromFile = async () => {
+        // TODO Make choose sync or replace
         if (!confirm('Current data will be replaced. Continue?')) return;
 
         const file = await this.#selectFile('.json');
         if (!file) return;
 
         try {
-            const readed = await this.#readFile(file);
-
-            const tasks = readed[0].map(task => Task.fromDB(task));
-            const projects = readed[1].map(project => Project.fromDB(project));
-
-            await this.tasksManager.clear();
-            await this.projectsManager.clear();
-
-            await Promise.all(tasks.map(task => this.tasksManager.addTask(task, true)));
-            await Promise.all(projects.map(project => this.projectsManager.addProject(project, true)));
-
-            this.garbageCleaner();
+            this.importDataFromJsonString(await this.#readFile(file));
 
             alert('Data imported successfully!');
-            return true; // For potential chaining
+            return true;
         } catch (error) {
             console.error('Import error:', error);
             alert('Invalid file format!');
@@ -182,7 +206,7 @@ export class DatabaseManager {
         });
     }
 
-    #readFile(file: File): Promise<Array<Task[] | Project[]>> { return new Promise((resolve, reject) => {
+    #readFile(file: File): Promise<string> { return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
             if (!e.target?.result) {
@@ -196,7 +220,7 @@ export class DatabaseManager {
             }
 
             try {
-                resolve(JSON.parse(e.target.result));
+                resolve(e.target.result);
             } catch (error) {
                 reject(error);
             }

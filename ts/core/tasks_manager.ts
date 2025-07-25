@@ -179,7 +179,7 @@ export class TasksManager {
             if (tasks.length === 0) return;
 
             for (const task of tasks) {
-                const diffDays = (Date.now() - task.updatedDate.getTime()) / (1000 * 60 * 60 * 24);
+                const diffDays = (Date.now() - task.updatedDate.getTime()) / 86400000;
 
                 if (diffDays > 30) {
                     this.deleteTask(task.id, true);
@@ -207,5 +207,20 @@ export class TasksManager {
             reject((e.target as IDBTransaction).error);
         };
     });}
+
+    async merge(remoteData: Task[]) {
+        const taskMap = new Map<string, Task>();
+
+        [...await this.getAllTasks(), ...remoteData].forEach( task => {
+            const existing = taskMap.get(task.id);
+            if (!existing || task.updatedDate > existing.updatedDate)
+                taskMap.set(task.id, task);
+        });
+
+        await this.clear();
+        Array.from(taskMap.values()).forEach(task => {
+            this.addTask(task, true);
+        });
+    }
 
 }

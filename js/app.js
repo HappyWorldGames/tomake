@@ -24,7 +24,7 @@ export class App {
         this.themreManager = new ThemeManager(this.syncProjectListSideUI.themeToggleButton);
     }
     async init() {
-        this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportData, this.dbManager.importData);
+        this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportDataToFile, this.dbManager.importDataFromFile);
         this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager, this.dbManager.projectsManager);
         this.mainSideUI.clearAll();
         await this.dbManager.initDB();

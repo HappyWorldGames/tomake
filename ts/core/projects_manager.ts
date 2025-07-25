@@ -164,4 +164,19 @@ export class ProjectsManager {
         };
     });}
 
+    async merge(remoteData: Project[]) {
+        const projectMap = new Map<string, Project>();
+
+        [...await this.getAllProjects(), ...remoteData].forEach( project => {
+            const existing = projectMap.get(project.id);
+            if (!existing || project.updatedDate > existing.updatedDate)
+                projectMap.set(project.id, project);
+        });
+
+        await this.clear();
+        Array.from(projectMap.values()).forEach(project => {
+            this.addProject(project, true);
+        })
+    }
+
 }
