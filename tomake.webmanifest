@@ -4,9 +4,9 @@
   "description": "To-do list.",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "48x48",
-      "type": "image/ico"
+      "src": "icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
     }
   ],
   "start_url": "index.html",
