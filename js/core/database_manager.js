@@ -14,39 +14,45 @@ export class DatabaseManager {
         this.db = null;
         this.tasksManager = new TasksManager();
         this.projectsManager = new ProjectsManager();
-        this.exportData = async () => {
+        this.merge = (jsonString) => {
+            const [remoteTasksData, remoteProjectsData] = _a.convertFromJsonStringToArray(jsonString);
+            this.garbageCleaner();
+            this.tasksManager.merge(remoteTasksData);
+            this.projectsManager.merge(remoteProjectsData);
+        };
+        this.exportDataToJsonString = async () => {
+            this.garbageCleaner();
+            const tasks = await this.tasksManager.getAllTasks();
+            const projects = await this.projectsManager.getAllProjects();
+            return JSON.stringify([
+                tasks.map(task => task.toDB()),
+                projects.map(project => project.toDB())
+            ], null, 2);
+        };
+        this.importDataFromJsonString = (jsonString) => {
+            const [tasks, projects] = _a.convertFromJsonStringToArray(jsonString);
+            this.tasksManager.clear().then(() => Promise.all(tasks.map(task => this.tasksManager.addTask(task, true))).then(() => this.tasksManager.garbageCleaner()));
+            this.projectsManager.clear().then(() => Promise.all(projects.map(project => this.projectsManager.addProject(project, true))).then(() => this.projectsManager.garbageCleaner(this.tasksManager)));
+        };
+        this.exportDataToFile = async () => {
             if (!confirm('Export all tasks to file?'))
                 return;
             try {
-                this.garbageCleaner();
-                const tasks = await this.tasksManager.getAllTasks();
-                const projects = await this.projectsManager.getAllProjects();
-                if (tasks.length === 0 && projects.length === 0) {
-                    alert('No data to export!');
-                    return;
-                }
-                __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_downloadFile).call(this, JSON.stringify([tasks.map(task => task.toDB()), projects.map(project => project.toDB())], null, 2), `tomake_backup_${new Date().toISOString().slice(0, 10)}.json`, 'application/json');
+                __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_downloadFile).call(this, await this.exportDataToJsonString(), `tomake_backup_${new Date().toISOString().slice(0, 10)}.json`, 'application/json');
             }
             catch (error) {
                 console.error('Export error:', error);
                 alert('Export failed!');
             }
         };
-        this.importData = async () => {
+        this.importDataFromFile = async () => {
             if (!confirm('Current data will be replaced. Continue?'))
                 return;
             const file = await __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_selectFile).call(this, '.json');
             if (!file)
                 return;
             try {
-                const readed = await __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_readFile).call(this, file);
-                const tasks = readed[0].map(task => Task.fromDB(task));
-                const projects = readed[1].map(project => Project.fromDB(project));
-                await this.tasksManager.clear();
-                await this.projectsManager.clear();
-                await Promise.all(tasks.map(task => this.tasksManager.addTask(task, true)));
-                await Promise.all(projects.map(project => this.projectsManager.addProject(project, true)));
-                this.garbageCleaner();
+                this.importDataFromJsonString(await __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_readFile).call(this, file));
                 alert('Data imported successfully!');
                 return true;
             }
@@ -82,6 +88,13 @@ export class DatabaseManager {
     garbageCleaner() {
         this.projectsManager.garbageCleaner(this.tasksManager);
         this.tasksManager.garbageCleaner();
+    }
+    static convertFromJsonStringToArray(jsonString) {
+        const jsonArrayObj = JSON.parse(jsonString);
+        return [
+            jsonArrayObj[0].map(task => Task.fromDB(task)),
+            jsonArrayObj[1].map(project => Project.fromDB(project))
+        ];
     }
 }
 _a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManager_initTasksStore = function _DatabaseManager_initTasksStore(db) {
@@ -159,7 +172,7 @@ _a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManag
                 return;
             }
             try {
-                resolve(JSON.parse(e.target.result));
+                resolve(e.target.result);
             }
             catch (error) {
                 reject(error);

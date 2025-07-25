@@ -26,7 +26,6 @@
     }
 }
 
-/* FIXME scroll to .main */
 .task-view-side {
     height: 100vh;
     background-color: var(--task-view-side-bg-color);

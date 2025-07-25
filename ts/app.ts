@@ -6,6 +6,7 @@ import { TaskViewSideUI } from "./ui/task-view-side.js";
 import { ThemeManager } from "./ui/theme_manager.js";
 import { ProjectListSideUI, SysProjectId } from "./ui/project-list-side.js";
 import { CustomContextMenuUI } from "./ui/custom-context-menu.js";
+import { GoogleSyncManager } from "./sync/google.js";
 
 export class App {
 
@@ -18,9 +19,11 @@ export class App {
     customContextMenuUI: CustomContextMenuUI;
 
     dbManager: DatabaseManager;
+    googleSyncManager: GoogleSyncManager;
 
     constructor() {
         this.dbManager = new DatabaseManager();
+        this.googleSyncManager = new GoogleSyncManager(this.dbManager);
 
         this.customContextMenuUI = new CustomContextMenuUI(this.dbManager.tasksManager, this.dbManager.projectsManager);
 
@@ -47,7 +50,7 @@ export class App {
     }
 
     async init() {
-        this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportData, this.dbManager.importData);
+        this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportDataToFile, this.dbManager.importDataFromFile, this.googleSyncManager.initAuth, this.googleSyncManager.sync);
 
         this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager, this.dbManager.projectsManager);
         this.mainSideUI.clearAll();
