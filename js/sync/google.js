@@ -15,7 +15,7 @@ export class GoogleSyncManager {
                     return;
                 }
                 this.token = response.credential;
-                this.sync(this.dbManager);
+                this.sync();
             },
             use_fedcm_for_prompt: true
         });
@@ -23,14 +23,14 @@ export class GoogleSyncManager {
         if (!this.token)
             this.requestToken();
     }
-    async sync(dbManager) {
+    async sync() {
         try {
             if (!this.token) {
                 await this.requestToken();
                 return;
             }
-            dbManager.merge(await this.fetchDriveData());
-            await this.uploadToDrive(await dbManager.exportDataToJsonString());
+            this.dbManager.merge(await this.fetchDriveData());
+            await this.uploadToDrive(await this.dbManager.exportDataToJsonString());
             alert('✅ Синхронизация завершена!');
         }
         catch (error) {
