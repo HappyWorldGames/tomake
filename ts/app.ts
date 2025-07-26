@@ -82,6 +82,15 @@ export class App {
         }
 
         this.updateWidthStyle();
+
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().then((persistent) => {
+                if (!persistent) {
+                    alert('Storage may be cleared by the UA under storage pressure.')
+                }
+            });
+        }
+
     }
 
     updateWidthStyle() {
