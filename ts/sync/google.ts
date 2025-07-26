@@ -44,7 +44,7 @@ export class GoogleSyncManager {
             }
 
             const jsonString = await this.fetchDriveData();
-            if (!jsonString) this.dbManager.merge(jsonString);
+            if (jsonString) this.dbManager.merge(jsonString);
             await this.uploadToDrive(await this.dbManager.exportDataToJsonString());
 
             alert('✅ Sync done!');
