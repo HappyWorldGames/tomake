@@ -28,6 +28,7 @@ export class GoogleSyncManager {
                     return;
                 }
                 const jsonString = await this.fetchDriveData();
+                console.log(`jsonString: ${jsonString}`);
                 if (!jsonString)
                     return;
                 this.dbManager.merge(jsonString);
