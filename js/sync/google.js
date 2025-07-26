@@ -2,27 +2,27 @@ export class GoogleSyncManager {
     constructor(dbManager) {
         this.FILE_NAME = 'ToMake.json';
         this.GOOGLE_FILE_URL = `https://www.googleapis.com/drive/v3/files?q=name="${this.FILE_NAME}"`;
+        this.initAuth = () => {
+            if (typeof google === 'undefined') {
+                alert("Google is unavailable. Try again later...");
+                return;
+            }
+            google.accounts.id.initialize({
+                client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
+                callback: (response) => {
+                    if (!response.credential) {
+                        console.error('Auth error:', response);
+                        return;
+                    }
+                    this.token = response.credential;
+                    this.sync();
+                },
+                use_fedcm_for_prompt: true
+            });
+            this.requestToken();
+        };
         this.dbManager = dbManager;
         this.token = null;
-    }
-    initAuth() {
-        if (typeof google === 'undefined') {
-            alert("Google is unavailable. Try again later...");
-            return;
-        }
-        google.accounts.id.initialize({
-            client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
-            callback: (response) => {
-                if (!response.credential) {
-                    console.error('Auth error:', response);
-                    return;
-                }
-                this.token = response.credential;
-                this.sync();
-            },
-            use_fedcm_for_prompt: true
-        });
-        this.requestToken();
     }
     async sync() {
         try {

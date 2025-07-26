@@ -13,7 +13,7 @@ export class GoogleSyncManager {
         this.token = null;
     }
 
-    initAuth() {
+    initAuth = () => {
         if (typeof google === 'undefined') {
             alert("Google is unavailable. Try again later...");
             return;
