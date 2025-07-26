@@ -1,6 +1,5 @@
 export class GoogleSyncManager {
     constructor(dbManager) {
-        this.GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
         this.FILE_NAME = 'ToMake.json';
         this.GOOGLE_FILE_URL = `https://www.googleapis.com/drive/v3/files?q=name="${this.FILE_NAME}"`;
         this.dbManager = dbManager;
@@ -8,7 +7,7 @@ export class GoogleSyncManager {
     }
     initAuth() {
         google.accounts.id.initialize({
-            client_id: this.GOOGLE_CLIENT_ID,
+            client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
             callback: (response) => {
                 if (!response.credential) {
                     console.error('Auth error:', response);
@@ -41,7 +40,7 @@ export class GoogleSyncManager {
     requestToken() {
         return new Promise((resolve, reject) => {
             const tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: this.GOOGLE_CLIENT_ID,
+                client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
                 scope: 'https://www.googleapis.com/auth/drive.file',
                 callback: (response) => {
                     if (response.error)
@@ -89,3 +88,4 @@ export class GoogleSyncManager {
         });
     }
 }
+GoogleSyncManager.GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';

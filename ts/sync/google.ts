@@ -1,7 +1,7 @@
 import { DatabaseManager } from "../core/database_manager.js";
 
 export class GoogleSyncManager {
-    private readonly GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
+    private static readonly GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
     private readonly FILE_NAME = 'ToMake.json';
     private readonly GOOGLE_FILE_URL = `https://www.googleapis.com/drive/v3/files?q=name="${this.FILE_NAME}"`;
 
@@ -14,8 +14,12 @@ export class GoogleSyncManager {
     }
 
     initAuth() {
+        if (typeof google === 'undefined') {
+            alert("Google is unavailable. Try again later...");
+            return;
+        }
         google.accounts.id.initialize({
-            client_id: this.GOOGLE_CLIENT_ID,
+            client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
             callback: (response: google.accounts.id.CredentialResponse) => {
                 if (!response.credential) {
                     console.error('Auth error:', response);
@@ -51,7 +55,7 @@ export class GoogleSyncManager {
     private requestToken(): Promise<void> {
         return new Promise((resolve, reject) => {
             const tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: this.GOOGLE_CLIENT_ID,
+                client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
                 scope: 'https://www.googleapis.com/auth/drive.file',
                 callback: (response: google.accounts.oauth2.TokenResponse) => {
                 if (response.error) reject(new Error(response.error));
