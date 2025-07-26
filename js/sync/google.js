@@ -6,6 +6,10 @@ export class GoogleSyncManager {
         this.token = null;
     }
     initAuth() {
+        if (typeof google === 'undefined') {
+            alert("Google is unavailable. Try again later...");
+            return;
+        }
         google.accounts.id.initialize({
             client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
             callback: (response) => {
@@ -18,9 +22,7 @@ export class GoogleSyncManager {
             },
             use_fedcm_for_prompt: true
         });
-        this.token = sessionStorage.getItem('google_token');
-        if (!this.token)
-            this.requestToken();
+        this.requestToken();
     }
     async sync() {
         try {
