@@ -36,7 +36,7 @@ export class GoogleSyncManager {
         this.requestToken();
     }
 
-    async sync(): Promise<void> {
+    sync = async (): Promise<void> => {
         try {
             if (!this.token) {
                 await this.requestToken();
@@ -46,14 +46,14 @@ export class GoogleSyncManager {
             this.dbManager.merge(await this.fetchDriveData());
             await this.uploadToDrive(await this.dbManager.exportDataToJsonString());
 
-            alert('✅ Синхронизация завершена!');
+            alert('✅ Sync done!');
         } catch (error: any) {
-            console.error('Ошибка синхронизации:', error);
-            alert('❌ Ошибка: ' + error.message);
+            console.error('Error sync:', error);
+            alert('❌ Error: ' + error.message);
         }
     }
 
-    private requestToken(): Promise<void> {
+    private requestToken = (): Promise<void> => {
         return new Promise((resolve, reject) => {
             const tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
@@ -69,7 +69,7 @@ export class GoogleSyncManager {
         });
     }
 
-    private async fetchDriveData(): Promise<string> {
+    private fetchDriveData = async (): Promise<string> => {
         const searchResponse = await fetch(this.GOOGLE_FILE_URL, {
             headers: { 'Authorization': `Bearer ${this.token}` }
         });
@@ -84,7 +84,7 @@ export class GoogleSyncManager {
         return await fileContent.json();
     }
 
-    private async uploadToDrive(data: string): Promise<void> {
+    private uploadToDrive = async (data: string): Promise<void> => {
         const searchResponse = await fetch(this.GOOGLE_FILE_URL, {
             headers: { 'Authorization': `Bearer ${this.token}` }
         });
