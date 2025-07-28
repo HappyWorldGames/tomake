@@ -55,27 +55,34 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
     if (e.request.method !== 'GET') return;
-    // TODO timeout to offline
-    e.respondWith(
-        fetch(e.request.clone()) // First access to the network
-            .then(networkResponse => {
-                const responseClone = networkResponse.clone();
-                // Response Caching
-                caches.open(CACHE_NAME)
-                    .then(cache => {
-                        cache.put(e.request, responseClone);
-                    });
-                return networkResponse;
-            })
-            .catch(err => {
-                console.error('[SW] Network error:', err);
-                // If the network is unavailable, return the cache
-                return caches.match(e.request)
-                    .then(cachedResponse => {
-                        if (cachedResponse) {
-                            return cachedResponse;
-                        }
-                    });
-            })
+
+    // 1. Trying to respond from cache on timeout
+    const cachePromise = caches.match(e.request)
+        .then(cached => cached || Promise.reject('No cache'));
+
+    // 2. Network request with caching (works in the background)
+    const networkFetch = fetch(e.request.clone())
+        .then(networkResponse => {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME)
+                .then(cache => cache.put(e.request, responseClone));
+            return networkResponse;
+        });
+
+    // 3. Timeout for quick response
+    const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject('Timeout'), 1000)
     );
+
+    // 4. Race: Network vs Timeout
+    e.respondWith(
+        Promise.race([
+            networkFetch.catch(() => cachePromise),
+            timeoutPromise.then(() => cachePromise, () => cachePromise)
+        ])
+        .catch(() => cachePromise)
+    );
+
+    // 5. Important: force execution of the network request
+    e.waitUntil(networkFetch.catch(() => {}));
 });
