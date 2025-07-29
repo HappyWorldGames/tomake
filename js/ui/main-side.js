@@ -30,17 +30,25 @@ export class MainSideUI {
     }
     setOnTaskAddButtonClickListener(tasksManager, projectsManager) {
         var _a;
-        (_a = this.taskAddButton) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
-            if (this.taskAddInput == null)
-                return;
+        const addTaskUI = () => {
             const titleTask = this.taskAddInput.value;
+            if (!titleTask)
+                return;
             const task = new Task(titleTask);
             task.startDate = new Date();
             tasksManager.addTask(task).then(() => {
                 this.renderMainSide(tasksManager, projectsManager);
                 this.taskAddInput.value = '';
             });
+        };
+        (_a = this.taskAddButton) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
+            addTaskUI();
         });
+        this.taskAddInput.onkeydown = (event) => {
+            if (event.key === 'Enter') {
+                addTaskUI();
+            }
+        };
     }
     renderMainSide(tasksManager, projectsManager, projectId = '') {
         if (projectId !== '')
