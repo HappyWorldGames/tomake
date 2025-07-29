@@ -86,3 +86,12 @@ self.addEventListener('fetch', e => {
     // 5. Important: force execution of the network request
     e.waitUntil(networkFetch.catch(() => {}));
 });
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+    if (alarm.name !== 'next-task-alarm') return;
+
+    self.registration.showNotification('nextTask.title', {
+        body: 'nextTask.description',
+        icon: '/tomake/icon.ico'
+    });
+});

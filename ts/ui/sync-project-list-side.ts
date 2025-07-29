@@ -48,6 +48,12 @@ export class SyncProjectListSideUI {
 
         this.notifyButton.onclick = () => {
             requestNotification();
+
+            const time = Date.now() + 5000;
+            chrome.alarms.create('next-task-alarm', {
+                when: time
+            });
+            console.log('Alarm set for:', new Date(time));
         }
     }
 
