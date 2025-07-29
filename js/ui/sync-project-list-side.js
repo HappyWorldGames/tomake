@@ -1,3 +1,4 @@
+import { requestNotification } from '../utils/notification.js';
 export class SyncProjectListSideUI {
     constructor() {
         this.syncSide = document.getElementById('sync-side');
@@ -6,19 +7,23 @@ export class SyncProjectListSideUI {
         this.syncButton = document.getElementById('syncButton');
         this.exportButton = document.getElementById('exportButton');
         this.importButton = document.getElementById('importButton');
+        this.notifyButton = document.getElementById('notifyButton');
         if (window.innerWidth > 500)
             this.syncSide.classList.add('visible');
     }
     setOnClickListener(exportFun, importFun, authGoogle, syncGoogle) {
-        var _a, _b, _c;
+        var _a;
         (_a = this.authButton) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
             authGoogle();
         });
         this.syncButton.onclick = () => {
             syncGoogle();
         };
-        (_b = this.exportButton) === null || _b === void 0 ? void 0 : _b.addEventListener('click', exportFun);
-        (_c = this.importButton) === null || _c === void 0 ? void 0 : _c.addEventListener('click', importFun);
+        this.exportButton.addEventListener('click', exportFun);
+        this.importButton.addEventListener('click', importFun);
+        this.notifyButton.onclick = () => {
+            requestNotification();
+        };
     }
     updateStyle() {
         if (window.innerWidth <= 500 && this.syncSide.classList.contains('visible')) {
