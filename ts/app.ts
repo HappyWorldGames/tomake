@@ -63,9 +63,8 @@ export class App {
             // save before close
             this.taskViewSideUI.saveTask(this.dbManager.tasksManager);
         };
-        document.onclick = () => {
-            if (this.customContextMenuUI.isOpen())
-                this.customContextMenuUI.dismiss();
+        document.onclick = (event) => {
+            this.customContextMenuUI.globalClick(event);
         }
 
         window.onresize = () => {

@@ -16,6 +16,8 @@ export class CustomContextMenuUI {
     #selectedDuplicateMethod: Function | null = null;
     #selectedDeleteMethod: Function | null = null;
 
+    private target: Node | null = null;
+
     constructor(tasksManager: TasksManager, projectsManager: ProjectsManager) {
         this.customContextMenuDiv = document.getElementById('custom-context-menu') as HTMLDivElement;
 
@@ -61,26 +63,25 @@ export class CustomContextMenuUI {
     }
 
     showTask(event: MouseEvent, task: Task, wontDoMethod: Function | null = null, duplicateMethod: Function | null = null, deleteMethod: Function | null = null) {
+        this.target = event.target instanceof Node ? event.target : null;
         this.#selectedObj = task;
         this.#selectedWontDoMethod = wontDoMethod;
         this.#selectedDuplicateMethod = duplicateMethod;
         this.#selectedDeleteMethod = deleteMethod;
 
-        setTimeout(() => { // FIXME Kludge Timeout
-            this.customContextMenuDiv.style.display = 'block';
-            // Position the context menu relative to the button
-            let posX = event.clientX;
-            let posY = event.clientY;
-            const width = this.customContextMenuDiv.clientWidth;
-            const height = this.customContextMenuDiv.clientHeight;
+        this.customContextMenuDiv.style.display = 'block';
+        // Position the context menu relative to the button
+        let posX = event.clientX;
+        let posY = event.clientY;
+        const width = this.customContextMenuDiv.clientWidth;
+        const height = this.customContextMenuDiv.clientHeight;
 
-            if (posX + width > window.innerWidth) posX -= width;
-            if (posY + height > window.innerHeight) posY -= height;
-            if (posY < 0) posY = 0;
+        if (posX + width > window.innerWidth) posX -= width;
+        if (posY + height > window.innerHeight) posY -= height;
+        if (posY < 0) posY = 0;
 
-            this.customContextMenuDiv.style.left = posX + 'px';
-            this.customContextMenuDiv.style.top = posY + 'px';
-        }, 5);
+        this.customContextMenuDiv.style.left = posX + 'px';
+        this.customContextMenuDiv.style.top = posY + 'px';
     }
 
     showProject(project: Project) {
@@ -89,6 +90,12 @@ export class CustomContextMenuUI {
 
     dismiss() {
         this.customContextMenuDiv.style.display = 'none';
+        this.target = null;
+    }
+
+    globalClick(event: MouseEvent) {
+        if (event.target instanceof Node && this.target && this.target.contains(event.target)) return;
+        this.dismiss();
     }
 
     isOpen(): boolean {

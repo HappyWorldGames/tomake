@@ -35,9 +35,8 @@ export class App {
         window.onbeforeunload = () => {
             this.taskViewSideUI.saveTask(this.dbManager.tasksManager);
         };
-        document.onclick = () => {
-            if (this.customContextMenuUI.isOpen())
-                this.customContextMenuUI.dismiss();
+        document.onclick = (event) => {
+            this.customContextMenuUI.globalClick(event);
         };
         window.onresize = () => {
             this.updateWidthStyle();

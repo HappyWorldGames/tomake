@@ -18,6 +18,7 @@ export class CustomContextMenuUI {
         _CustomContextMenuUI_selectedWontDoMethod.set(this, null);
         _CustomContextMenuUI_selectedDuplicateMethod.set(this, null);
         _CustomContextMenuUI_selectedDeleteMethod.set(this, null);
+        this.target = null;
         this.customContextMenuDiv = document.getElementById('custom-context-menu');
         this.wontDoButton = document.getElementById('custom-context-menu-wontdo-button');
         this.duplicateButton = document.getElementById('custom-context-menu-duplicate-button');
@@ -59,30 +60,35 @@ export class CustomContextMenuUI {
         };
     }
     showTask(event, task, wontDoMethod = null, duplicateMethod = null, deleteMethod = null) {
+        this.target = event.target instanceof Node ? event.target : null;
         __classPrivateFieldSet(this, _CustomContextMenuUI_selectedObj, task, "f");
         __classPrivateFieldSet(this, _CustomContextMenuUI_selectedWontDoMethod, wontDoMethod, "f");
         __classPrivateFieldSet(this, _CustomContextMenuUI_selectedDuplicateMethod, duplicateMethod, "f");
         __classPrivateFieldSet(this, _CustomContextMenuUI_selectedDeleteMethod, deleteMethod, "f");
-        setTimeout(() => {
-            this.customContextMenuDiv.style.display = 'block';
-            let posX = event.clientX;
-            let posY = event.clientY;
-            const width = this.customContextMenuDiv.clientWidth;
-            const height = this.customContextMenuDiv.clientHeight;
-            if (posX + width > window.innerWidth)
-                posX -= width;
-            if (posY + height > window.innerHeight)
-                posY -= height;
-            if (posY < 0)
-                posY = 0;
-            this.customContextMenuDiv.style.left = posX + 'px';
-            this.customContextMenuDiv.style.top = posY + 'px';
-        }, 5);
+        this.customContextMenuDiv.style.display = 'block';
+        let posX = event.clientX;
+        let posY = event.clientY;
+        const width = this.customContextMenuDiv.clientWidth;
+        const height = this.customContextMenuDiv.clientHeight;
+        if (posX + width > window.innerWidth)
+            posX -= width;
+        if (posY + height > window.innerHeight)
+            posY -= height;
+        if (posY < 0)
+            posY = 0;
+        this.customContextMenuDiv.style.left = posX + 'px';
+        this.customContextMenuDiv.style.top = posY + 'px';
     }
     showProject(project) {
     }
     dismiss() {
         this.customContextMenuDiv.style.display = 'none';
+        this.target = null;
+    }
+    globalClick(event) {
+        if (event.target instanceof Node && this.target && this.target.contains(event.target))
+            return;
+        this.dismiss();
     }
     isOpen() {
         return this.customContextMenuDiv.style.display !== 'none';

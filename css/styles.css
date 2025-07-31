@@ -68,6 +68,7 @@ body {
     width: 200px;
     background-color: var(--bg-color);
     padding: 5px;
+    z-index: 100;
 }
 
 #custom-context-menu li {
