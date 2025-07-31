@@ -12,6 +12,7 @@
     --main-side-item-hover-bg-color: #ddac19c5;
     --main-side-item-active-bg-color: #ddac198c;
     --main-side-item-selected-bg-color: #f58b13bb;
+    color-scheme: dark;
 }
 
 .main-side {

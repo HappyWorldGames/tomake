@@ -12,6 +12,7 @@
     --task-view-side-item-hover-bg-color: #ddac19c5;
     --task-view-side-item-active-bg-color: #ddac198c;
     --task-view-side-item-selected-bg-color: #f58b13bb;
+    color-scheme: dark;
 }
 
 @media (min-width: 961px) {
