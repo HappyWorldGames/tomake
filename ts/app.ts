@@ -29,13 +29,7 @@ export class App {
 
         this.syncProjectListSideUI = new SyncProjectListSideUI();
         this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager, this.dbManager.projectsManager, this.customContextMenuUI);
-        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI, () => {
-            this.projectListSideUI.projectListSide.style.visibility = this.projectListSideUI.projectListSide.style.visibility === 'visible' ? 'hidden' : 'visible';
-            this.projectListSideUI.updateStyle();
-
-            this.syncProjectListSideUI.syncSide.classList.toggle('visible');
-            this.syncProjectListSideUI.updateStyle();
-        });
+        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI);
         this.projectListSideUI = new ProjectListSideUI(
             this.mainSideUI,
             this.dbManager.tasksManager,
@@ -50,9 +44,6 @@ export class App {
     }
 
     async init() {
-        this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportDataToFile, this.dbManager.importDataFromFile, this.googleSyncManager.initAuth, this.googleSyncManager.sync);
-
-        this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager, this.dbManager.projectsManager);
         this.mainSideUI.clearAll();
         await this.dbManager.initDB();
 
@@ -64,6 +55,7 @@ export class App {
             this.taskViewSideUI.saveTask(this.dbManager.tasksManager);
         };
         document.onclick = (event) => {
+            this.mainSideUI.globalClick(event);
             this.customContextMenuUI.globalClick(event);
         }
 
@@ -90,6 +82,24 @@ export class App {
             });
         }
 
+        this.syncProjectListSideUI.setOnClickListener(
+            this.dbManager.exportDataToFile,
+            this.dbManager.importDataFromFile,
+            this.googleSyncManager.initAuth,
+            this.googleSyncManager.sync
+        );
+
+        this.mainSideUI.setOnTaskAddButtonClickListener(
+            this.dbManager.tasksManager,
+            this.dbManager.projectsManager,
+            () => {
+                this.projectListSideUI.projectListSide.style.visibility = this.projectListSideUI.projectListSide.style.visibility === 'visible' ? 'hidden' : 'visible';
+                this.projectListSideUI.updateStyle();
+
+                this.syncProjectListSideUI.syncSide.classList.toggle('visible');
+                this.syncProjectListSideUI.updateStyle();
+            }
+        );
     }
 
     updateWidthStyle() {

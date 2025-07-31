@@ -1,6 +1,9 @@
+import { ProjectStatus } from "../core/project.js";
 import { ProjectsManager } from "../core/projects_manager.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
+import { getUTCDateFromLocal } from "../utils/date_converter.js";
+import { insertChildAtIndex } from "../utils/html_functions.js";
 import { CustomContextMenuUI } from "./custom-context-menu.js";
 import { SysProjectId } from "./project-list-side.js";
 import { TaskViewSideUI } from "./task-view-side.js";
@@ -9,8 +12,13 @@ export class MainSideUI {
 
     menuButton: HTMLButtonElement;
 
+    taskForm: HTMLDivElement;
     taskAddInput: HTMLInputElement;
-    taskAddButton: HTMLElement;
+    taskFormDown: HTMLDivElement;
+    taskNewDateButton: HTMLInputElement;
+    taskNewPrioritySelect: HTMLSelectElement;
+    taskNewProjectSelect: HTMLSelectElement;
+    taskAddButton: HTMLButtonElement;
 
     taskArrayList: HTMLElement;
 
@@ -20,29 +28,64 @@ export class MainSideUI {
     #projectId: string = '';
     #selectedTaskItemId: string = '';
 
-    constructor(taskViewSideUI: TaskViewSideUI, customContextMenuUI: CustomContextMenuUI, menuButtonClick: Function) {
+    constructor(taskViewSideUI: TaskViewSideUI, customContextMenuUI: CustomContextMenuUI) {
         this.menuButton = document.getElementById('menu-btn') as HTMLButtonElement;
 
+        this.taskForm = document.getElementById('task-form') as HTMLDivElement;
         this.taskAddInput = document.getElementById('task-add-input') as HTMLInputElement;
+        this.taskFormDown = document.getElementById('task-form-down') as HTMLDivElement;
+        this.taskNewDateButton = document.getElementById('task-new-date-button') as HTMLInputElement;
+        this.taskNewPrioritySelect = document.getElementById('task-new-priority-select') as HTMLSelectElement;
+        this.taskNewProjectSelect = document.getElementById('task-new-project-select') as HTMLSelectElement;
         this.taskAddButton = document.getElementById('add-task-btn') as HTMLButtonElement;
 
         this.taskArrayList = document.getElementById('task-array-list') as HTMLUListElement;
 
         this.#taskViewSideUI = taskViewSideUI;
         this.#customContextMenuUI = customContextMenuUI;
+    }
+
+    setOnTaskAddButtonClickListener(tasksManager: TasksManager, projectsManager: ProjectsManager, menuButtonClick: Function) {
+        projectsManager.getAllProjects().then(projects => {
+            console.log('wtf');
+
+            // add system project
+            const inboxItem = document.createElement('option');
+            inboxItem.value = SysProjectId.Inbox;
+            inboxItem.text = 'Inbox';
+            this.taskNewProjectSelect.appendChild(inboxItem);
+
+            for (const project of projects) {
+                if (project.status === ProjectStatus.Deleted) continue;
+
+                const selectItem = document.createElement('option') as HTMLOptionElement;
+                selectItem.value = project.id;
+                selectItem.text = project.name;
+
+                insertChildAtIndex(this.taskNewProjectSelect, selectItem, project.order);
+            }
+
+            this.taskNewProjectSelect.value = SysProjectId.Inbox;
+        });
 
         this.menuButton.onclick = () => {
             menuButtonClick();
         }
-    }
 
-    setOnTaskAddButtonClickListener(tasksManager: TasksManager, projectsManager: ProjectsManager) {
+        this.taskForm.onclick = () => {
+            this.taskFormDown.style.display = 'flex';
+            this.taskForm.style.outline = 'solid';
+            this.taskForm.style.outlineColor = 'green';
+        }
+
         const addTaskUI = () => {
             const titleTask = this.taskAddInput.value;
             if (!titleTask) return;
 
             const task = new Task(titleTask);
-            task.startDate = new Date();
+            task.startDate = getUTCDateFromLocal(this.taskNewDateButton.value);
+            task.priority = Number(this.taskNewPrioritySelect.value) as TaskPriority;
+            task.listNameId = this.taskNewProjectSelect.value;
 
             tasksManager.addTask(task).then(() => {
                 this.renderMainSide(tasksManager, projectsManager);
@@ -327,5 +370,12 @@ export class MainSideUI {
         else result += date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         return result;
+    }
+
+    globalClick(event: MouseEvent) {
+        if (event.target instanceof Node && this.taskForm.contains(event.target)) return;
+            this.taskFormDown.style.display = '';
+            this.taskForm.style.outline = '';
+            this.taskForm.style.outlineColor = '';
     }
 }

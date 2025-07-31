@@ -10,32 +10,63 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _MainSideUI_taskViewSideUI, _MainSideUI_customContextMenuUI, _MainSideUI_projectId, _MainSideUI_selectedTaskItemId;
+import { ProjectStatus } from "../core/project.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
+import { getUTCDateFromLocal } from "../utils/date_converter.js";
+import { insertChildAtIndex } from "../utils/html_functions.js";
 import { SysProjectId } from "./project-list-side.js";
 export class MainSideUI {
-    constructor(taskViewSideUI, customContextMenuUI, menuButtonClick) {
+    constructor(taskViewSideUI, customContextMenuUI) {
         _MainSideUI_taskViewSideUI.set(this, void 0);
         _MainSideUI_customContextMenuUI.set(this, void 0);
         _MainSideUI_projectId.set(this, '');
         _MainSideUI_selectedTaskItemId.set(this, '');
         this.menuButton = document.getElementById('menu-btn');
+        this.taskForm = document.getElementById('task-form');
         this.taskAddInput = document.getElementById('task-add-input');
+        this.taskFormDown = document.getElementById('task-form-down');
+        this.taskNewDateButton = document.getElementById('task-new-date-button');
+        this.taskNewPrioritySelect = document.getElementById('task-new-priority-select');
+        this.taskNewProjectSelect = document.getElementById('task-new-project-select');
         this.taskAddButton = document.getElementById('add-task-btn');
         this.taskArrayList = document.getElementById('task-array-list');
         __classPrivateFieldSet(this, _MainSideUI_taskViewSideUI, taskViewSideUI, "f");
         __classPrivateFieldSet(this, _MainSideUI_customContextMenuUI, customContextMenuUI, "f");
+    }
+    setOnTaskAddButtonClickListener(tasksManager, projectsManager, menuButtonClick) {
+        var _a;
+        projectsManager.getAllProjects().then(projects => {
+            console.log('wtf');
+            const inboxItem = document.createElement('option');
+            inboxItem.value = SysProjectId.Inbox;
+            inboxItem.text = 'Inbox';
+            this.taskNewProjectSelect.appendChild(inboxItem);
+            for (const project of projects) {
+                if (project.status === ProjectStatus.Deleted)
+                    continue;
+                const selectItem = document.createElement('option');
+                selectItem.value = project.id;
+                selectItem.text = project.name;
+                insertChildAtIndex(this.taskNewProjectSelect, selectItem, project.order);
+            }
+            this.taskNewProjectSelect.value = SysProjectId.Inbox;
+        });
         this.menuButton.onclick = () => {
             menuButtonClick();
         };
-    }
-    setOnTaskAddButtonClickListener(tasksManager, projectsManager) {
-        var _a;
+        this.taskForm.onclick = () => {
+            this.taskFormDown.style.display = 'flex';
+            this.taskForm.style.outline = 'solid';
+            this.taskForm.style.outlineColor = 'green';
+        };
         const addTaskUI = () => {
             const titleTask = this.taskAddInput.value;
             if (!titleTask)
                 return;
             const task = new Task(titleTask);
-            task.startDate = new Date();
+            task.startDate = getUTCDateFromLocal(this.taskNewDateButton.value);
+            task.priority = Number(this.taskNewPrioritySelect.value);
+            task.listNameId = this.taskNewProjectSelect.value;
             tasksManager.addTask(task).then(() => {
                 this.renderMainSide(tasksManager, projectsManager);
                 this.taskAddInput.value = '';
@@ -261,6 +292,13 @@ export class MainSideUI {
         else
             result += date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         return result;
+    }
+    globalClick(event) {
+        if (event.target instanceof Node && this.taskForm.contains(event.target))
+            return;
+        this.taskFormDown.style.display = '';
+        this.taskForm.style.outline = '';
+        this.taskForm.style.outlineColor = '';
     }
 }
 _MainSideUI_taskViewSideUI = new WeakMap(), _MainSideUI_customContextMenuUI = new WeakMap(), _MainSideUI_projectId = new WeakMap(), _MainSideUI_selectedTaskItemId = new WeakMap();

@@ -36,42 +36,102 @@
     cursor:pointer;
 }
 
-.main-side #task-form {
+#task-form {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    margin: 10px 10px 10px 0;
+    border-radius: 10px;
 }
 
-.main-side #task-form #task-add-input {
-    flex: 1;
+#task-add-input {
+    margin-top: 5px;
     color: var(--text-color);
-    background-color: #ea7100;
+    background-color: #ea710000;
     border: none;
-    border-radius: 10px 0 0 10px;
-    padding: 10px;
-    margin: 10px 0;
+    margin: 10px;
 }
 
-.main-side #task-form #task-add-input:focus {
-    outline: solid;
-    outline-color: green;
+#task-add-input:focus {
+    outline: none;
 }
 
-.main-side #task-form #task-add-input:focus + #add-task-btn {
-    outline: solid;
-    outline-color: green;
+#task-form-down {
+    display: none;
+    margin-bottom: 5px;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
-.main-side #task-form #task-add-input::placeholder {
+#task-new-date-button {
+    margin: 5px;
+    height: 20px;
+    border: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    text-align: center;
+    cursor: pointer;
+}
+
+#task-new-priority-select {
+    margin: 5px;
+    height: 20px;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    text-align: left;
+}
+
+#task-new-priority-select:has(option[value="0"]:checked) { color: gray; }
+#task-new-priority-select:has(option[value="1"]:checked) { color: RoyalBlue; }
+#task-new-priority-select:has(option[value="2"]:checked) { color: yellow; }
+#task-new-priority-select:has(option[value="3"]:checked) { color: red; }
+
+#task-new-priority-select option {
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #000;
+    /* background-color: var(--task-view-side-bg-color); */
+}
+
+#task-new-priority-select option[value="0"] { color: gray; }
+#task-new-priority-select option[value="1"] { color: RoyalBlue; }
+#task-new-priority-select option[value="2"] { color: yellow; }
+#task-new-priority-select option[value="3"] { color: red; }
+
+#task-new-project-select {
+    margin: 5px;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #fff0;
+    text-align: left;
+}
+
+#task-new-project-select option {
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    background-color: #000;
+    /* background-color: var(--task-view-side-bg-color); */
+}
+
+#task-form #task-add-input::placeholder {
     color: var(--placeholder-text-color);
 }
 
-.main-side #task-form #add-task-btn {
+#task-form-down-right {
+    margin: 0 10px;
+    display: flex;
+}
+
+#task-form #add-task-btn {
+    flex: 1;
     padding: 5px 10px;
-    margin: 10px 0;
     color: var(--text-color);
     background-color: #ea7100;
     border: none;
-    border-radius: 0 10px 10px 0;
     cursor:pointer;
 }
 

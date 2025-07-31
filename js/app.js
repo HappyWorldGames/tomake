@@ -13,12 +13,7 @@ export class App {
         this.customContextMenuUI = new CustomContextMenuUI(this.dbManager.tasksManager, this.dbManager.projectsManager);
         this.syncProjectListSideUI = new SyncProjectListSideUI();
         this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager, this.dbManager.projectsManager, this.customContextMenuUI);
-        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI, () => {
-            this.projectListSideUI.projectListSide.style.visibility = this.projectListSideUI.projectListSide.style.visibility === 'visible' ? 'hidden' : 'visible';
-            this.projectListSideUI.updateStyle();
-            this.syncProjectListSideUI.syncSide.classList.toggle('visible');
-            this.syncProjectListSideUI.updateStyle();
-        });
+        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI);
         this.projectListSideUI = new ProjectListSideUI(this.mainSideUI, this.dbManager.tasksManager, this.dbManager.projectsManager, () => {
             this.syncProjectListSideUI.syncSide.classList.remove('visible');
             this.syncProjectListSideUI.updateStyle();
@@ -26,8 +21,6 @@ export class App {
         this.themreManager = new ThemeManager(this.syncProjectListSideUI.themeToggleButton);
     }
     async init() {
-        this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportDataToFile, this.dbManager.importDataFromFile, this.googleSyncManager.initAuth, this.googleSyncManager.sync);
-        this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager, this.dbManager.projectsManager);
         this.mainSideUI.clearAll();
         await this.dbManager.initDB();
         this.projectListSideUI.renderProjectListSide(this.dbManager.tasksManager, this.dbManager.projectsManager);
@@ -36,6 +29,7 @@ export class App {
             this.taskViewSideUI.saveTask(this.dbManager.tasksManager);
         };
         document.onclick = (event) => {
+            this.mainSideUI.globalClick(event);
             this.customContextMenuUI.globalClick(event);
         };
         window.onresize = () => {
@@ -54,6 +48,13 @@ export class App {
                 }
             });
         }
+        this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportDataToFile, this.dbManager.importDataFromFile, this.googleSyncManager.initAuth, this.googleSyncManager.sync);
+        this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager, this.dbManager.projectsManager, () => {
+            this.projectListSideUI.projectListSide.style.visibility = this.projectListSideUI.projectListSide.style.visibility === 'visible' ? 'hidden' : 'visible';
+            this.projectListSideUI.updateStyle();
+            this.syncProjectListSideUI.syncSide.classList.toggle('visible');
+            this.syncProjectListSideUI.updateStyle();
+        });
     }
     updateWidthStyle() {
         this.projectListSideUI.updateStyle();

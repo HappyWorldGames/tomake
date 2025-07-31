@@ -58,8 +58,22 @@
             <h2 class="top-text">Today</h2>
         </header>
         <div id="task-form">
-            <input type="text" id="task-add-input" placeholder="Добавить задачу..." required>
-            <button type="button" id="add-task-btn">Add</button>
+            <input type="text" id="task-add-input" placeholder="Добавить задачу..." autocomplete="off" required>
+            <div id="task-form-down">
+                <div id="task-form-down-left">
+                    <input type="datetime-local" id="task-new-date-button">
+                    <select id="task-new-priority-select">
+                        <option value="0">Nope</option>
+                        <option value="1">Low</option>
+                        <option value="2">Medium</option>
+                        <option value="3">High</option>
+                    </select>
+                    <select id="task-new-project-select"></select>
+                </div>
+                <div id="task-form-down-right">
+                    <button type="button" id="add-task-btn">Add</button>
+                </div>
+            </div>
         </div>
         <ul id="task-array-list"></ul>
     </div>
