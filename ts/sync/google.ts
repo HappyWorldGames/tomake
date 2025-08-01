@@ -1,4 +1,5 @@
 import { DatabaseManager } from "../core/database_manager.js";
+import { showSnackbar } from "../utils/notification.js";
 
 export class GoogleSyncManager {
     private static readonly GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
@@ -15,7 +16,7 @@ export class GoogleSyncManager {
 
     initAuth = () => {
         if (typeof google === 'undefined') {
-            alert("Google is unavailable. Try again later...");
+            showSnackbar("Google is unavailable. Try again later...");
             return;
         }
 
@@ -23,6 +24,7 @@ export class GoogleSyncManager {
             client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
             callback: (response: google.accounts.id.CredentialResponse) => {
                 if (!response.credential) {
+                    showSnackbar('Auth error');
                     console.error('Auth error:', response);
                     return;
                 }
@@ -46,11 +48,11 @@ export class GoogleSyncManager {
             this.dbManager.merge(jsonString);
             await this.uploadToDrive(await this.dbManager.exportDataToJsonString());
 
-            alert('✅ Sync done!');
+            showSnackbar('✅ Sync done!')
             location.reload();
         } catch (error: any) {
             console.error('Error sync:', error);
-            alert('❌ Error: ' + error.message);
+            showSnackbar('❌ Error: ' + error.message);
         }
     }
 

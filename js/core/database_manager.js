@@ -4,6 +4,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _DatabaseManager_instances, _a, _DatabaseManager_initTasksStore, _DatabaseManager_initProjectsStore, _DatabaseManager_downloadFile, _DatabaseManager_selectFile, _DatabaseManager_readFile;
+import { showSnackbar } from "../utils/notification.js";
 import { Project } from "./project.js";
 import { ProjectsManager } from "./projects_manager.js";
 import { Task } from "./task.js";
@@ -42,7 +43,7 @@ export class DatabaseManager {
             }
             catch (error) {
                 console.error('Export error:', error);
-                alert('Export failed!');
+                showSnackbar('Export failed!');
             }
         };
         this.importDataFromFile = async () => {
@@ -53,12 +54,12 @@ export class DatabaseManager {
                 return;
             try {
                 this.importDataFromJsonString(await __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_readFile).call(this, file));
-                alert('Data imported successfully!');
+                showSnackbar('Data imported successfully!');
                 return true;
             }
             catch (error) {
                 console.error('Import error:', error);
-                alert('Invalid file format!');
+                showSnackbar('Invalid file format!');
                 return false;
             }
         };
@@ -67,7 +68,7 @@ export class DatabaseManager {
         return new Promise((resolve, reject) => {
             let request = indexedDB.open(_a.dbName, _a.version);
             request.onblocked = (event) => {
-                alert('Upgrade blocked - Please close other tabs displaying this site.');
+                showSnackbar('Upgrade blocked - Please close other tabs displaying this site.');
                 console.log('Upgrade blocked - Please close other tabs displaying this site.');
             };
             request.onupgradeneeded = (event) => {

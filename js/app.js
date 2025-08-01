@@ -6,6 +6,7 @@ import { ThemeManager } from "./ui/theme_manager.js";
 import { ProjectListSideUI, SysProjectId } from "./ui/project-list-side.js";
 import { CustomContextMenuUI } from "./ui/custom-context-menu.js";
 import { GoogleSyncManager } from "./sync/google.js";
+import { showSnackbar } from "./utils/notification.js";
 export class App {
     constructor() {
         this.dbManager = new DatabaseManager();
@@ -44,7 +45,7 @@ export class App {
         if (navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().then((persistent) => {
                 if (!persistent) {
-                    alert('Storage may be cleared by the UA under storage pressure.');
+                    showSnackbar('Storage may be cleared by the UA under storage pressure.');
                 }
             });
         }

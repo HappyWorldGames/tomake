@@ -1,16 +1,18 @@
+import { showSnackbar } from "../utils/notification.js";
 export class GoogleSyncManager {
     constructor(dbManager) {
         this.FILE_NAME = 'ToMake.json';
         this.GOOGLE_FILE_URL = `https://www.googleapis.com/drive/v3/files?q=name="${this.FILE_NAME}"`;
         this.initAuth = () => {
             if (typeof google === 'undefined') {
-                alert("Google is unavailable. Try again later...");
+                showSnackbar("Google is unavailable. Try again later...");
                 return;
             }
             google.accounts.id.initialize({
                 client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
                 callback: (response) => {
                     if (!response.credential) {
+                        showSnackbar('Auth error');
                         console.error('Auth error:', response);
                         return;
                     }
@@ -31,12 +33,12 @@ export class GoogleSyncManager {
                     return;
                 this.dbManager.merge(jsonString);
                 await this.uploadToDrive(await this.dbManager.exportDataToJsonString());
-                alert('✅ Sync done!');
+                showSnackbar('✅ Sync done!');
                 location.reload();
             }
             catch (error) {
                 console.error('Error sync:', error);
-                alert('❌ Error: ' + error.message);
+                showSnackbar('❌ Error: ' + error.message);
             }
         };
         this.requestToken = () => {
