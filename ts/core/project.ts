@@ -41,8 +41,8 @@ export class Project {
         return {
             id: this.id,
 
-            createdDate: this.createdDate,
-            updatedDate: this.updatedDate,
+            createdDate: this.createdDate.toISOString(),
+            updatedDate: this.updatedDate.toISOString(),
 
             name: this.name,
             order: this.order,

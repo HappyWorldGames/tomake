@@ -84,15 +84,15 @@ export class Task {
             title: this.title,
             description: this.description,
 
-            createdDate: this.createdDate,
-            updatedDate: this.updatedDate,
-            completedDate: this.completedDate,
+            createdDate: this.createdDate.toISOString(),
+            updatedDate: this.updatedDate.toISOString(),
+            completedDate: this.completedDate && this.completedDate.toISOString(),
 
-            startDate: this.startDate,
-            dueDate: this.dueDate,
+            startDate: this.startDate && this.startDate.toISOString(),
+            dueDate: this.dueDate && this.dueDate.toISOString(),
 
-            reminder: this.reminder,
-            repeat: this.repeat,
+            reminder: this.reminder.map(date => date.toISOString()),
+            repeat: this.repeat.map(date => date.toISOString()),
 
             priority: this.priority,
             status: this.status,
