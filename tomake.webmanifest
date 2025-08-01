@@ -1,4 +1,5 @@
 {
+  "manifest_version": 3,
   "name": "ToMake your TODO list",
   "short_name": "ToMake",
   "description": "To-do list.",

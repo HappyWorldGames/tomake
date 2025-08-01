@@ -1,3 +1,6 @@
+import { DatabaseManager } from './js/core/database_manager.js';
+import { TaskStatus } from './js/core/task.js';
+
 const APP_PREFIX = 'tomake'
 const VERSION = 2
 const CACHE_NAME = `${APP_PREFIX}-v${VERSION}`;
@@ -51,6 +54,15 @@ self.addEventListener('activate', e => {
             })
         ))
     );
+
+    chrome.alarms.onAlarm.addListener(async (alarm) => {
+        if (alarm.name !== 'next-task-alarm') return;
+
+        self.registration.showNotification('nextTask.title', {
+            body: 'nextTask.description',
+            icon: '/tomake/icon.ico'
+        });
+    });
 });
 
 self.addEventListener('fetch', e => {
@@ -87,11 +99,35 @@ self.addEventListener('fetch', e => {
     e.waitUntil(networkFetch.catch(() => {}));
 });
 
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-    if (alarm.name !== 'next-task-alarm') return;
+self.addEventListener('message', (event) => {
+    console.log(`Message: ${event.type}`);
 
-    self.registration.showNotification('nextTask.title', {
-        body: 'nextTask.description',
-        icon: '/tomake/icon.ico'
-    });
+    if (event.data.type === 'schedule-alarm') {
+        setNextAlarmNotification();
+    }
 });
+
+function setNextAlarmNotification() {
+    console.log(`Start set alarm`);
+
+    const dbManager = new DatabaseManager();
+    dbManager.initDB().then(() => {
+        dbManager.tasksManager.getTasksFromIndex('startDate', IDBKeyRange.lowerBound(new Date().toISOString())).then(tasks => {
+            if (!tasks) {
+                console.log('Undefined');
+                return;
+            }
+            tasks.forEach(task => {
+                console.log(`Check task: ${task.title}, ${task.status}`);
+
+                if (task.status === TaskStatus.Normal, task.startDate.getTime() > Date.now()) {
+                    chrome.alarms.create('next-task-alarm', {
+                        when: task.startDate.getTime()
+                    });
+                    console.log(`Created alarm on: ${task.startDate}`);
+                    return;
+                }
+            });
+        });
+    });
+}

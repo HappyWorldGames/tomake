@@ -67,7 +67,7 @@ export class App {
         // register ServiceWorker
         if (navigator.serviceWorker) {
             navigator.serviceWorker.register(
-                '/tomake/sw.js', {scope: '/tomake/'}
+                '/tomake/sw.js', { scope: '/tomake/', type: 'module' }
             ).catch(err => {
                 throw new Error('ServiceWorker error: ' + err);
             })
