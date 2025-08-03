@@ -121,9 +121,7 @@ function setNextAlarmNotification() {
                 console.log(`Check task: ${task.title}, ${task.status}`);
 
                 if (task.status === TaskStatus.Normal, task.startDate.getTime() > Date.now()) {
-                    chrome.alarms.create('next-task-alarm', {
-                        when: task.startDate.getTime()
-                    });
+                    // TODO
                     console.log(`Created alarm on: ${task.startDate}`);
                     return;
                 }

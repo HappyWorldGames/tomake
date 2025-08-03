@@ -1,4 +1,3 @@
-import { App } from '../app.js';
 import { requestNotification, showSnackbar } from '../utils/notification.js';
 
 export class SyncProjectListSideUI {
@@ -48,22 +47,15 @@ export class SyncProjectListSideUI {
         this.importButton.addEventListener('click', importFun);
 
         this.notifyButton.onclick = () => {
-            showSnackbar(`Test ${Date.now()}`);
-            requestNotification();
-
             if (!navigator.serviceWorker.controller) {
-                console.log(`no: ${navigator.serviceWorker.controller}`);
+                showSnackbar(`Please install app before.`);
                 return;
             }
+            requestNotification();
+
             navigator.serviceWorker.controller.postMessage({
                 type: 'schedule-alarm'
             });
-
-            // const time = Date.now() + 5000;
-            // chrome.alarms.create('next-task-alarm', {
-            //     when: time
-            // });
-            // console.log('Alarm set for:', new Date(time));
         }
     }
 

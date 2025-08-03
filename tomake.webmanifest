@@ -1,5 +1,4 @@
 {
-  "manifest_version": 3,
   "name": "ToMake your TODO list",
   "short_name": "ToMake",
   "description": "To-do list.",
@@ -18,6 +17,5 @@
   "start_url": "index.html",
   "display": "standalone",
   "theme_color": "#008000",
-  "background_color": "#008000",
-  "permissions": ["alarms"]
+  "background_color": "#008000"
 }

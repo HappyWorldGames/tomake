@@ -22,12 +22,11 @@ export class SyncProjectListSideUI {
         this.exportButton.addEventListener('click', exportFun);
         this.importButton.addEventListener('click', importFun);
         this.notifyButton.onclick = () => {
-            showSnackbar(`Test ${Date.now()}`);
-            requestNotification();
             if (!navigator.serviceWorker.controller) {
-                console.log(`no: ${navigator.serviceWorker.controller}`);
+                showSnackbar(`Please install app before.`);
                 return;
             }
+            requestNotification();
             navigator.serviceWorker.controller.postMessage({
                 type: 'schedule-alarm'
             });
