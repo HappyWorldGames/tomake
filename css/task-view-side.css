@@ -1,5 +1,5 @@
 :root {
-    --task-view-side-bg-color: #ffffffff;
+    --task-view-side-bg-color: #ffffff;
     --task-view-side-item-bg-color: #ffbd33;
     --task-view-side-item-hover-bg-color: #e9b826;
     --task-view-side-item-active-bg-color: #bb9c00;
@@ -7,7 +7,7 @@
 }
 
 .dark-theme {
-    --task-view-side-bg-color: #000000ff;
+    --task-view-side-bg-color: rgb(0, 0, 0);
     --task-view-side-item-bg-color: #ffb820c5;
     --task-view-side-item-hover-bg-color: #ddac19c5;
     --task-view-side-item-active-bg-color: #ddac198c;
@@ -18,12 +18,20 @@
 @media (min-width: 961px) {
     .task-view-side {
         display: flex;
+        border-left: 1px solid var(--border-color);
     }
 }
 
 @media (max-width: 960px) {
     .task-view-side {
         display: none;
+        border-left: 1px solid var(--border-color);
+    }
+}
+
+@media (max-width: 640px) {
+    .task-view-side {
+        border-left: none;
     }
 }
 
@@ -120,11 +128,11 @@
     scrollbar-width: thin;
     scrollbar-gutter: stable;
     scrollbar-color: #fff0 #fff0;
-    margin: 4px;
-    padding: 5px;
+    padding: 10px 0 10px 10px;
     height: 100%;
     display: flex;
     flex-direction: column;
+    border-top: 1px solid var(--border-color);
 }
 
 .task-view-side .main:hover {
@@ -154,7 +162,8 @@
 }
 
 .task-view-side .main .checkbox-list {
-    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
 }
 
 .task-view-side .main .checkbox-list li {

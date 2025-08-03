@@ -1,12 +1,12 @@
 :root {
-    --sync-side-bg-color: #ffc0cb;
+    --sync-side-bg-color: #0000000;
     --sync-side-button-bg-color: #ffbd33;
     --sync-side-button-hover-bg-color: #e9b826;
     --sync-side-button-active-bg-color: #bb9c00;
 }
 
 .dark-theme {
-    --sync-side-bg-color: #ffa2b1f3;
+    --sync-side-bg-color: #ffffff34;
     --sync-side-button-bg-color: #fdb824;
     --sync-side-button-hover-bg-color: #ddac19;
     --sync-side-button-active-bg-color: #998000;
@@ -29,13 +29,13 @@
     height: 100vh;
     flex-direction: column;
     align-items: stretch;
-    background-color: var(--sync-side-bg-color);
+    background-color: var(--primary-color);
 }
 
 .sync-side button {
     border: none;
     border-radius: 50%;
-    background-color: var(--sync-side-button-bg-color);
+    background-color: #fff0;
     padding: 10px;
     margin: 5px;
     text-align: center;

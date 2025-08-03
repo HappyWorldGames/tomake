@@ -1,5 +1,5 @@
 :root {
-    --project-list-side-bg-color: #ffc0cbff;
+    --project-list-side-bg-color: #0003;
     --project-list-side-item-bg-color: #ffbd33;
     --project-list-side-item-hover-bg-color: #e9b826;
     --project-list-side-item-active-bg-color: #bb9c00;
@@ -7,7 +7,7 @@
 }
 
 .dark-theme {
-    --project-list-side-bg-color: #ffa2b1ff;
+    --project-list-side-bg-color: #fff7;
     --project-list-side-item-bg-color: #ffb820c5;
     --project-list-side-item-hover-bg-color: #ddac19c5;
     --project-list-side-item-active-bg-color: #ddac198c;
@@ -17,19 +17,21 @@
 @media (min-width: 641px) {
     .project-list-side {
         display: flex;
+        border-right: 1px solid var(--border-color);
     }
 }
 
 @media (max-width: 640px) {
     .project-list-side {
         display: none;
+        border-right: none;
     }
 }
 
 .project-list-side {
     height: 100vh;
     min-width: 200px;
-    background-color: var(--project-list-side-bg-color);
+    background-color: var(--second-color);
     flex-direction: column;
     padding: 10px;
     z-index: 2;
@@ -51,7 +53,7 @@
     width: 100%;
     padding: 10px;
     margin: 1px 0;
-    background-color: var(--project-list-side-item-bg-color);
+    background-color: #fff0;
     border-radius: 5px;
     cursor:pointer;
 }
@@ -82,6 +84,7 @@
     padding: 5px;
     justify-content: space-between;
     color: var(--text-color);
+    border-top: 1px solid var(--border-color);
 }
 
 .project-list-side .project-list-name-add {

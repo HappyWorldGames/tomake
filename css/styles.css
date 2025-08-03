@@ -3,21 +3,23 @@ max 640 tablet
 min 960 desktop */
 
 :root {
-    --primary-color: #5865F2;
-    --second-color: #db49ff;
-    --bg-color: #96c000;
+    --primary-color: #96c000;
+    --second-color: #be6e1e;
+    --bg-color: #ffffff;
     --second-bg-color: #ffffff93;
     --card-bg: #ffffff;
     --text-color: #333333;
     --placeholder-text-color: #333333e0;
     --border-radius: 8px;
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    --border-color: #000;
 }
 
 .dark-theme {
-    --bg-color: #1a1a1a;
+    --bg-color: #000000;
     --text-color: #e0e0e0;
     --placeholder-text-color: #e0e0e0e0;
+    --border-color: #fff;
 }
 
 * {

@@ -1,5 +1,5 @@
 :root {
-    --main-side-bg-color: #ffffff34;
+    --main-side-bg-color: #ffffff;
     --main-side-item-bg-color: #ffbd33;
     --main-side-item-hover-bg-color: #e9b826;
     --main-side-item-active-bg-color: #bb9c00;
@@ -7,7 +7,7 @@
 }
 
 .dark-theme {
-    --main-side-bg-color: #ffffff00;
+    --main-side-bg-color: #000000;
     --main-side-item-bg-color: #ffb820c5;
     --main-side-item-hover-bg-color: #ddac19c5;
     --main-side-item-active-bg-color: #ddac198c;
@@ -169,7 +169,7 @@
     margin: 0;
     padding: 10px;
     list-style-type: none;
-    background-color: var(--main-side-item-bg-color);
+    background-color: #fff0;
 }
 
 .main-side .item:hover {
