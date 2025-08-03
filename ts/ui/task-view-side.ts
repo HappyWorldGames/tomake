@@ -246,6 +246,18 @@ export class TaskViewSideUI {
         }
 
         subTaskItem.appendChild(subTaskDeleteButton);
+
+        // Open Button
+        const subTaskOpenButton = document.createElement('button') as HTMLButtonElement;
+        subTaskOpenButton.classList.add('delete-btn');
+        subTaskOpenButton.title = 'Open';
+        subTaskOpenButton.textContent = '>';
+
+        subTaskOpenButton.onclick = () => {
+            this.renderTaskViewSide(subTask, tasksManager, projectsManager);
+        }
+
+        subTaskItem.appendChild(subTaskOpenButton);
     }
 
     clearAll() {
