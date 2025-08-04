@@ -2,17 +2,20 @@ import { requestNotification, showSnackbar } from '../utils/notification.js';
 
 export class SyncProjectListSideUI {
 
-    syncSide: HTMLDivElement;
+    private syncSide: HTMLDivElement;
+    public get getSyncSide() : HTMLDivElement {
+        return this.syncSide;
+    }
 
-    authButton: HTMLButtonElement;
+    private authButton: HTMLButtonElement;
+    private syncButton: HTMLButtonElement;
 
-    themeToggleButton: HTMLButtonElement;
+    private exportButton: HTMLButtonElement;
+    private importButton: HTMLButtonElement;
 
-    syncButton: HTMLButtonElement;
-    exportButton: HTMLButtonElement;
-    importButton: HTMLButtonElement;
+    private themeToggleButton: HTMLButtonElement;
 
-    notifyButton: HTMLButtonElement;
+    private notifyButton: HTMLButtonElement;
 
     constructor() {
         this.syncSide = document.getElementById('sync-side') as HTMLDivElement;
@@ -33,18 +36,23 @@ export class SyncProjectListSideUI {
     setOnClickListener(
         exportFun: () => void,
         importFun: () => void,
-        authGoogle: () => void,
-        syncGoogle: () => void
+        authGoogleFun: () => void,
+        syncGoogleFun: () => void,
+        themeToggleFun: () => void
     ) {
-        this.authButton?.addEventListener('click', () => {
-            authGoogle();
-        });
+        this.authButton.onclick = () => {
+            authGoogleFun();
+        };
         this.syncButton.onclick = () => {
-            syncGoogle();
+            syncGoogleFun();
         }
 
         this.exportButton.addEventListener('click', exportFun);
         this.importButton.addEventListener('click', importFun);
+
+        this.themeToggleButton.onclick = () => {
+            themeToggleFun();
+        }
 
         this.notifyButton.onclick = () => {
             if (!navigator.serviceWorker.controller) {

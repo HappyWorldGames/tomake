@@ -60,7 +60,7 @@ export class Project {
 
             obj.id,
 
-            new Date(obj.createDate),
+            new Date(obj.createdDate),
             new Date(obj.updatedDate),
 
             obj.status

@@ -21,7 +21,7 @@ export class Project {
         };
     }
     static fromDB(obj) {
-        return new Project(obj.name, obj.order, obj.color, obj.id, new Date(obj.createDate), new Date(obj.updatedDate), obj.status);
+        return new Project(obj.name, obj.order, obj.color, obj.id, new Date(obj.createdDate), new Date(obj.updatedDate), obj.status);
     }
 }
 export var ProjectStatus;

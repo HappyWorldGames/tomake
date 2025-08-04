@@ -1,5 +1,8 @@
 import { requestNotification, showSnackbar } from '../utils/notification.js';
 export class SyncProjectListSideUI {
+    get getSyncSide() {
+        return this.syncSide;
+    }
     constructor() {
         this.syncSide = document.getElementById('sync-side');
         this.authButton = document.getElementById('authButton');
@@ -11,16 +14,18 @@ export class SyncProjectListSideUI {
         if (window.innerWidth > 500)
             this.syncSide.classList.add('visible');
     }
-    setOnClickListener(exportFun, importFun, authGoogle, syncGoogle) {
-        var _a;
-        (_a = this.authButton) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
-            authGoogle();
-        });
+    setOnClickListener(exportFun, importFun, authGoogleFun, syncGoogleFun, themeToggleFun) {
+        this.authButton.onclick = () => {
+            authGoogleFun();
+        };
         this.syncButton.onclick = () => {
-            syncGoogle();
+            syncGoogleFun();
         };
         this.exportButton.addEventListener('click', exportFun);
         this.importButton.addEventListener('click', importFun);
+        this.themeToggleButton.onclick = () => {
+            themeToggleFun();
+        };
         this.notifyButton.onclick = () => {
             if (!navigator.serviceWorker.controller) {
                 showSnackbar(`Please install app before.`);

@@ -1,20 +1,22 @@
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _ProjectListSideUI_mainSideUI, _ProjectListSideUI_selectedProject;
+var _ProjectListSideUI_selectedProject;
 import { Project, ProjectStatus } from "../core/project.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
 export class ProjectListSideUI {
+    get getProjectListSide() {
+        return this.projectListSide;
+    }
     constructor(mainSideUI, tasksManager, projectsManager, projectSpaceClick) {
-        _ProjectListSideUI_mainSideUI.set(this, void 0);
         this.sysProjectList = [
             new Project('All', 0, '', SysProjectId.All),
             new Project('ToDay', 1, '', SysProjectId.ToDay),
@@ -28,7 +30,9 @@ export class ProjectListSideUI {
         this.projectListSys = document.getElementById('project-list-sys');
         this.projectList = document.getElementById('project-list');
         this.projectListAddButton = document.getElementById('project-list-add-button');
-        __classPrivateFieldSet(this, _ProjectListSideUI_mainSideUI, mainSideUI, "f");
+        this.mainSideUI = mainSideUI;
+        this.tasksManager = tasksManager;
+        this.projectsManager = projectsManager;
         this.projectListSide.style.visibility = window.innerWidth <= 640 ? 'hidden' : 'visible';
         this.projectListSideSpace.onclick = () => {
             this.projectListSide.style.visibility = 'hidden';
@@ -40,19 +44,19 @@ export class ProjectListSideUI {
             if (!name)
                 return;
             projectsManager.addProject(new Project(name, -1)).then(() => {
-                this.renderProjectListSide(tasksManager, projectsManager);
+                this.renderProjectListSide();
             });
         };
     }
-    renderProjectListSide(tasksManager, projectsManager) {
+    renderProjectListSide() {
         this.clearAll();
         for (const sysProject of this.sysProjectList) {
-            this.addProject(sysProject, tasksManager, projectsManager, true);
+            this.addProject(sysProject, this.tasksManager, this.projectsManager, true);
         }
-        projectsManager.getAllProjects().then(projects => {
+        this.projectsManager.getAllProjects().then(projects => {
             for (const project of projects)
                 if (project.status !== ProjectStatus.Deleted)
-                    this.addProject(project, tasksManager, projectsManager);
+                    this.addProject(project, this.tasksManager, this.projectsManager);
         });
     }
     clearAll() {
@@ -75,7 +79,7 @@ export class ProjectListSideUI {
             (_a = document.getElementById(__classPrivateFieldGet(this, _ProjectListSideUI_selectedProject, "f").id)) === null || _a === void 0 ? void 0 : _a.classList.remove('selected');
             (_b = document.getElementById(project.id)) === null || _b === void 0 ? void 0 : _b.classList.add('selected');
             __classPrivateFieldSet(this, _ProjectListSideUI_selectedProject, project, "f");
-            __classPrivateFieldGet(this, _ProjectListSideUI_mainSideUI, "f").renderMainSide(tasksManager, projectsManager, project.id);
+            this.mainSideUI.renderMainSide(tasksManager, projectsManager, project.id);
         };
         insertChildAtIndex(isSys ? this.projectListSys : this.projectList, projectItem, project.order);
         if (isSys)
@@ -93,7 +97,7 @@ export class ProjectListSideUI {
                 return;
             project.name = newName;
             projectsManager.updateProject(project).then(() => {
-                this.renderProjectListSide(tasksManager, projectsManager);
+                this.renderProjectListSide();
             });
         };
         buttons.appendChild(editButton);
@@ -130,7 +134,7 @@ export class ProjectListSideUI {
         }
     }
 }
-_ProjectListSideUI_mainSideUI = new WeakMap(), _ProjectListSideUI_selectedProject = new WeakMap();
+_ProjectListSideUI_selectedProject = new WeakMap();
 export var SysProjectId;
 (function (SysProjectId) {
     SysProjectId["All"] = "0";

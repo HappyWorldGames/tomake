@@ -6,16 +6,22 @@ import { MainSideUI } from "./main-side";
 
 export class ProjectListSideUI {
 
-    projectListSide: HTMLDivElement;
-    projectListSideSpace: HTMLDivElement;
+    // UI Elements
+    private projectListSide: HTMLDivElement;
+    public get getProjectListSide() : HTMLDivElement {
+        return this.projectListSide;
+    }
 
-    projectListSys: HTMLDivElement;
-    projectList: HTMLDivElement;
+    private projectListSideSpace: HTMLDivElement;
 
-    projectListAddButton: HTMLButtonElement;
+    private projectListSys: HTMLDivElement;
+    private projectList: HTMLDivElement;
 
-    #mainSideUI: MainSideUI;
+    private projectListAddButton: HTMLButtonElement;
 
+    private mainSideUI: MainSideUI;
+
+    // Other
     readonly sysProjectList: Project[] = [
         new Project('All', 0, '', SysProjectId.All),
         new Project('ToDay', 1, '', SysProjectId.ToDay),
@@ -25,7 +31,11 @@ export class ProjectListSideUI {
     ]
     #selectedProject: Project = this.sysProjectList[1];
 
+    tasksManager: TasksManager;
+    projectsManager: ProjectsManager;
+
     constructor(mainSideUI: MainSideUI, tasksManager: TasksManager, projectsManager: ProjectsManager, projectSpaceClick: Function) {
+        // Init UI Elements
         this.projectListSide = document.getElementById('project-list-side') as HTMLDivElement;
         this.projectListSideSpace = document.getElementById('project-list-side-space') as HTMLDivElement;
 
@@ -34,7 +44,11 @@ export class ProjectListSideUI {
 
         this.projectListAddButton = document.getElementById('project-list-add-button') as HTMLButtonElement;
 
-        this.#mainSideUI = mainSideUI;
+        // Other
+        this.mainSideUI = mainSideUI;
+
+        this.tasksManager = tasksManager;
+        this.projectsManager = projectsManager;
 
         this.projectListSide.style.visibility = window.innerWidth <= 640 ? 'hidden' : 'visible';
         this.projectListSideSpace.onclick = () => {
@@ -48,23 +62,23 @@ export class ProjectListSideUI {
             if (!name) return;
 
             projectsManager.addProject(new Project(name, -1)).then(() => {
-                this.renderProjectListSide(tasksManager, projectsManager)
+                this.renderProjectListSide();
             })
         }
     }
 
-    renderProjectListSide(tasksManager: TasksManager, projectsManager: ProjectsManager) {
+    renderProjectListSide() {
         this.clearAll();
         // Render sys project list
         for (const sysProject of this.sysProjectList) {
-            this.addProject(sysProject, tasksManager, projectsManager, true);
+            this.addProject(sysProject, this.tasksManager, this.projectsManager, true);
         }
 
         // Render project list
-        projectsManager.getAllProjects().then(projects => {
+        this.projectsManager.getAllProjects().then(projects => {
             for (const project of projects)
                 if (project.status !== ProjectStatus.Deleted)
-                    this.addProject(project, tasksManager, projectsManager);
+                    this.addProject(project, this.tasksManager, this.projectsManager);
         })
     }
 
@@ -94,7 +108,7 @@ export class ProjectListSideUI {
 
             this.#selectedProject = project;
 
-            this.#mainSideUI.renderMainSide(tasksManager, projectsManager, project.id);
+            this.mainSideUI.renderMainSide(tasksManager, projectsManager, project.id);
         }
 
         insertChildAtIndex(isSys? this.projectListSys : this.projectList, projectItem, project.order);
@@ -118,7 +132,7 @@ export class ProjectListSideUI {
             // TODO make project save function
             project.name = newName;
             projectsManager.updateProject(project).then(() => {
-                this.renderProjectListSide(tasksManager, projectsManager);
+                this.renderProjectListSide();
             });
         }
 

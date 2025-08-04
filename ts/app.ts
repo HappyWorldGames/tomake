@@ -3,7 +3,7 @@ import { MainSideUI } from "./ui/main-side.js";
 
 import { DatabaseManager } from "./core/database_manager.js";
 import { TaskViewSideUI } from "./ui/task-view-side.js";
-import { ThemeManager } from "./ui/theme_manager.js";
+import { ThemeManager } from "./utils/theme_manager.js";
 import { ProjectListSideUI, SysProjectId } from "./ui/project-list-side.js";
 import { CustomContextMenuUI } from "./ui/custom-context-menu.js";
 import { GoogleSyncManager } from "./sync/google.js";
@@ -36,19 +36,19 @@ export class App {
             this.dbManager.tasksManager,
             this.dbManager.projectsManager,
             () => {
-                this.syncProjectListSideUI.syncSide.classList.remove('visible');
+                this.syncProjectListSideUI.getSyncSide.classList.remove('visible');
                 this.syncProjectListSideUI.updateStyle();
             }
         );
 
-        this.themreManager = new ThemeManager(this.syncProjectListSideUI.themeToggleButton);
+        this.themreManager = new ThemeManager();
     }
 
     async init() {
         this.mainSideUI.clearAll();
         await this.dbManager.initDB();
 
-        this.projectListSideUI.renderProjectListSide(this.dbManager.tasksManager, this.dbManager.projectsManager);
+        this.projectListSideUI.renderProjectListSide();
         this.mainSideUI.renderMainSide(this.dbManager.tasksManager, this.dbManager.projectsManager, SysProjectId.ToDay);
 
         window.onbeforeunload = () => {
@@ -87,17 +87,18 @@ export class App {
             this.dbManager.exportDataToFile,
             this.dbManager.importDataFromFile,
             this.googleSyncManager.initAuth,
-            this.googleSyncManager.sync
+            this.googleSyncManager.sync,
+            this.themreManager.toggleTheme
         );
 
         this.mainSideUI.setOnTaskAddButtonClickListener(
             this.dbManager.tasksManager,
             this.dbManager.projectsManager,
             () => {
-                this.projectListSideUI.projectListSide.style.visibility = this.projectListSideUI.projectListSide.style.visibility === 'visible' ? 'hidden' : 'visible';
+                this.projectListSideUI.getProjectListSide.style.visibility = this.projectListSideUI.getProjectListSide.style.visibility === 'visible' ? 'hidden' : 'visible';
                 this.projectListSideUI.updateStyle();
 
-                this.syncProjectListSideUI.syncSide.classList.toggle('visible');
+                this.syncProjectListSideUI.getSyncSide.classList.toggle('visible');
                 this.syncProjectListSideUI.updateStyle();
             }
         );
