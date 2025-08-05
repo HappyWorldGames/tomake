@@ -37,7 +37,7 @@
     z-index: 2;
 }
 
-#project-list-side-space {
+#project-list-close-side-space {
     display: none;
     width: calc(100vw - 200px);
     height: 100vh;

@@ -3,13 +3,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var _TaskViewSideUI_instances, _TaskViewSideUI_selectedTask, _TaskViewSideUI_closeTaskButtonMethod, _TaskViewSideUI_updateHeightDescription;
+var _TaskViewSideUI_instances, _TaskViewSideUI_updateHeightDescription;
 import { ProjectStatus } from "../core/project.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
@@ -18,8 +12,8 @@ import { SysProjectId } from "./project-list-side.js";
 export class TaskViewSideUI {
     constructor(tasksManager, projectsManager, customContextMenuUI) {
         _TaskViewSideUI_instances.add(this);
-        _TaskViewSideUI_selectedTask.set(this, null);
-        _TaskViewSideUI_closeTaskButtonMethod.set(this, () => { });
+        this.selectedTask = null;
+        this.closeTaskButtonFun = () => { };
         this.taskViewSide = document.getElementById('task-view-side');
         this.taskHeader = document.getElementById('task-header');
         this.taskCloseButton = document.getElementById('task-close-btn');
@@ -32,67 +26,69 @@ export class TaskViewSideUI {
         this.taskSubtaskAddButton = document.getElementById('add-subtask-btn');
         this.taskProjectSelect = document.getElementById('task-project-select');
         this.taskProjectMoreButton = document.getElementById('task-project-more-btn');
+        this.tasksManager = tasksManager;
+        this.projectsManager = projectsManager;
         this.taskCheckboxComplete.onchange = () => {
-            if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
+            if (!this.selectedTask)
                 return;
-            this.saveTask(tasksManager);
+            this.saveTask();
         };
         this.taskDateTimeInput.onchange = () => {
-            this.saveTask(tasksManager);
+            this.saveTask();
         };
         this.taskPrioritySelect.onchange = () => {
-            this.saveTask(tasksManager);
+            this.saveTask();
         };
         let saveTimerId;
         this.taskTitleInput.oninput = () => {
             clearTimeout(saveTimerId);
             saveTimerId = setTimeout(() => {
-                this.saveTask(tasksManager);
+                this.saveTask();
             }, 2500);
         };
-        this.taskTitleInput.onblur = () => this.saveTask(tasksManager);
+        this.taskTitleInput.onblur = () => this.saveTask();
         this.taskDescriptionInput.oninput = () => {
             __classPrivateFieldGet(this, _TaskViewSideUI_instances, "m", _TaskViewSideUI_updateHeightDescription).call(this);
             clearTimeout(saveTimerId);
             saveTimerId = setTimeout(() => {
-                this.saveTask(tasksManager);
+                this.saveTask();
             }, 2500);
         };
-        this.taskDescriptionInput.onblur = () => this.saveTask(tasksManager);
+        this.taskDescriptionInput.onblur = () => this.saveTask();
         this.taskSubtaskAddButton.onclick = () => {
-            if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
+            if (!this.selectedTask)
                 return;
             const subTaskTitle = prompt('SubTask Title:', '');
             if (!subTaskTitle)
                 return;
-            tasksManager.addSubTask(__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").id, new Task(subTaskTitle)).then(subTaskId => {
-                if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
+            this.tasksManager.addSubTask(this.selectedTask.id, new Task(subTaskTitle)).then(subTaskId => {
+                if (!this.selectedTask)
                     return;
-                __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").childIdList.push(subTaskId);
-                this.renderTaskViewSide(__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"), tasksManager, projectsManager);
+                this.selectedTask.childIdList.push(subTaskId);
+                this.renderTaskViewSide(this.selectedTask);
             });
         };
         this.taskProjectSelect.onchange = () => {
-            this.saveTask(tasksManager);
+            this.saveTask();
         };
         this.taskProjectMoreButton.onclick = (event) => {
-            if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
+            if (!this.selectedTask)
                 return;
-            customContextMenuUI.showTask(event, __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"), null, null, () => this.renderTaskViewSide(null, tasksManager, projectsManager));
+            customContextMenuUI.showTask(event, this.selectedTask, null, null, () => this.renderTaskViewSide(null));
         };
     }
-    renderTaskViewSide(task, tasksManager, projectsManager) {
+    renderTaskViewSide(task) {
         this.taskViewSide.style.visibility = task ? 'visible' : 'hidden';
         if (!task) {
-            __classPrivateFieldSet(this, _TaskViewSideUI_selectedTask, null, "f");
+            this.selectedTask = null;
             return;
         }
-        if (task !== __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
-            __classPrivateFieldSet(this, _TaskViewSideUI_selectedTask, task, "f");
+        if (task !== this.selectedTask)
+            this.selectedTask = task;
         this.clearAll();
         this.taskCloseButton.onclick = () => {
-            this.renderTaskViewSide(null, tasksManager, projectsManager);
-            __classPrivateFieldGet(this, _TaskViewSideUI_closeTaskButtonMethod, "f").call(this);
+            this.renderTaskViewSide(null);
+            this.closeTaskButtonFun();
             this.updateStyle();
         };
         const priorityColor = function () {
@@ -120,7 +116,7 @@ export class TaskViewSideUI {
             return new Promise(resolve => {
                 let count = 0;
                 for (const taskChildId of task.childIdList) {
-                    tasksManager.getTaskFromId(taskChildId).then(subTask => {
+                    this.tasksManager.getTaskFromId(taskChildId).then(subTask => {
                         switch (subTask.status) {
                             case TaskStatus.Deleted:
                                 break;
@@ -129,7 +125,7 @@ export class TaskViewSideUI {
                                 completeSubTasks.push(subTask);
                                 break;
                             default:
-                                this.addSubTask(subTask, tasksManager, projectsManager);
+                                this.addSubTask(subTask);
                                 break;
                         }
                         count++;
@@ -143,10 +139,10 @@ export class TaskViewSideUI {
             if (completeSubTasks.length === 0)
                 return;
             for (const subTask of completeSubTasks) {
-                this.addSubTask(subTask, tasksManager, projectsManager);
+                this.addSubTask(subTask);
             }
         });
-        projectsManager.getAllProjects().then(projects => {
+        this.projectsManager.getAllProjects().then(projects => {
             const inboxItem = document.createElement('option');
             inboxItem.value = SysProjectId.Inbox;
             inboxItem.text = 'Inbox';
@@ -162,7 +158,7 @@ export class TaskViewSideUI {
             this.taskProjectSelect.value = task.listNameId;
         });
     }
-    addSubTask(subTask, tasksManager, projectsManager) {
+    addSubTask(subTask) {
         const subTaskItem = document.createElement('li');
         subTaskItem.id = subTask.id;
         this.taskSubtaskList.appendChild(subTaskItem);
@@ -171,9 +167,9 @@ export class TaskViewSideUI {
         subTaskCheckbox.classList.add('check-field');
         subTaskCheckbox.checked = !!subTask.completedDate;
         subTaskCheckbox.onchange = () => {
-            this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
-            if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
-                this.renderTaskViewSide(__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"), tasksManager, projectsManager);
+            this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle);
+            if (this.selectedTask)
+                this.renderTaskViewSide(this.selectedTask);
         };
         subTaskItem.appendChild(subTaskCheckbox);
         const subTaskTitle = document.createElement('input');
@@ -184,17 +180,17 @@ export class TaskViewSideUI {
         subTaskTitle.oninput = () => {
             clearTimeout(saveTimerId);
             saveTimerId = setTimeout(() => {
-                subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
+                subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle);
             }, 2500);
         };
-        subTaskTitle.onblur = () => subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle, tasksManager);
+        subTaskTitle.onblur = () => subTask = this.saveSubTask(subTask, subTaskCheckbox, subTaskTitle);
         subTaskItem.appendChild(subTaskTitle);
         const subTaskDeleteButton = document.createElement('button');
         subTaskDeleteButton.classList.add('delete-btn');
         subTaskDeleteButton.title = 'delete';
         subTaskDeleteButton.textContent = '🗑';
         subTaskDeleteButton.onclick = () => {
-            tasksManager.deleteTask(subTask.id).then(() => subTaskItem.remove());
+            this.tasksManager.deleteTask(subTask.id).then(() => subTaskItem.remove());
         };
         subTaskItem.appendChild(subTaskDeleteButton);
         const subTaskOpenButton = document.createElement('button');
@@ -202,7 +198,7 @@ export class TaskViewSideUI {
         subTaskOpenButton.title = 'Open';
         subTaskOpenButton.textContent = '>';
         subTaskOpenButton.onclick = () => {
-            this.renderTaskViewSide(subTask, tasksManager, projectsManager);
+            this.renderTaskViewSide(subTask);
         };
         subTaskItem.appendChild(subTaskOpenButton);
     }
@@ -212,40 +208,40 @@ export class TaskViewSideUI {
         while (this.taskProjectSelect.firstChild)
             this.taskProjectSelect.removeChild(this.taskProjectSelect.firstChild);
     }
-    saveTask(tasksManager) {
-        if (!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"))
+    saveTask() {
+        if (!this.selectedTask)
             return;
         let isEdited = false;
-        if (!!__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").completedDate !== this.taskCheckboxComplete.checked) {
-            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").completedDate = this.taskCheckboxComplete.checked ? new Date() : null;
-            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").status = this.taskCheckboxComplete.checked ? TaskStatus.Completed : TaskStatus.Normal;
+        if (!!this.selectedTask.completedDate !== this.taskCheckboxComplete.checked) {
+            this.selectedTask.completedDate = this.taskCheckboxComplete.checked ? new Date() : null;
+            this.selectedTask.status = this.taskCheckboxComplete.checked ? TaskStatus.Completed : TaskStatus.Normal;
             isEdited = true;
         }
         const dateTime = getUTCDateFromLocal(this.taskDateTimeInput.value);
-        if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate !== dateTime) {
-            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").startDate = dateTime;
+        if (this.selectedTask.startDate !== dateTime) {
+            this.selectedTask.startDate = dateTime;
             isEdited = true;
         }
-        if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority !== +this.taskPrioritySelect.value) {
-            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").priority = Number(this.taskPrioritySelect.value);
+        if (this.selectedTask.priority !== +this.taskPrioritySelect.value) {
+            this.selectedTask.priority = Number(this.taskPrioritySelect.value);
             isEdited = true;
         }
-        if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").title !== this.taskTitleInput.value) {
-            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").title = this.taskTitleInput.value;
+        if (this.selectedTask.title !== this.taskTitleInput.value) {
+            this.selectedTask.title = this.taskTitleInput.value;
             isEdited = true;
         }
-        if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").description !== this.taskDescriptionInput.value) {
-            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").description = this.taskDescriptionInput.value;
+        if (this.selectedTask.description !== this.taskDescriptionInput.value) {
+            this.selectedTask.description = this.taskDescriptionInput.value;
             isEdited = true;
         }
-        if (__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").listNameId !== this.taskProjectSelect.value) {
-            __classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f").listNameId = this.taskProjectSelect.value;
+        if (this.selectedTask.listNameId !== this.taskProjectSelect.value) {
+            this.selectedTask.listNameId = this.taskProjectSelect.value;
             isEdited = true;
         }
         if (isEdited)
-            tasksManager.updateTask(__classPrivateFieldGet(this, _TaskViewSideUI_selectedTask, "f"));
+            this.tasksManager.updateTask(this.selectedTask);
     }
-    saveSubTask(subTask, checkBoxView, titleView, tasksManager) {
+    saveSubTask(subTask, checkBoxView, titleView) {
         let isEdited = false;
         if (!!subTask.completedDate !== checkBoxView.checked) {
             subTask.completedDate = checkBoxView.checked ? new Date() : null;
@@ -257,10 +253,10 @@ export class TaskViewSideUI {
             isEdited = true;
         }
         if (isEdited)
-            tasksManager.updateTask(subTask);
+            this.tasksManager.updateTask(subTask);
         return subTask;
     }
-    updateStyle(closeTaskButtonMethod = null) {
+    updateStyle(closeTaskButtonFun = null) {
         if (this.taskViewSide.style.visibility === 'visible' && window.innerWidth <= 960) {
             this.taskViewSide.style.zIndex = '4';
             if (window.innerWidth <= 640) {
@@ -285,12 +281,12 @@ export class TaskViewSideUI {
             this.taskViewSide.style.width = '';
             this.taskCloseButton.style.display = '';
         }
-        if (closeTaskButtonMethod)
-            __classPrivateFieldSet(this, _TaskViewSideUI_closeTaskButtonMethod, closeTaskButtonMethod, "f");
+        if (closeTaskButtonFun)
+            this.closeTaskButtonFun = closeTaskButtonFun;
         __classPrivateFieldGet(this, _TaskViewSideUI_instances, "m", _TaskViewSideUI_updateHeightDescription).call(this);
     }
 }
-_TaskViewSideUI_selectedTask = new WeakMap(), _TaskViewSideUI_closeTaskButtonMethod = new WeakMap(), _TaskViewSideUI_instances = new WeakSet(), _TaskViewSideUI_updateHeightDescription = function _TaskViewSideUI_updateHeightDescription() {
+_TaskViewSideUI_instances = new WeakSet(), _TaskViewSideUI_updateHeightDescription = function _TaskViewSideUI_updateHeightDescription() {
     this.taskDescriptionInput.style.height = 'auto';
     this.taskDescriptionInput.style.minHeight = 'auto';
     this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;

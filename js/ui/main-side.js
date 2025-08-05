@@ -1,26 +1,12 @@
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _MainSideUI_taskViewSideUI, _MainSideUI_customContextMenuUI, _MainSideUI_projectId, _MainSideUI_selectedTaskItemId;
 import { ProjectStatus } from "../core/project.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { getUTCDateFromLocal } from "../utils/date_converter.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
 import { SysProjectId } from "./project-list-side.js";
 export class MainSideUI {
-    constructor(taskViewSideUI, customContextMenuUI) {
-        _MainSideUI_taskViewSideUI.set(this, void 0);
-        _MainSideUI_customContextMenuUI.set(this, void 0);
-        _MainSideUI_projectId.set(this, '');
-        _MainSideUI_selectedTaskItemId.set(this, '');
+    constructor(taskViewSideUI, customContextMenuUI, tasksManager, projectsManager) {
+        this.projectId = '';
+        this.selectedTaskItemId = '';
         this.menuButton = document.getElementById('menu-btn');
         this.taskForm = document.getElementById('task-form');
         this.taskAddInput = document.getElementById('task-add-input');
@@ -30,16 +16,18 @@ export class MainSideUI {
         this.taskNewProjectSelect = document.getElementById('task-new-project-select');
         this.taskAddButton = document.getElementById('add-task-btn');
         this.taskArrayList = document.getElementById('task-array-list');
-        __classPrivateFieldSet(this, _MainSideUI_taskViewSideUI, taskViewSideUI, "f");
-        __classPrivateFieldSet(this, _MainSideUI_customContextMenuUI, customContextMenuUI, "f");
+        this.taskViewSideUI = taskViewSideUI;
+        this.customContextMenuUI = customContextMenuUI;
+        this.tasksManager = tasksManager;
+        this.projectsManager = projectsManager;
     }
-    setOnTaskAddButtonClickListener(tasksManager, projectsManager, menuButtonClick) {
+    setOnTaskAddButtonClickListener(menuButtonClick) {
         var _a;
         this.menuButton.onclick = () => {
             menuButtonClick();
         };
         this.taskForm.onclick = () => {
-            projectsManager.getAllProjects().then(projects => {
+            this.projectsManager.getAllProjects().then(projects => {
                 while (this.taskNewProjectSelect.firstChild)
                     this.taskNewProjectSelect.firstChild.remove();
                 const inboxItem = document.createElement('option');
@@ -68,8 +56,8 @@ export class MainSideUI {
             task.startDate = getUTCDateFromLocal(this.taskNewDateButton.value);
             task.priority = Number(this.taskNewPrioritySelect.value);
             task.listNameId = this.taskNewProjectSelect.value;
-            tasksManager.addTask(task).then(() => {
-                this.renderMainSide(tasksManager, projectsManager);
+            this.tasksManager.addTask(task).then(() => {
+                this.renderMainSide();
                 this.taskAddInput.value = '';
             });
         };
@@ -82,16 +70,16 @@ export class MainSideUI {
             }
         };
     }
-    async renderMainSide(tasksManager, projectsManager, projectId = '') {
+    async renderMainSide(projectId = '') {
         if (projectId !== '')
-            __classPrivateFieldSet(this, _MainSideUI_projectId, projectId, "f");
-        __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(null, tasksManager, projectsManager);
-        __classPrivateFieldSet(this, _MainSideUI_selectedTaskItemId, '', "f");
+            this.projectId = projectId;
+        this.taskViewSideUI.renderTaskViewSide(null);
+        this.selectedTaskItemId = '';
         this.clearAll();
         if (projectId.length < 4 && projectId !== SysProjectId.Inbox) {
-            switch (__classPrivateFieldGet(this, _MainSideUI_projectId, "f")) {
+            switch (this.projectId) {
                 case SysProjectId.All:
-                    const tasksWithStartDate = await tasksManager.getTasksFromIndex('startDate', null);
+                    const tasksWithStartDate = await this.tasksManager.getTasksFromIndex('startDate', null);
                     let dateNow = null;
                     tasksWithStartDate.forEach(task => {
                         if (task.status == TaskStatus.Normal && task.startDate != null) {
@@ -99,17 +87,17 @@ export class MainSideUI {
                                 dateNow = task.startDate;
                                 this.addTaskListName(dateNow.toDateString());
                             }
-                            this.addItem(task, tasksManager, projectsManager);
+                            this.addItem(task);
                         }
                     });
                     break;
                 case SysProjectId.ToDay:
-                    this.addSysToDay(tasksManager, projectsManager);
+                    this.addSysToDay();
                     break;
                 case SysProjectId.Tomorrow:
                     const date = new Date();
                     date.setHours(23, 59, 59, 999);
-                    this.addFiltredList(tasksManager, projectsManager, 'startDate', IDBKeyRange.lowerBound(date.toISOString()), 'Tomorrow');
+                    this.addFiltredList('startDate', IDBKeyRange.lowerBound(date.toISOString()), 'Tomorrow');
                     break;
                 case SysProjectId.Next_7_Days:
                     const date7 = new Date();
@@ -117,7 +105,7 @@ export class MainSideUI {
                     const date7t = new Date();
                     date7t.setHours(23, 59, 59, 999);
                     for (let day = 0; day < 7; day++) {
-                        this.addFiltredList(tasksManager, projectsManager, 'startDate', IDBKeyRange.bound(date7.toISOString(), date7t.toISOString()), date7.toDateString());
+                        this.addFiltredList('startDate', IDBKeyRange.bound(date7.toISOString(), date7t.toISOString()), date7.toDateString());
                         date7.setDate(date7.getDate() + 1);
                         date7t.setDate(date7t.getDate() + 1);
                     }
@@ -125,7 +113,7 @@ export class MainSideUI {
             }
         }
         else {
-            this.addFiltredList(tasksManager, projectsManager, 'listNameId', IDBKeyRange.only(projectId));
+            this.addFiltredList('listNameId', IDBKeyRange.only(projectId));
         }
     }
     clearAll() {
@@ -162,25 +150,25 @@ export class MainSideUI {
         });
         this.taskArrayList.appendChild(taskListName);
     }
-    async addItem(task, tasksManager, projectsManager) {
+    async addItem(task) {
         var _a;
         if (this.taskArrayList == null || task.status === TaskStatus.Deleted)
             return;
         const taskItem = document.createElement('li');
         taskItem.id = task.id;
         taskItem.classList.add('item');
-        if (__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f") === task.id)
+        if (this.selectedTaskItemId === task.id)
             taskItem.classList.add('selected');
         taskItem.onclick = (event) => {
             var _a;
-            if (__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f") === task.id || event.target === taskMoreButton)
+            if (this.selectedTaskItemId === task.id || event.target === taskMoreButton)
                 return;
-            (_a = document.getElementById(__classPrivateFieldGet(this, _MainSideUI_selectedTaskItemId, "f"))) === null || _a === void 0 ? void 0 : _a.classList.remove('selected');
-            __classPrivateFieldSet(this, _MainSideUI_selectedTaskItemId, task.id, "f");
+            (_a = document.getElementById(this.selectedTaskItemId)) === null || _a === void 0 ? void 0 : _a.classList.remove('selected');
+            this.selectedTaskItemId = task.id;
             taskItem.classList.add('selected');
             taskTitleInput.focus();
-            __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(task, tasksManager, projectsManager);
-            __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").updateStyle(() => this.renderMainSide(tasksManager, projectsManager));
+            this.taskViewSideUI.renderTaskViewSide(task);
+            this.taskViewSideUI.updateStyle(() => this.renderMainSide());
         };
         (_a = this.taskArrayList) === null || _a === void 0 ? void 0 : _a.appendChild(taskItem);
         const taskCheckbox = document.createElement('input');
@@ -204,8 +192,8 @@ export class MainSideUI {
         taskCheckbox.onchange = () => {
             task.completedDate = taskCheckbox.checked ? new Date() : null;
             task.status = taskCheckbox.checked ? TaskStatus.Completed : TaskStatus.Normal;
-            tasksManager.updateTask(task).then(() => {
-                this.renderMainSide(tasksManager, projectsManager);
+            this.tasksManager.updateTask(task).then(() => {
+                this.renderMainSide();
             });
         };
         taskItem.appendChild(taskCheckbox);
@@ -222,11 +210,11 @@ export class MainSideUI {
         if (task.listNameId === SysProjectId.Inbox)
             taskListNameButton.textContent = 'Inbox';
         else
-            projectsManager.getProjectFromId(task.listNameId).then(project => {
+            this.projectsManager.getProjectFromId(task.listNameId).then(project => {
                 taskListNameButton.textContent = project ? project.name : '';
             });
         taskListNameButton.addEventListener('click', () => {
-            this.renderMainSide(tasksManager, projectsManager, task.listNameId);
+            this.renderMainSide(task.listNameId);
         });
         taskItem.appendChild(taskListNameButton);
         const taskDateButton = document.createElement('button');
@@ -245,32 +233,32 @@ export class MainSideUI {
         taskMoreButton.classList.add('task-more-btn');
         taskMoreButton.textContent = "···";
         taskMoreButton.addEventListener('click', (event) => {
-            __classPrivateFieldGet(this, _MainSideUI_customContextMenuUI, "f").showTask(event, task, () => {
-                this.renderMainSide(tasksManager, projectsManager);
-                __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(null, tasksManager, projectsManager);
+            this.customContextMenuUI.showTask(event, task, () => {
+                this.renderMainSide();
+                this.taskViewSideUI.renderTaskViewSide(null);
             }, null, () => {
                 taskItem.remove();
-                __classPrivateFieldGet(this, _MainSideUI_taskViewSideUI, "f").renderTaskViewSide(null, tasksManager, projectsManager);
+                this.taskViewSideUI.renderTaskViewSide(null);
             });
         });
         taskItem.appendChild(taskMoreButton);
     }
-    async addSysToDay(tasksManager, projectsManager) {
-        this.addUntilToDay(tasksManager, projectsManager);
+    async addSysToDay() {
+        this.addUntilToDay();
         const startDate = new Date();
         startDate.setHours(0, 0, 0, 0);
         const endDate = new Date();
         endDate.setHours(23, 59, 59, 999);
         const dateRange = IDBKeyRange.bound(startDate.toISOString(), endDate.toISOString());
-        this.addFiltredList(tasksManager, projectsManager, 'startDate', dateRange, 'ToDay', true, true);
+        this.addFiltredList('startDate', dateRange, 'ToDay', true, true);
     }
-    async addUntilToDay(tasksManager, projectsManager) {
+    async addUntilToDay() {
         const endDate = new Date();
         endDate.setHours(0, 0, 0, 0);
-        this.addFiltredList(tasksManager, projectsManager, 'startDate', IDBKeyRange.upperBound(endDate.toISOString()), 'Overdue', false);
+        this.addFiltredList('startDate', IDBKeyRange.upperBound(endDate.toISOString()), 'Overdue', false);
     }
-    async addFiltredList(tasksManager, projectsManager, index, dateRange, taskListName = '', withCompleteTasks = true, withToDayCompleteTasks = false) {
-        const tasks = await tasksManager.getTasksFromIndex(index, dateRange);
+    async addFiltredList(index, dateRange, taskListName = '', withCompleteTasks = true, withToDayCompleteTasks = false) {
+        const tasks = await this.tasksManager.getTasksFromIndex(index, dateRange);
         if (tasks.length === 0)
             return;
         const filtredTasks = [];
@@ -285,10 +273,10 @@ export class MainSideUI {
             if (taskListName !== '')
                 this.addTaskListName(taskListName);
             for (const task of filtredTasks)
-                this.addItem(task, tasksManager, projectsManager);
+                this.addItem(task);
         }
         if (withToDayCompleteTasks) {
-            const toDayCompleteTasks = await tasksManager.getTasksFromIndex('completedDate', dateRange);
+            const toDayCompleteTasks = await this.tasksManager.getTasksFromIndex('completedDate', dateRange);
             toDayCompleteTasks.forEach(task => {
                 switch (task.status) {
                     case TaskStatus.Completed:
@@ -311,7 +299,7 @@ export class MainSideUI {
             return;
         this.addTaskListName(titleTaskList);
         for (const task of completeTasks)
-            this.addItem(task, tasksManager, projectsManager);
+            this.addItem(task);
     }
     dateToString(date, fromDate = new Date()) {
         let result = '';
@@ -331,4 +319,3 @@ export class MainSideUI {
         this.taskForm.style.outlineColor = '';
     }
 }
-_MainSideUI_taskViewSideUI = new WeakMap(), _MainSideUI_customContextMenuUI = new WeakMap(), _MainSideUI_projectId = new WeakMap(), _MainSideUI_selectedTaskItemId = new WeakMap();

@@ -11,23 +11,22 @@ export class App {
     constructor() {
         this.dbManager = new DatabaseManager();
         this.googleSyncManager = new GoogleSyncManager(this.dbManager);
+        this.themreManager = new ThemeManager();
         this.customContextMenuUI = new CustomContextMenuUI(this.dbManager.tasksManager, this.dbManager.projectsManager);
         this.syncProjectListSideUI = new SyncProjectListSideUI();
-        this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager, this.dbManager.projectsManager, this.customContextMenuUI);
-        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI);
-        this.projectListSideUI = new ProjectListSideUI(this.mainSideUI, this.dbManager.tasksManager, this.dbManager.projectsManager, () => {
+        this.projectListSideUI = new ProjectListSideUI(this.dbManager.tasksManager, this.dbManager.projectsManager, () => {
             this.syncProjectListSideUI.getSyncSide.classList.remove('visible');
             this.syncProjectListSideUI.updateStyle();
-        });
-        this.themreManager = new ThemeManager();
+        }, (projectId) => this.mainSideUI.renderMainSide(projectId));
+        this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager, this.dbManager.projectsManager, this.customContextMenuUI);
+        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI, this.dbManager.tasksManager, this.dbManager.projectsManager);
     }
     async init() {
-        this.mainSideUI.clearAll();
         await this.dbManager.initDB();
         this.projectListSideUI.renderProjectListSide();
-        this.mainSideUI.renderMainSide(this.dbManager.tasksManager, this.dbManager.projectsManager, SysProjectId.ToDay);
+        this.mainSideUI.renderMainSide(SysProjectId.ToDay);
         window.onbeforeunload = () => {
-            this.taskViewSideUI.saveTask(this.dbManager.tasksManager);
+            this.taskViewSideUI.saveTask();
         };
         document.onclick = (event) => {
             this.mainSideUI.globalClick(event);
@@ -50,7 +49,7 @@ export class App {
             });
         }
         this.syncProjectListSideUI.setOnClickListener(this.dbManager.exportDataToFile, this.dbManager.importDataFromFile, this.googleSyncManager.initAuth, this.googleSyncManager.sync, this.themreManager.toggleTheme);
-        this.mainSideUI.setOnTaskAddButtonClickListener(this.dbManager.tasksManager, this.dbManager.projectsManager, () => {
+        this.mainSideUI.setOnTaskAddButtonClickListener(() => {
             this.projectListSideUI.getProjectListSide.style.visibility = this.projectListSideUI.getProjectListSide.style.visibility === 'visible' ? 'hidden' : 'visible';
             this.projectListSideUI.updateStyle();
             this.syncProjectListSideUI.getSyncSide.classList.toggle('visible');

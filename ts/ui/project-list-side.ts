@@ -2,7 +2,6 @@ import { Project, ProjectStatus } from "../core/project.js";
 import { ProjectsManager } from "../core/projects_manager";
 import { TasksManager } from "../core/tasks_manager";
 import { insertChildAtIndex } from "../utils/html_functions.js";
-import { MainSideUI } from "./main-side";
 
 export class ProjectListSideUI {
 
@@ -12,14 +11,12 @@ export class ProjectListSideUI {
         return this.projectListSide;
     }
 
-    private projectListSideSpace: HTMLDivElement;
+    private projectListCloseSideSpace: HTMLDivElement;
 
     private projectListSys: HTMLDivElement;
     private projectList: HTMLDivElement;
 
     private projectListAddButton: HTMLButtonElement;
-
-    private mainSideUI: MainSideUI;
 
     // Other
     readonly sysProjectList: Project[] = [
@@ -29,15 +26,21 @@ export class ProjectListSideUI {
         new Project('Next 7 Days', 3, '', SysProjectId.Next_7_Days),
         new Project('Inbox', 4, '', SysProjectId.Inbox)
     ]
-    #selectedProject: Project = this.sysProjectList[1];
+    private selectedProject: Project = this.sysProjectList[1];
 
-    tasksManager: TasksManager;
-    projectsManager: ProjectsManager;
+    private tasksManager: TasksManager;
+    private projectsManager: ProjectsManager;
+    private renderMainSide: Function;
 
-    constructor(mainSideUI: MainSideUI, tasksManager: TasksManager, projectsManager: ProjectsManager, projectSpaceClick: Function) {
+    constructor(
+        tasksManager: TasksManager,
+        projectsManager: ProjectsManager,
+        projectListCloseSpaceClick: Function,
+        renderMainSide: (projectId: string) => void
+    ) {
         // Init UI Elements
         this.projectListSide = document.getElementById('project-list-side') as HTMLDivElement;
-        this.projectListSideSpace = document.getElementById('project-list-side-space') as HTMLDivElement;
+        this.projectListCloseSideSpace = document.getElementById('project-list-close-side-space') as HTMLDivElement;
 
         this.projectListSys = document.getElementById('project-list-sys') as HTMLDivElement;
         this.projectList = document.getElementById('project-list') as HTMLDivElement;
@@ -45,16 +48,15 @@ export class ProjectListSideUI {
         this.projectListAddButton = document.getElementById('project-list-add-button') as HTMLButtonElement;
 
         // Other
-        this.mainSideUI = mainSideUI;
-
         this.tasksManager = tasksManager;
         this.projectsManager = projectsManager;
+        this.renderMainSide = renderMainSide;
 
         this.projectListSide.style.visibility = window.innerWidth <= 640 ? 'hidden' : 'visible';
-        this.projectListSideSpace.onclick = () => {
+        this.projectListCloseSideSpace.onclick = () => {
             this.projectListSide.style.visibility = 'hidden';
             this.updateStyle();
-            projectSpaceClick();
+            projectListCloseSpaceClick();
         }
 
         this.projectListAddButton.onclick = () => {
@@ -71,18 +73,18 @@ export class ProjectListSideUI {
         this.clearAll();
         // Render sys project list
         for (const sysProject of this.sysProjectList) {
-            this.addProject(sysProject, this.tasksManager, this.projectsManager, true);
+            this.addProject(sysProject, true);
         }
 
         // Render project list
         this.projectsManager.getAllProjects().then(projects => {
             for (const project of projects)
                 if (project.status !== ProjectStatus.Deleted)
-                    this.addProject(project, this.tasksManager, this.projectsManager);
+                    this.addProject(project);
         })
     }
 
-    clearAll() {
+    private clearAll() {
         // Clear sys project list
         while(this.projectListSys.firstChild)
             this.projectListSys.removeChild(this.projectListSys.firstChild);
@@ -92,23 +94,23 @@ export class ProjectListSideUI {
             this.projectList.removeChild(this.projectList.firstChild);
     }
 
-    addProject(project: Project, tasksManager: TasksManager, projectsManager: ProjectsManager, isSys = false) {
+    private addProject(project: Project, isSys = false) {
         const projectItem = document.createElement('div') as HTMLDivElement;
         projectItem.classList.add('item');
-        if (this.#selectedProject === project) projectItem.classList.add('selected');
+        if (this.selectedProject === project) projectItem.classList.add('selected');
         projectItem.textContent = project.name;
         projectItem.id = project.id;
 
         projectItem.onclick = () => {
             // Select project
-            if (this.#selectedProject === project) return;
+            if (this.selectedProject === project) return;
 
-            document.getElementById(this.#selectedProject.id)?.classList.remove('selected');
+            document.getElementById(this.selectedProject.id)?.classList.remove('selected');
             document.getElementById(project.id)?.classList.add('selected');
 
-            this.#selectedProject = project;
+            this.selectedProject = project;
 
-            this.mainSideUI.renderMainSide(tasksManager, projectsManager, project.id);
+            this.renderMainSide(project.id);
         }
 
         insertChildAtIndex(isSys? this.projectListSys : this.projectList, projectItem, project.order);
@@ -131,7 +133,7 @@ export class ProjectListSideUI {
 
             // TODO make project save function
             project.name = newName;
-            projectsManager.updateProject(project).then(() => {
+            this.projectsManager.updateProject(project).then(() => {
                 this.renderProjectListSide();
             });
         }
@@ -147,7 +149,7 @@ export class ProjectListSideUI {
 
         deleteButton.onclick = () => {
             if (confirm(`Delete ${project.name}?`)) {
-                projectsManager.deleteProject(project.id, tasksManager);
+                this.projectsManager.deleteProject(project.id, this.tasksManager);
             }
         }
 
@@ -158,15 +160,15 @@ export class ProjectListSideUI {
         if (this.projectListSide.style.visibility === 'visible') {
             if (window.innerWidth <= 640){
                 this.projectListSide.style.position = 'absolute';
-                this.projectListSideSpace.style.display = 'block';
+                this.projectListCloseSideSpace.style.display = 'block';
             }else {
                 this.projectListSide.style.position = '';
-                this.projectListSideSpace.style.display = 'none';
+                this.projectListCloseSideSpace.style.display = 'none';
             }
             this.projectListSide.style.left = '50px';
             this.projectListSide.style.display = 'flex';
         } else {
-            this.projectListSideSpace.style.display = 'none';
+            this.projectListCloseSideSpace.style.display = 'none';
             this.projectListSide.style.position = '';
             this.projectListSide.style.left = '';
             this.projectListSide.style.display = 'none';
