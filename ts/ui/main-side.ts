@@ -87,7 +87,8 @@ export class MainSideUI {
                     insertChildAtIndex(this.taskNewProjectSelect, selectItem, project.order);
                 }
 
-                this.taskNewProjectSelect.value = SysProjectId.Inbox;
+                this.taskNewProjectSelect.value = this.projectId.length < 4 ? SysProjectId.Inbox : this.projectId;
+                this.taskNewDateButton.value = this.projectId === SysProjectId.ToDay ? convertToDateTimeLocalString(new Date()) : '';
             });
 
             this.taskFormDown.style.display = 'flex';
