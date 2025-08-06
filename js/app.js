@@ -18,8 +18,8 @@ export class App {
             this.syncProjectListSideUI.getSyncSide.classList.remove('visible');
             this.syncProjectListSideUI.updateStyle();
         }, (projectId) => this.mainSideUI.renderMainSide(projectId));
+        this.mainSideUI = new MainSideUI(this.customContextMenuUI, this.dbManager.tasksManager, this.dbManager.projectsManager, (task, closeTaskButtonFun) => this.taskViewSideUI.renderTaskViewSide(task, closeTaskButtonFun), (project) => this.projectListSideUI.selectProject(project));
         this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager, this.dbManager.projectsManager, this.customContextMenuUI);
-        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI, this.dbManager.tasksManager, this.dbManager.projectsManager);
     }
     async init() {
         await this.dbManager.initDB();

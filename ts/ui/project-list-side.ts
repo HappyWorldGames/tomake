@@ -3,6 +3,14 @@ import { ProjectsManager } from "../core/projects_manager";
 import { TasksManager } from "../core/tasks_manager";
 import { insertChildAtIndex } from "../utils/html_functions.js";
 
+export enum SysProjectId {
+    All = '0',
+    ToDay = '1',
+    Tomorrow = '2',
+    Next_7_Days = '3',
+    Inbox = '4'
+}
+
 export class ProjectListSideUI {
 
     // UI Elements
@@ -19,14 +27,14 @@ export class ProjectListSideUI {
     private projectListAddButton: HTMLButtonElement;
 
     // Other
-    readonly sysProjectList: Project[] = [
+    static readonly SysProjectList: Project[] = [
         new Project('All', 0, '', SysProjectId.All),
         new Project('ToDay', 1, '', SysProjectId.ToDay),
         new Project('Tomorrow', 2, '', SysProjectId.Tomorrow),
         new Project('Next 7 Days', 3, '', SysProjectId.Next_7_Days),
         new Project('Inbox', 4, '', SysProjectId.Inbox)
     ]
-    private selectedProject: Project = this.sysProjectList[1];
+    private selectedProject: Project = ProjectListSideUI.SysProjectList[1];
 
     private tasksManager: TasksManager;
     private projectsManager: ProjectsManager;
@@ -72,7 +80,7 @@ export class ProjectListSideUI {
     renderProjectListSide() {
         this.clearAll();
         // Render sys project list
-        for (const sysProject of this.sysProjectList) {
+        for (const sysProject of ProjectListSideUI.SysProjectList) {
             this.addProject(sysProject, true);
         }
 
@@ -104,13 +112,7 @@ export class ProjectListSideUI {
         projectItem.onclick = () => {
             // Select project
             if (this.selectedProject === project) return;
-
-            document.getElementById(this.selectedProject.id)?.classList.remove('selected');
-            document.getElementById(project.id)?.classList.add('selected');
-
-            this.selectedProject = project;
-
-            this.renderMainSide(project.id);
+            this.selectProject(project);
         }
 
         insertChildAtIndex(isSys? this.projectListSys : this.projectList, projectItem, project.order);
@@ -174,12 +176,12 @@ export class ProjectListSideUI {
             this.projectListSide.style.display = 'none';
         }
     }
-}
 
-export enum SysProjectId {
-    All = '0',
-    ToDay = '1',
-    Tomorrow = '2',
-    Next_7_Days = '3',
-    Inbox = '4'
+    selectProject(project: Project) {
+        document.getElementById(this.selectedProject.id)?.classList.remove('selected');
+        document.getElementById(project.id)?.classList.add('selected');
+
+        this.selectedProject = project;
+        this.renderMainSide(project.id);
+    }
 }

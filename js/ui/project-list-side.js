@@ -1,18 +1,19 @@
 import { Project, ProjectStatus } from "../core/project.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
+export var SysProjectId;
+(function (SysProjectId) {
+    SysProjectId["All"] = "0";
+    SysProjectId["ToDay"] = "1";
+    SysProjectId["Tomorrow"] = "2";
+    SysProjectId["Next_7_Days"] = "3";
+    SysProjectId["Inbox"] = "4";
+})(SysProjectId || (SysProjectId = {}));
 export class ProjectListSideUI {
     get getProjectListSide() {
         return this.projectListSide;
     }
     constructor(tasksManager, projectsManager, projectListCloseSpaceClick, renderMainSide) {
-        this.sysProjectList = [
-            new Project('All', 0, '', SysProjectId.All),
-            new Project('ToDay', 1, '', SysProjectId.ToDay),
-            new Project('Tomorrow', 2, '', SysProjectId.Tomorrow),
-            new Project('Next 7 Days', 3, '', SysProjectId.Next_7_Days),
-            new Project('Inbox', 4, '', SysProjectId.Inbox)
-        ];
-        this.selectedProject = this.sysProjectList[1];
+        this.selectedProject = ProjectListSideUI.SysProjectList[1];
         this.projectListSide = document.getElementById('project-list-side');
         this.projectListCloseSideSpace = document.getElementById('project-list-close-side-space');
         this.projectListSys = document.getElementById('project-list-sys');
@@ -38,7 +39,7 @@ export class ProjectListSideUI {
     }
     renderProjectListSide() {
         this.clearAll();
-        for (const sysProject of this.sysProjectList) {
+        for (const sysProject of ProjectListSideUI.SysProjectList) {
             this.addProject(sysProject, true);
         }
         this.projectsManager.getAllProjects().then(projects => {
@@ -61,13 +62,9 @@ export class ProjectListSideUI {
         projectItem.textContent = project.name;
         projectItem.id = project.id;
         projectItem.onclick = () => {
-            var _a, _b;
             if (this.selectedProject === project)
                 return;
-            (_a = document.getElementById(this.selectedProject.id)) === null || _a === void 0 ? void 0 : _a.classList.remove('selected');
-            (_b = document.getElementById(project.id)) === null || _b === void 0 ? void 0 : _b.classList.add('selected');
-            this.selectedProject = project;
-            this.renderMainSide(project.id);
+            this.selectProject(project);
         };
         insertChildAtIndex(isSys ? this.projectListSys : this.projectList, projectItem, project.order);
         if (isSys)
@@ -121,12 +118,18 @@ export class ProjectListSideUI {
             this.projectListSide.style.display = 'none';
         }
     }
+    selectProject(project) {
+        var _a, _b;
+        (_a = document.getElementById(this.selectedProject.id)) === null || _a === void 0 ? void 0 : _a.classList.remove('selected');
+        (_b = document.getElementById(project.id)) === null || _b === void 0 ? void 0 : _b.classList.add('selected');
+        this.selectedProject = project;
+        this.renderMainSide(project.id);
+    }
 }
-export var SysProjectId;
-(function (SysProjectId) {
-    SysProjectId["All"] = "0";
-    SysProjectId["ToDay"] = "1";
-    SysProjectId["Tomorrow"] = "2";
-    SysProjectId["Next_7_Days"] = "3";
-    SysProjectId["Inbox"] = "4";
-})(SysProjectId || (SysProjectId = {}));
+ProjectListSideUI.SysProjectList = [
+    new Project('All', 0, '', SysProjectId.All),
+    new Project('ToDay', 1, '', SysProjectId.ToDay),
+    new Project('Tomorrow', 2, '', SysProjectId.Tomorrow),
+    new Project('Next 7 Days', 3, '', SysProjectId.Next_7_Days),
+    new Project('Inbox', 4, '', SysProjectId.Inbox)
+];

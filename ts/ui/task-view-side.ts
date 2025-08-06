@@ -78,7 +78,7 @@ export class TaskViewSideUI {
 
         // Auto height descruption
         this.taskDescriptionInput.oninput = () => {
-            this.#updateHeightDescription();
+            this.updateHeightDescription();
 
             clearTimeout(saveTimerId);
             saveTimerId = setTimeout(() => {
@@ -110,7 +110,9 @@ export class TaskViewSideUI {
     }
 
     // TODO make fun small
-    renderTaskViewSide(task: Task | null) {
+    renderTaskViewSide(task: Task | null, closeTaskButtonFun: Function | null = null) {
+        if (closeTaskButtonFun) this.closeTaskButtonFun = closeTaskButtonFun;
+
         this.taskViewSide.style.visibility = task ? 'visible' : 'hidden';
         if (!task) {
             this.selectedTask = null;
@@ -156,7 +158,7 @@ export class TaskViewSideUI {
 
         // Description
         this.taskDescriptionInput.value = task.description;
-        this.#updateHeightDescription();
+        this.updateHeightDescription();
 
         // Subtask list
         const completeSubTasks: Task[] = [];
@@ -208,6 +210,8 @@ export class TaskViewSideUI {
 
             this.taskProjectSelect.value = task.listNameId;
         });
+
+        this.updateStyle();
     }
 
     addSubTask(subTask: Task) {
@@ -345,7 +349,7 @@ export class TaskViewSideUI {
         return subTask;
     }
 
-    updateStyle(closeTaskButtonFun: Function | null = null) {
+    updateStyle() {
         if (this.taskViewSide.style.visibility === 'visible' && window.innerWidth <= 960) {
             this.taskViewSide.style.zIndex = '4';
 
@@ -370,11 +374,10 @@ export class TaskViewSideUI {
             this.taskCloseButton.style.display = '';
         }
 
-        if (closeTaskButtonFun) this.closeTaskButtonFun = closeTaskButtonFun;
-        this.#updateHeightDescription();
+        this.updateHeightDescription();
     }
 
-    #updateHeightDescription() {
+    private updateHeightDescription() {
         this.taskDescriptionInput.style.height = 'auto';
         this.taskDescriptionInput.style.minHeight = 'auto';
         this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;

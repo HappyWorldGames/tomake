@@ -1,9 +1,3 @@
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _TaskViewSideUI_instances, _TaskViewSideUI_updateHeightDescription;
 import { ProjectStatus } from "../core/project.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
@@ -11,7 +5,6 @@ import { insertChildAtIndex } from "../utils/html_functions.js";
 import { SysProjectId } from "./project-list-side.js";
 export class TaskViewSideUI {
     constructor(tasksManager, projectsManager, customContextMenuUI) {
-        _TaskViewSideUI_instances.add(this);
         this.selectedTask = null;
         this.closeTaskButtonFun = () => { };
         this.taskViewSide = document.getElementById('task-view-side');
@@ -48,7 +41,7 @@ export class TaskViewSideUI {
         };
         this.taskTitleInput.onblur = () => this.saveTask();
         this.taskDescriptionInput.oninput = () => {
-            __classPrivateFieldGet(this, _TaskViewSideUI_instances, "m", _TaskViewSideUI_updateHeightDescription).call(this);
+            this.updateHeightDescription();
             clearTimeout(saveTimerId);
             saveTimerId = setTimeout(() => {
                 this.saveTask();
@@ -77,7 +70,9 @@ export class TaskViewSideUI {
             customContextMenuUI.showTask(event, this.selectedTask, null, null, () => this.renderTaskViewSide(null));
         };
     }
-    renderTaskViewSide(task) {
+    renderTaskViewSide(task, closeTaskButtonFun = null) {
+        if (closeTaskButtonFun)
+            this.closeTaskButtonFun = closeTaskButtonFun;
         this.taskViewSide.style.visibility = task ? 'visible' : 'hidden';
         if (!task) {
             this.selectedTask = null;
@@ -110,7 +105,7 @@ export class TaskViewSideUI {
         this.taskPrioritySelect.selectedIndex = task.priority;
         this.taskTitleInput.value = task.title;
         this.taskDescriptionInput.value = task.description;
-        __classPrivateFieldGet(this, _TaskViewSideUI_instances, "m", _TaskViewSideUI_updateHeightDescription).call(this);
+        this.updateHeightDescription();
         const completeSubTasks = [];
         const addMainSubTask = async () => {
             return new Promise(resolve => {
@@ -157,6 +152,7 @@ export class TaskViewSideUI {
             }
             this.taskProjectSelect.value = task.listNameId;
         });
+        this.updateStyle();
     }
     addSubTask(subTask) {
         const subTaskItem = document.createElement('li');
@@ -256,7 +252,7 @@ export class TaskViewSideUI {
             this.tasksManager.updateTask(subTask);
         return subTask;
     }
-    updateStyle(closeTaskButtonFun = null) {
+    updateStyle() {
         if (this.taskViewSide.style.visibility === 'visible' && window.innerWidth <= 960) {
             this.taskViewSide.style.zIndex = '4';
             if (window.innerWidth <= 640) {
@@ -281,14 +277,12 @@ export class TaskViewSideUI {
             this.taskViewSide.style.width = '';
             this.taskCloseButton.style.display = '';
         }
-        if (closeTaskButtonFun)
-            this.closeTaskButtonFun = closeTaskButtonFun;
-        __classPrivateFieldGet(this, _TaskViewSideUI_instances, "m", _TaskViewSideUI_updateHeightDescription).call(this);
+        this.updateHeightDescription();
+    }
+    updateHeightDescription() {
+        this.taskDescriptionInput.style.height = 'auto';
+        this.taskDescriptionInput.style.minHeight = 'auto';
+        this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
+        this.taskDescriptionInput.style.minHeight = `${this.taskDescriptionInput.scrollHeight}px`;
     }
 }
-_TaskViewSideUI_instances = new WeakSet(), _TaskViewSideUI_updateHeightDescription = function _TaskViewSideUI_updateHeightDescription() {
-    this.taskDescriptionInput.style.height = 'auto';
-    this.taskDescriptionInput.style.minHeight = 'auto';
-    this.taskDescriptionInput.style.height = `${this.taskDescriptionInput.scrollHeight}px`;
-    this.taskDescriptionInput.style.minHeight = `${this.taskDescriptionInput.scrollHeight}px`;
-};

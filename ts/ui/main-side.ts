@@ -1,11 +1,11 @@
-import { ProjectStatus } from "../core/project.js";
+import { Project, ProjectStatus } from "../core/project.js";
 import { ProjectsManager } from "../core/projects_manager.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { TasksManager } from "../core/tasks_manager.js";
-import { getUTCDateFromLocal } from "../utils/date_converter.js";
+import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
 import { CustomContextMenuUI } from "./custom-context-menu.js";
-import { SysProjectId } from "./project-list-side.js";
+import { ProjectListSideUI, SysProjectId } from "./project-list-side.js";
 import { TaskViewSideUI } from "./task-view-side.js";
 
 export class MainSideUI {
@@ -27,16 +27,18 @@ export class MainSideUI {
     private projectId: string = '';
     private selectedTaskItemId: string = '';
 
-    private taskViewSideUI: TaskViewSideUI;
     private customContextMenuUI: CustomContextMenuUI;
     private tasksManager: TasksManager;
     private projectsManager: ProjectsManager;
+    private renderTaskViewSide: (task: Task | null, closeTaskButtonFun?: Function) => void;
+    private selectProject: (project: Project) => void;
 
     constructor(
-        taskViewSideUI: TaskViewSideUI,
         customContextMenuUI: CustomContextMenuUI,
         tasksManager: TasksManager,
-        projectsManager: ProjectsManager
+        projectsManager: ProjectsManager,
+        renderTaskViewSide: (task: Task | null, closeTaskButtonFun?: Function) => void,
+        selectProject: (project: Project) => void
     ) {
         // Init UI Elements
         this.menuButton = document.getElementById('menu-btn') as HTMLButtonElement;
@@ -52,10 +54,11 @@ export class MainSideUI {
         this.taskArrayList = document.getElementById('task-array-list') as HTMLUListElement;
 
         // Init Other
-        this.taskViewSideUI = taskViewSideUI;
         this.customContextMenuUI = customContextMenuUI;
         this.tasksManager = tasksManager;
         this.projectsManager = projectsManager;
+        this.renderTaskViewSide = renderTaskViewSide;
+        this.selectProject = selectProject;
     }
 
     setOnTaskAddButtonClickListener(menuButtonClick: Function) {
@@ -119,7 +122,7 @@ export class MainSideUI {
 
     async renderMainSide(projectId: string = '') {
         if (projectId !== '') this.projectId = projectId;
-        this.taskViewSideUI.renderTaskViewSide(null);
+        this.renderTaskViewSide(null);
         this.selectedTaskItemId = '';
         this.clearAll();
 
@@ -209,15 +212,19 @@ export class MainSideUI {
         if (this.selectedTaskItemId === task.id) taskItem.classList.add('selected');
 
         taskItem.onclick = (event) => {
-            if (this.selectedTaskItemId === task.id || event.target === taskMoreButton) return;
+            if (this.selectedTaskItemId === task.id) return;
+            switch (event.target) {
+                case taskMoreButton:
+                case taskListNameButton:
+                    return;
+            }
 
             document.getElementById(this.selectedTaskItemId)?.classList.remove('selected');
             this.selectedTaskItemId = task.id;
             taskItem.classList.add('selected');
             taskTitleInput.focus();
 
-            this.taskViewSideUI.renderTaskViewSide(task);
-            this.taskViewSideUI.updateStyle(() => this.renderMainSide());
+            this.renderTaskViewSide(task, () => this.renderMainSide());
         }
 
         this.taskArrayList?.appendChild(taskItem);
@@ -297,10 +304,11 @@ export class MainSideUI {
             taskListNameButton.textContent = project ? project.name : '';
         });
 
-        taskListNameButton.addEventListener('click', () => {
+        taskListNameButton.onclick = async () => {
             // Open listName
-            this.renderMainSide(task.listNameId);
-        });
+            const project = task.listNameId === SysProjectId.Inbox ? ProjectListSideUI.SysProjectList[4] : await this.projectsManager.getProjectFromId(task.listNameId);
+            if (project) this.selectProject(project);
+        };
 
         taskItem.appendChild(taskListNameButton);
 
@@ -329,11 +337,11 @@ export class MainSideUI {
             this.customContextMenuUI.showTask(event, task,
                 () => {
                     this.renderMainSide();
-                    this.taskViewSideUI.renderTaskViewSide(null);
+                    this.renderTaskViewSide(null);
                 }, null,
                 () => {
                 taskItem.remove();
-                this.taskViewSideUI.renderTaskViewSide(null);
+                this.renderTaskViewSide(null);
             });
         });
 

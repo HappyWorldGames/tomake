@@ -8,6 +8,8 @@ import { ProjectListSideUI, SysProjectId } from "./ui/project-list-side.js";
 import { CustomContextMenuUI } from "./ui/custom-context-menu.js";
 import { GoogleSyncManager } from "./sync/google.js";
 import { showSnackbar } from "./utils/notification.js";
+import { Task } from "./core/task.js";
+import { Project } from "./core/project.js";
 
 export class App {
 
@@ -16,9 +18,9 @@ export class App {
     mainSideUI: MainSideUI;
     taskViewSideUI: TaskViewSideUI;
 
-    themreManager: ThemeManager;
     customContextMenuUI: CustomContextMenuUI;
 
+    themreManager: ThemeManager;
     dbManager: DatabaseManager;
     googleSyncManager: GoogleSyncManager;
 
@@ -40,8 +42,14 @@ export class App {
             },
             (projectId: string) => this.mainSideUI.renderMainSide(projectId)
         );
+        this.mainSideUI = new MainSideUI(
+            this.customContextMenuUI,
+            this.dbManager.tasksManager,
+            this.dbManager.projectsManager,
+            (task: Task | null, closeTaskButtonFun?: Function) => this.taskViewSideUI.renderTaskViewSide(task, closeTaskButtonFun),
+            (project: Project) => this.projectListSideUI.selectProject(project)
+        );
         this.taskViewSideUI = new TaskViewSideUI(this.dbManager.tasksManager, this.dbManager.projectsManager, this.customContextMenuUI);
-        this.mainSideUI = new MainSideUI(this.taskViewSideUI, this.customContextMenuUI, this.dbManager.tasksManager, this.dbManager.projectsManager);
     }
 
     async init() {
