@@ -15,7 +15,7 @@ export class Project {
 
     constructor(
         name: string,
-        order: number,
+        order: number = -1,
         color: string = '',
 
         id: string = getUUID(),

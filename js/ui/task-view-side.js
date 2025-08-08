@@ -2,7 +2,6 @@ import { ProjectStatus } from "../core/project.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
 import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
-import { SysProjectId } from "./project-list-side.js";
 export class TaskViewSideUI {
     constructor(tasksManager, projectsManager, customContextMenuUI) {
         this.selectedTask = null;
@@ -24,6 +23,7 @@ export class TaskViewSideUI {
         this.taskCheckboxComplete.onchange = () => {
             if (!this.selectedTask)
                 return;
+            this.updateCompleteCheckBox();
             this.saveTask();
         };
         this.taskDateTimeInput.onchange = () => {
@@ -86,20 +86,7 @@ export class TaskViewSideUI {
             this.closeTaskButtonFun();
             this.updateStyle();
         };
-        const priorityColor = function () {
-            switch (task.priority) {
-                case TaskPriority.High:
-                    return 'red';
-                case TaskPriority.Medium:
-                    return 'yellow';
-                case TaskPriority.Low:
-                    return 'RoyalBlue';
-                default:
-                    return 'gray';
-            }
-        }();
-        this.taskCheckboxComplete.style.borderColor = priorityColor;
-        this.taskCheckboxComplete.style.accentColor = priorityColor;
+        this.updateCompleteCheckBox();
         this.taskCheckboxComplete.checked = !!task.completedDate;
         this.taskDateTimeInput.value = task.startDate ? convertToDateTimeLocalString(task.startDate) : '';
         this.taskPrioritySelect.selectedIndex = task.priority;
@@ -138,10 +125,6 @@ export class TaskViewSideUI {
             }
         });
         this.projectsManager.getAllProjects().then(projects => {
-            const inboxItem = document.createElement('option');
-            inboxItem.value = SysProjectId.Inbox;
-            inboxItem.text = 'Inbox';
-            this.taskProjectSelect.appendChild(inboxItem);
             for (const project of projects) {
                 if (project.status === ProjectStatus.Deleted)
                     continue;
@@ -278,6 +261,25 @@ export class TaskViewSideUI {
             this.taskCloseButton.style.display = '';
         }
         this.updateHeightDescription();
+    }
+    updateCompleteCheckBox() {
+        if (!this.selectedTask)
+            return;
+        const tempSelectedTask = this.selectedTask;
+        const priorityColor = function () {
+            switch (tempSelectedTask.priority) {
+                case TaskPriority.High:
+                    return 'red';
+                case TaskPriority.Medium:
+                    return 'yellow';
+                case TaskPriority.Low:
+                    return 'RoyalBlue';
+                default:
+                    return 'gray';
+            }
+        }();
+        this.taskCheckboxComplete.style.borderColor = priorityColor;
+        this.taskCheckboxComplete.style.accentColor = priorityColor;
     }
     updateHeightDescription() {
         this.taskDescriptionInput.style.height = 'auto';

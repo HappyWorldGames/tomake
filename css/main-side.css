@@ -75,6 +75,7 @@
 #task-new-priority-select {
     margin: 5px;
     height: 20px;
+    width: 40px;
     border: none;
     outline: none;
     color: var(--text-color);

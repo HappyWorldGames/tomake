@@ -58,6 +58,7 @@ export class TaskViewSideUI {
         // listeners to save
         this.taskCheckboxComplete.onchange = () => {
             if (!this.selectedTask) return;
+            this.updateCompleteCheckBox();
             this.saveTask();
         }
         this.taskDateTimeInput.onchange = () => {
@@ -129,21 +130,7 @@ export class TaskViewSideUI {
         }
 
         // Checkbox complete
-        const priorityColor: string = function(): string {
-            switch(task.priority) {
-                case TaskPriority.High:
-                    return 'red';
-                case TaskPriority.Medium:
-                    return 'yellow';
-                case TaskPriority.Low:
-                    return 'RoyalBlue';
-                default:
-                    return 'gray';
-            }
-        }();
-
-        this.taskCheckboxComplete.style.borderColor = priorityColor;
-        this.taskCheckboxComplete.style.accentColor = priorityColor;
+        this.updateCompleteCheckBox();
 
         this.taskCheckboxComplete.checked = !!task.completedDate;
 
@@ -192,12 +179,6 @@ export class TaskViewSideUI {
 
         // Select ProjectList
         this.projectsManager.getAllProjects().then(projects => {
-            // add system project
-            const inboxItem = document.createElement('option');
-            inboxItem.value = SysProjectId.Inbox;
-            inboxItem.text = 'Inbox';
-            this.taskProjectSelect.appendChild(inboxItem);
-
             for (const project of projects) {
                 if (project.status === ProjectStatus.Deleted) continue;
 
@@ -375,6 +356,27 @@ export class TaskViewSideUI {
         }
 
         this.updateHeightDescription();
+    }
+
+    updateCompleteCheckBox() {
+        if (!this.selectedTask) return;
+        const tempSelectedTask = this.selectedTask;
+
+        const priorityColor: string = function(): string {
+            switch(tempSelectedTask.priority) {
+                case TaskPriority.High:
+                    return 'red';
+                case TaskPriority.Medium:
+                    return 'yellow';
+                case TaskPriority.Low:
+                    return 'RoyalBlue';
+                default:
+                    return 'gray';
+            }
+        }();
+
+        this.taskCheckboxComplete.style.borderColor = priorityColor;
+        this.taskCheckboxComplete.style.accentColor = priorityColor;
     }
 
     private updateHeightDescription() {

@@ -71,7 +71,7 @@ export class ProjectListSideUI {
             const name = prompt('List name:', '');
             if (!name) return;
 
-            projectsManager.addProject(new Project(name, -1)).then(() => {
+            projectsManager.addProject(new Project(name)).then(() => {
                 this.renderProjectListSide();
             })
         }
@@ -87,7 +87,7 @@ export class ProjectListSideUI {
         // Render project list
         this.projectsManager.getAllProjects().then(projects => {
             for (const project of projects)
-                if (project.status !== ProjectStatus.Deleted)
+                if (project.status !== ProjectStatus.Deleted && project.order != -2)
                     this.addProject(project);
         })
     }

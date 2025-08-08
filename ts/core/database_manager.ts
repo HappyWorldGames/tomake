@@ -1,3 +1,4 @@
+import { SysProjectId } from "../ui/project-list-side.js";
 import { showSnackbar } from "../utils/notification.js";
 import { Project } from "./project.js";
 import { ProjectsManager } from "./projects_manager.js";
@@ -31,8 +32,8 @@ export class DatabaseManager {
 
             db.onerror = reject;
 
-            this.#initTasksStore(db);
-            this.#initProjectsStore(db);
+            this.initTasksStore(db);
+            this.initProjectsStore(db);
         }
 
         request.onsuccess = (event) => {
@@ -40,13 +41,15 @@ export class DatabaseManager {
             this.tasksManager.db = this.db;
             this.projectsManager.db = this.db;
 
+            this.addSysProject();
+
             resolve(this.db);
         }
 
         request.onerror = reject;
     });}
 
-    #initTasksStore(db: IDBDatabase) {
+    private initTasksStore(db: IDBDatabase) {
         if (!db.objectStoreNames.contains(DatabaseManager.storeTasksName)) {
             const tasksStore = db.createObjectStore(DatabaseManager.storeTasksName, { keyPath: 'taskId', autoIncrement: false });
 
@@ -79,18 +82,32 @@ export class DatabaseManager {
         }
     }
 
-    #initProjectsStore(db: IDBDatabase) {
+    private initProjectsStore(db: IDBDatabase) {
         if (!db.objectStoreNames.contains(DatabaseManager.storeProjectsName)) {
-            const tasksStore = db.createObjectStore(DatabaseManager.storeProjectsName, { keyPath: 'id', autoIncrement: false });
+            const projectsStore = db.createObjectStore(DatabaseManager.storeProjectsName, { keyPath: 'id', autoIncrement: false });
 
-            tasksStore.createIndex('name', 'name', { unique: false });
-            tasksStore.createIndex('order', 'order', { unique: false });
-            tasksStore.createIndex('color', 'color', { unique: false });
+            projectsStore.createIndex('name', 'name', { unique: false });
+            projectsStore.createIndex('order', 'order', { unique: false });
+            projectsStore.createIndex('color', 'color', { unique: false });
 
-            tasksStore.createIndex('createdDate', 'createdDate', { unique: false });
-            tasksStore.createIndex('updatedDate', 'updatedDate', { unique: false });
+            projectsStore.createIndex('createdDate', 'createdDate', { unique: false });
+            projectsStore.createIndex('updatedDate', 'updatedDate', { unique: false });
 
-            tasksStore.createIndex('status', 'status', { unique: false });
+            projectsStore.createIndex('status', 'status', { unique: false });
+        }
+    }
+
+    private addSysProject() {
+        if (!this.db) return;
+        const projectsStore = this.db.transaction(DatabaseManager.storeProjectsName, 'readwrite').objectStore(DatabaseManager.storeProjectsName);
+
+        // Create 'inbox', if not
+        projectsStore.get(SysProjectId.Inbox).onsuccess = (event) => {
+            const project = (event.target as IDBRequest).result;
+            if (project) return;
+
+            const inboxProject = new Project('Inbox', -2, '', SysProjectId.Inbox);
+            projectsStore.put(inboxProject);
         }
     }
 

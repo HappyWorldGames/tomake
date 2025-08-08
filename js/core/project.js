@@ -1,6 +1,6 @@
 import { getUUID } from "../utils/uuid.js";
 export class Project {
-    constructor(name, order, color = '', id = getUUID(), createDate = new Date(), updatedDate = new Date(), status = ProjectStatus.Normal) {
+    constructor(name, order = -1, color = '', id = getUUID(), createDate = new Date(), updatedDate = new Date(), status = ProjectStatus.Normal) {
         this.id = id;
         this.createdDate = createDate;
         this.updatedDate = updatedDate;

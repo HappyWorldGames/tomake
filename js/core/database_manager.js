@@ -3,7 +3,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _DatabaseManager_instances, _a, _DatabaseManager_initTasksStore, _DatabaseManager_initProjectsStore, _DatabaseManager_downloadFile, _DatabaseManager_selectFile, _DatabaseManager_readFile;
+var _DatabaseManager_instances, _DatabaseManager_downloadFile, _DatabaseManager_selectFile, _DatabaseManager_readFile;
+import { SysProjectId } from "../ui/project-list-side.js";
 import { showSnackbar } from "../utils/notification.js";
 import { Project } from "./project.js";
 import { ProjectsManager } from "./projects_manager.js";
@@ -16,7 +17,7 @@ export class DatabaseManager {
         this.tasksManager = new TasksManager();
         this.projectsManager = new ProjectsManager();
         this.merge = (jsonString) => {
-            const [remoteTasksData, remoteProjectsData] = _a.convertFromJsonStringToArray(jsonString);
+            const [remoteTasksData, remoteProjectsData] = DatabaseManager.convertFromJsonStringToArray(jsonString);
             this.garbageCleaner();
             this.tasksManager.merge(remoteTasksData);
             this.projectsManager.merge(remoteProjectsData);
@@ -31,7 +32,7 @@ export class DatabaseManager {
             ], null, 2);
         };
         this.importDataFromJsonString = (jsonString) => {
-            const [tasks, projects] = _a.convertFromJsonStringToArray(jsonString);
+            const [tasks, projects] = DatabaseManager.convertFromJsonStringToArray(jsonString);
             this.tasksManager.clear().then(() => Promise.all(tasks.map(task => this.tasksManager.addTask(task, true))).then(() => this.tasksManager.garbageCleaner()));
             this.projectsManager.clear().then(() => Promise.all(projects.map(project => this.projectsManager.addProject(project, true))).then(() => this.projectsManager.garbageCleaner(this.tasksManager)));
         };
@@ -66,7 +67,7 @@ export class DatabaseManager {
     }
     async initDB() {
         return new Promise((resolve, reject) => {
-            let request = indexedDB.open(_a.dbName, _a.version);
+            let request = indexedDB.open(DatabaseManager.dbName, DatabaseManager.version);
             request.onblocked = (event) => {
                 showSnackbar('Upgrade blocked - Please close other tabs displaying this site.');
                 console.log('Upgrade blocked - Please close other tabs displaying this site.');
@@ -74,17 +75,67 @@ export class DatabaseManager {
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
                 db.onerror = reject;
-                __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_initTasksStore).call(this, db);
-                __classPrivateFieldGet(this, _DatabaseManager_instances, "m", _DatabaseManager_initProjectsStore).call(this, db);
+                this.initTasksStore(db);
+                this.initProjectsStore(db);
             };
             request.onsuccess = (event) => {
                 this.db = event.target.result;
                 this.tasksManager.db = this.db;
                 this.projectsManager.db = this.db;
+                this.addSysProject();
                 resolve(this.db);
             };
             request.onerror = reject;
         });
+    }
+    initTasksStore(db) {
+        if (!db.objectStoreNames.contains(DatabaseManager.storeTasksName)) {
+            const tasksStore = db.createObjectStore(DatabaseManager.storeTasksName, { keyPath: 'taskId', autoIncrement: false });
+            tasksStore.createIndex('parentId', 'parentId', { unique: false });
+            tasksStore.createIndex('childIdList', 'childIdList', { unique: false, multiEntry: true });
+            tasksStore.createIndex('listNameId', 'listNameId', { unique: false });
+            tasksStore.createIndex('title', 'title', { unique: false });
+            tasksStore.createIndex('description', 'description', { unique: false });
+            tasksStore.createIndex('createdDate', 'createdDate', { unique: false });
+            tasksStore.createIndex('updatedDate', 'updatedDate', { unique: false });
+            tasksStore.createIndex('completedDate', 'completedDate', { unique: false });
+            tasksStore.createIndex('startDate', 'startDate', { unique: false });
+            tasksStore.createIndex('dueDate', 'dueDate', { unique: false });
+            tasksStore.createIndex('reminder', 'reminder', { unique: false, multiEntry: true });
+            tasksStore.createIndex('repeat', 'repeat', { unique: false, multiEntry: true });
+            tasksStore.createIndex('priority', 'priority', { unique: false });
+            tasksStore.createIndex('status', 'status', { unique: false });
+        }
+        if (db.version < DatabaseManager.version) {
+            const tasksStore = db.transaction(DatabaseManager.storeTasksName, 'readwrite').objectStore(DatabaseManager.storeTasksName);
+            if (db.version < 2) {
+                tasksStore.createIndex('order', 'order', { unique: false });
+                tasksStore.createIndex('tags', 'tags', { unique: false, multiEntry: true });
+            }
+        }
+    }
+    initProjectsStore(db) {
+        if (!db.objectStoreNames.contains(DatabaseManager.storeProjectsName)) {
+            const projectsStore = db.createObjectStore(DatabaseManager.storeProjectsName, { keyPath: 'id', autoIncrement: false });
+            projectsStore.createIndex('name', 'name', { unique: false });
+            projectsStore.createIndex('order', 'order', { unique: false });
+            projectsStore.createIndex('color', 'color', { unique: false });
+            projectsStore.createIndex('createdDate', 'createdDate', { unique: false });
+            projectsStore.createIndex('updatedDate', 'updatedDate', { unique: false });
+            projectsStore.createIndex('status', 'status', { unique: false });
+        }
+    }
+    addSysProject() {
+        if (!this.db)
+            return;
+        const projectsStore = this.db.transaction(DatabaseManager.storeProjectsName, 'readwrite').objectStore(DatabaseManager.storeProjectsName);
+        projectsStore.get(SysProjectId.Inbox).onsuccess = (event) => {
+            const project = event.target.result;
+            if (project)
+                return;
+            const inboxProject = new Project('Inbox', -2, '', SysProjectId.Inbox);
+            projectsStore.put(inboxProject);
+        };
     }
     garbageCleaner() {
         this.projectsManager.garbageCleaner(this.tasksManager);
@@ -98,42 +149,7 @@ export class DatabaseManager {
         ];
     }
 }
-_a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManager_initTasksStore = function _DatabaseManager_initTasksStore(db) {
-    if (!db.objectStoreNames.contains(_a.storeTasksName)) {
-        const tasksStore = db.createObjectStore(_a.storeTasksName, { keyPath: 'taskId', autoIncrement: false });
-        tasksStore.createIndex('parentId', 'parentId', { unique: false });
-        tasksStore.createIndex('childIdList', 'childIdList', { unique: false, multiEntry: true });
-        tasksStore.createIndex('listNameId', 'listNameId', { unique: false });
-        tasksStore.createIndex('title', 'title', { unique: false });
-        tasksStore.createIndex('description', 'description', { unique: false });
-        tasksStore.createIndex('createdDate', 'createdDate', { unique: false });
-        tasksStore.createIndex('updatedDate', 'updatedDate', { unique: false });
-        tasksStore.createIndex('completedDate', 'completedDate', { unique: false });
-        tasksStore.createIndex('startDate', 'startDate', { unique: false });
-        tasksStore.createIndex('dueDate', 'dueDate', { unique: false });
-        tasksStore.createIndex('reminder', 'reminder', { unique: false, multiEntry: true });
-        tasksStore.createIndex('repeat', 'repeat', { unique: false, multiEntry: true });
-        tasksStore.createIndex('priority', 'priority', { unique: false });
-        tasksStore.createIndex('status', 'status', { unique: false });
-    }
-    if (db.version < _a.version) {
-        const tasksStore = db.transaction(_a.storeTasksName, 'readwrite').objectStore(_a.storeTasksName);
-        if (db.version < 2) {
-            tasksStore.createIndex('order', 'order', { unique: false });
-            tasksStore.createIndex('tags', 'tags', { unique: false, multiEntry: true });
-        }
-    }
-}, _DatabaseManager_initProjectsStore = function _DatabaseManager_initProjectsStore(db) {
-    if (!db.objectStoreNames.contains(_a.storeProjectsName)) {
-        const tasksStore = db.createObjectStore(_a.storeProjectsName, { keyPath: 'id', autoIncrement: false });
-        tasksStore.createIndex('name', 'name', { unique: false });
-        tasksStore.createIndex('order', 'order', { unique: false });
-        tasksStore.createIndex('color', 'color', { unique: false });
-        tasksStore.createIndex('createdDate', 'createdDate', { unique: false });
-        tasksStore.createIndex('updatedDate', 'updatedDate', { unique: false });
-        tasksStore.createIndex('status', 'status', { unique: false });
-    }
-}, _DatabaseManager_downloadFile = function _DatabaseManager_downloadFile(content, filename, mimeType) {
+_DatabaseManager_instances = new WeakSet(), _DatabaseManager_downloadFile = function _DatabaseManager_downloadFile(content, filename, mimeType) {
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -149,9 +165,9 @@ _a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManag
         input.type = 'file';
         input.accept = accept;
         input.onchange = (e) => {
-            var _b;
+            var _a;
             if (e.target instanceof HTMLInputElement) {
-                resolve(((_b = e.target.files) === null || _b === void 0 ? void 0 : _b[0]) || null);
+                resolve(((_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0]) || null);
             }
             else {
                 resolve(null);
@@ -163,8 +179,8 @@ _a = DatabaseManager, _DatabaseManager_instances = new WeakSet(), _DatabaseManag
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            var _b;
-            if (!((_b = e.target) === null || _b === void 0 ? void 0 : _b.result)) {
+            var _a;
+            if (!((_a = e.target) === null || _a === void 0 ? void 0 : _a.result)) {
                 reject(new Error("Empty file content"));
                 return;
             }

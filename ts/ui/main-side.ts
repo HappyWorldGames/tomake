@@ -71,12 +71,6 @@ export class MainSideUI {
                 while(this.taskNewProjectSelect.firstChild)
                     this.taskNewProjectSelect.firstChild.remove();
 
-                // add system project
-                const inboxItem = document.createElement('option');
-                inboxItem.value = SysProjectId.Inbox;
-                inboxItem.text = 'Inbox';
-                this.taskNewProjectSelect.appendChild(inboxItem);
-
                 for (const project of projects) {
                     if (project.status === ProjectStatus.Deleted) continue;
 
