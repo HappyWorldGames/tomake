@@ -88,6 +88,13 @@ export class CustomContextMenuUI {
         // TODO
     }
 
+    showDateTime(event: MouseEvent) {
+        // TODO
+        this.target = event.target instanceof Node ? event.target : null;
+
+        // create context menu
+    }
+
     dismiss() {
         this.customContextMenuDiv.style.display = 'none';
         this.target = null;
