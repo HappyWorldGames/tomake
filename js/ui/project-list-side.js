@@ -94,6 +94,7 @@ export class ProjectListSideUI {
         deleteButton.onclick = () => {
             if (confirm(`Delete ${project.name}?`)) {
                 this.projectsManager.deleteProject(project.id, this.tasksManager);
+                projectItem.remove();
             }
         };
         buttons.appendChild(deleteButton);
