@@ -74,7 +74,7 @@ export class MainSideUI {
         this.renderTaskViewSide(null);
         this.selectedTaskItemId = '';
         this.clearAll();
-        if (projectId.length < 4 && projectId !== SysProjectId.Inbox) {
+        if (this.projectId.length < 4 && this.projectId !== SysProjectId.Inbox) {
             switch (this.projectId) {
                 case SysProjectId.All:
                     const tasksWithStartDate = await this.tasksManager.getTasksFromIndex('startDate', null);
@@ -111,7 +111,7 @@ export class MainSideUI {
             }
         }
         else {
-            this.addFiltredList('listNameId', IDBKeyRange.only(projectId));
+            this.addFiltredList('listNameId', IDBKeyRange.only(this.projectId));
         }
     }
     clearAll() {

@@ -122,7 +122,7 @@ export class MainSideUI {
         this.clearAll();
 
         // check system or not
-        if (projectId.length < 4 && projectId !== SysProjectId.Inbox) {
+        if (this.projectId.length < 4 && this.projectId !== SysProjectId.Inbox) {
             switch(this.projectId) {
                 case SysProjectId.All:
                     const tasksWithStartDate = await this.tasksManager.getTasksFromIndex('startDate', null);
@@ -158,7 +158,7 @@ export class MainSideUI {
                     break;
             }
         } else {
-            this.addFiltredList('listNameId', IDBKeyRange.only(projectId));
+            this.addFiltredList('listNameId', IDBKeyRange.only(this.projectId));
         }
     }
 
