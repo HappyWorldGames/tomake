@@ -43,7 +43,7 @@
     border-radius: 10px;
 }
 
-#task-add-input {
+.main-side .task-add-input {
     margin-top: 5px;
     color: var(--text-color);
     background-color: #ea710000;
@@ -51,7 +51,7 @@
     margin: 10px;
 }
 
-#task-add-input:focus {
+.main-side .task-add-input:focus {
     outline: none;
 }
 

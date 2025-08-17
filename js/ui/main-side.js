@@ -10,6 +10,7 @@ export class MainSideUI {
         this.menuButton = document.getElementById('menu-btn');
         this.taskForm = document.getElementById('task-form');
         this.taskAddInput = document.getElementById('task-add-input');
+        this.taskAddDescriptionInput = document.getElementById('task-add-description-input');
         this.taskFormDown = document.getElementById('task-form-down');
         this.taskNewDateButton = document.getElementById('task-new-date-button');
         this.taskNewPrioritySelect = document.getElementById('task-new-priority-select');
@@ -52,11 +53,14 @@ export class MainSideUI {
                 return;
             const task = new Task(titleTask);
             task.startDate = getUTCDateFromLocal(this.taskNewDateButton.value);
+            task.description = this.taskAddDescriptionInput.value;
             task.priority = Number(this.taskNewPrioritySelect.value);
             task.listNameId = this.taskNewProjectSelect.value;
             this.tasksManager.addTask(task).then(() => {
                 this.renderMainSide();
                 this.taskAddInput.value = '';
+                this.taskAddDescriptionInput.style.display = 'none';
+                this.taskAddDescriptionInput.value = '';
             });
         };
         (_a = this.taskAddButton) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
@@ -64,7 +68,12 @@ export class MainSideUI {
         });
         this.taskAddInput.onkeydown = (event) => {
             if (event.key === 'Enter') {
-                addTaskUI();
+                if (event.shiftKey) {
+                    this.taskAddDescriptionInput.style.display = 'flex';
+                    this.taskAddDescriptionInput.focus();
+                }
+                else
+                    addTaskUI();
             }
         };
     }

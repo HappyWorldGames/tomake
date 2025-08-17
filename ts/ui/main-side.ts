@@ -15,6 +15,7 @@ export class MainSideUI {
 
     private taskForm: HTMLDivElement;
     private taskAddInput: HTMLInputElement;
+    private taskAddDescriptionInput: HTMLInputElement;
     private taskFormDown: HTMLDivElement;
     private taskNewDateButton: HTMLInputElement;
     private taskNewPrioritySelect: HTMLSelectElement;
@@ -45,6 +46,7 @@ export class MainSideUI {
 
         this.taskForm = document.getElementById('task-form') as HTMLDivElement;
         this.taskAddInput = document.getElementById('task-add-input') as HTMLInputElement;
+        this.taskAddDescriptionInput = document.getElementById('task-add-description-input') as HTMLInputElement;
         this.taskFormDown = document.getElementById('task-form-down') as HTMLDivElement;
         this.taskNewDateButton = document.getElementById('task-new-date-button') as HTMLInputElement;
         this.taskNewPrioritySelect = document.getElementById('task-new-priority-select') as HTMLSelectElement;
@@ -96,12 +98,15 @@ export class MainSideUI {
 
             const task = new Task(titleTask);
             task.startDate = getUTCDateFromLocal(this.taskNewDateButton.value);
+            task.description = this.taskAddDescriptionInput.value;
             task.priority = Number(this.taskNewPrioritySelect.value) as TaskPriority;
             task.listNameId = this.taskNewProjectSelect.value;
 
             this.tasksManager.addTask(task).then(() => {
                 this.renderMainSide();
                 this.taskAddInput.value = '';
+                this.taskAddDescriptionInput.style.display = 'none';
+                this.taskAddDescriptionInput.value = '';
             });
         }
 
@@ -110,7 +115,10 @@ export class MainSideUI {
         });
         this.taskAddInput.onkeydown = (event) => {
             if (event.key === 'Enter') {
-                addTaskUI();
+                if (event.shiftKey) {
+                    this.taskAddDescriptionInput.style.display = 'flex';
+                    this.taskAddDescriptionInput.focus();
+                } else addTaskUI();
             }
         }
     }
