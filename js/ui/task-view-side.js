@@ -10,7 +10,7 @@ export class TaskViewSideUI {
         this.taskHeader = document.getElementById('task-header');
         this.taskCloseButton = document.getElementById('task-close-btn');
         this.taskCheckboxComplete = document.getElementById('task-checkbox-complete');
-        this.taskDateTimeInput = document.getElementById('task-date-button');
+        this.taskDateTimeButton = document.getElementById('task-date-button');
         this.taskPrioritySelect = document.getElementById('task-priority-select');
         this.taskTitleInput = document.getElementById('task-title-input');
         this.taskDescriptionInput = document.getElementById('task-description-input');
@@ -26,8 +26,14 @@ export class TaskViewSideUI {
             this.updateCompleteCheckBox();
             this.saveTask();
         };
-        this.taskDateTimeInput.onchange = () => {
-            this.saveTask();
+        this.taskDateTimeButton.onclick = (event) => {
+            var _a;
+            customContextMenuUI.showDateTime(event, (_a = this.selectedTask) === null || _a === void 0 ? void 0 : _a.startDate).then(dateString => {
+                const dateText = getUTCDateFromLocal(dateString);
+                this.taskDateTimeButton.textContent = `𝄜 ${dateText ? dateText.toLocaleString() : ''}`;
+                this.taskDateTimeButton.value = dateString;
+                this.saveTask();
+            });
         };
         this.taskPrioritySelect.onchange = () => {
             this.saveTask();
@@ -88,7 +94,8 @@ export class TaskViewSideUI {
         };
         this.updateCompleteCheckBox();
         this.taskCheckboxComplete.checked = !!task.completedDate;
-        this.taskDateTimeInput.value = task.startDate ? convertToDateTimeLocalString(task.startDate) : '';
+        this.taskDateTimeButton.textContent = `𝄜 ${task.startDate ? task.startDate.toLocaleString() : ''}`;
+        this.taskDateTimeButton.value = task.startDate ? convertToDateTimeLocalString(task.startDate) : '';
         this.taskPrioritySelect.selectedIndex = task.priority;
         this.taskTitleInput.value = task.title;
         this.taskDescriptionInput.value = task.description;
@@ -196,7 +203,7 @@ export class TaskViewSideUI {
             this.selectedTask.status = this.taskCheckboxComplete.checked ? TaskStatus.Completed : TaskStatus.Normal;
             isEdited = true;
         }
-        const dateTime = getUTCDateFromLocal(this.taskDateTimeInput.value);
+        const dateTime = getUTCDateFromLocal(this.taskDateTimeButton.value);
         if (this.selectedTask.startDate !== dateTime) {
             this.selectedTask.startDate = dateTime;
             isEdited = true;

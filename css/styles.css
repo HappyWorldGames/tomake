@@ -64,10 +64,11 @@ body {
 }
 
 #custom-context-menu {
-    display: none;
+    display: flex;
+    flex-direction: column;
     position: absolute;
     border: 1px solid #ccc;
-    width: 200px;
+    min-width: 200px;
     background-color: var(--bg-color);
     padding: 5px;
     z-index: 100;

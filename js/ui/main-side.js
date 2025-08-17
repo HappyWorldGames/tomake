@@ -1,6 +1,6 @@
 import { ProjectStatus } from "../core/project.js";
 import { Task, TaskPriority, TaskStatus } from "../core/task.js";
-import { convertToDateTimeLocalString, getUTCDateFromLocal } from "../utils/date_converter.js";
+import { getUTCDateFromLocal } from "../utils/date_converter.js";
 import { insertChildAtIndex } from "../utils/html_functions.js";
 import { ProjectListSideUI, SysProjectId } from "./project-list-side.js";
 export class MainSideUI {
@@ -41,19 +41,24 @@ export class MainSideUI {
                     insertChildAtIndex(this.taskNewProjectSelect, selectItem, project.order);
                 }
                 this.taskNewProjectSelect.value = this.projectId.length < 4 ? SysProjectId.Inbox : this.projectId;
-                this.taskNewDateButton.value = this.projectId === SysProjectId.ToDay ? convertToDateTimeLocalString(new Date()) : '';
             });
             this.taskFormDown.style.display = 'flex';
             this.taskForm.style.outline = 'solid';
             this.taskForm.style.outlineColor = 'green';
+        };
+        let taskStartDate = null;
+        this.taskNewDateButton.onclick = (event) => {
+            this.customContextMenuUI.showDateTime(event).then(dateString => {
+                taskStartDate = dateString ? getUTCDateFromLocal(dateString) : null;
+            });
         };
         const addTaskUI = () => {
             const titleTask = this.taskAddInput.value;
             if (!titleTask)
                 return;
             const task = new Task(titleTask);
-            task.startDate = getUTCDateFromLocal(this.taskNewDateButton.value);
             task.description = this.taskAddDescriptionInput.value;
+            task.startDate = taskStartDate;
             task.priority = Number(this.taskNewPrioritySelect.value);
             task.listNameId = this.taskNewProjectSelect.value;
             this.tasksManager.addTask(task).then(() => {

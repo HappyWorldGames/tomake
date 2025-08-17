@@ -17,7 +17,7 @@ export class MainSideUI {
     private taskAddInput: HTMLInputElement;
     private taskAddDescriptionInput: HTMLInputElement;
     private taskFormDown: HTMLDivElement;
-    private taskNewDateButton: HTMLInputElement;
+    private taskNewDateButton: HTMLButtonElement;
     private taskNewPrioritySelect: HTMLSelectElement;
     private taskNewProjectSelect: HTMLSelectElement;
     private taskAddButton: HTMLButtonElement;
@@ -48,7 +48,7 @@ export class MainSideUI {
         this.taskAddInput = document.getElementById('task-add-input') as HTMLInputElement;
         this.taskAddDescriptionInput = document.getElementById('task-add-description-input') as HTMLInputElement;
         this.taskFormDown = document.getElementById('task-form-down') as HTMLDivElement;
-        this.taskNewDateButton = document.getElementById('task-new-date-button') as HTMLInputElement;
+        this.taskNewDateButton = document.getElementById('task-new-date-button') as HTMLButtonElement;
         this.taskNewPrioritySelect = document.getElementById('task-new-priority-select') as HTMLSelectElement;
         this.taskNewProjectSelect = document.getElementById('task-new-project-select') as HTMLSelectElement;
         this.taskAddButton = document.getElementById('add-task-btn') as HTMLButtonElement;
@@ -84,7 +84,7 @@ export class MainSideUI {
                 }
 
                 this.taskNewProjectSelect.value = this.projectId.length < 4 ? SysProjectId.Inbox : this.projectId;
-                this.taskNewDateButton.value = this.projectId === SysProjectId.ToDay ? convertToDateTimeLocalString(new Date()) : '';
+                // this.taskNewDateButton.value = this.projectId === SysProjectId.ToDay ? convertToDateTimeLocalString(new Date()) : '';
             });
 
             this.taskFormDown.style.display = 'flex';
@@ -92,13 +92,20 @@ export class MainSideUI {
             this.taskForm.style.outlineColor = 'green';
         }
 
+        let taskStartDate: Date | null = null;
+        this.taskNewDateButton.onclick = (event) => {
+            this.customContextMenuUI.showDateTime(event).then(dateString => {
+                taskStartDate = dateString ? getUTCDateFromLocal(dateString) : null;
+            });
+        }
+
         const addTaskUI = () => {
             const titleTask = this.taskAddInput.value;
             if (!titleTask) return;
 
             const task = new Task(titleTask);
-            task.startDate = getUTCDateFromLocal(this.taskNewDateButton.value);
             task.description = this.taskAddDescriptionInput.value;
+            task.startDate = taskStartDate;
             task.priority = Number(this.taskNewPrioritySelect.value) as TaskPriority;
             task.listNameId = this.taskNewProjectSelect.value;
 

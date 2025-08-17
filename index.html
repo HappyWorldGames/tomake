@@ -64,8 +64,7 @@
             <input type="text" id="task-add-description-input" class="task-add-input" placeholder="Описание..." style="display: none;" autocomplete="off" required>
             <div id="task-form-down">
                 <div id="task-form-down-left">
-                    <button type="button" class="task-new-date-button">𝄜</button>
-                    <input type="datetime-local" id="task-new-date-button">
+                    <button type="button" id="task-new-date-button" class="task-new-date-button">𝄜</button>
                     <select id="task-new-priority-select">
                         <option value="0">⚪ Nope</option>
                         <option value="1">🔵 Low</option>
@@ -88,7 +87,8 @@
                 <button type="button" id="task-close-btn">X</button>
                 <input type="checkbox" id="task-checkbox-complete">
             </div>
-            <input type="datetime-local" id="task-date-button">
+            <button type="button" id="task-date-button" class="task-date-button">𝄜</button>
+            <!-- <input type="datetime-local" id="task-date-button"> -->
             <select id="task-priority-select">
                 <option value="0">⚪ Nope</option>
                 <option value="1">🔵 Low</option>
@@ -110,15 +110,6 @@
             <select id="task-project-select"></select>
             <button type="button" id="task-project-more-btn">···</button>
         </div>
-    </div>
-
-    <div id="custom-context-menu">
-        <ul>
-            <li id="custom-context-menu-tags-button" style="display: none;">Tags</li>
-            <li id="custom-context-menu-wontdo-button">Won`t Do</li>
-            <li id="custom-context-menu-duplicate-button" style="display: none;">Duplicate</li>
-            <li id="custom-context-menu-delete-button">🗑 Delete</li>
-        </ul>
     </div>
 </body>
 </html>

@@ -57,6 +57,7 @@
 
 #task-form-down {
     display: none;
+    margin-left: 5px;
     margin-bottom: 5px;
     flex-direction: row;
     justify-content: space-between;
