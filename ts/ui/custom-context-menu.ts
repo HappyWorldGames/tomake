@@ -96,7 +96,7 @@ export class CustomContextMenuUI {
         // TODO
     }
 
-    showDateTime(event: MouseEvent, defaultDate: Date | null = null): Promise<string> {
+    showDateTime(event: MouseEvent, defaultDate: Date | null = null, isAllDay: Boolean = false): Promise<[string, boolean]> {
         this.createBody(event);
 
         const calendarParent = document.createElement('div') as HTMLDivElement;
@@ -118,7 +118,7 @@ export class CustomContextMenuUI {
         // time
         const timeInput = document.createElement('input') as HTMLInputElement;
         timeInput.type = 'time';
-        timeInput.value = dateTimeValue[1];
+        timeInput.value = isAllDay ? '' : dateTimeValue[1];
         timeInput.onchange = checkDateTimeValue;
         this.customContextMenuDiv!.appendChild(timeInput);
 
@@ -135,7 +135,7 @@ export class CustomContextMenuUI {
             const applyButton = document.createElement('button');
             applyButton.textContent = 'Apply';
             applyButton.onclick = () => {
-                resolve(`${dateInput.value}T${timeInput.value}`);
+                resolve([`${dateInput.value}T${timeInput.value ? timeInput.value : '00:00'}`, !timeInput.value]);
                 this.dismiss();
             };
             this.customContextMenuDiv!.appendChild(applyButton);

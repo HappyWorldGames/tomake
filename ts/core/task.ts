@@ -17,6 +17,7 @@ export class Task {
 
     startDate: Date | null;
     dueDate: Date | null;
+    isAllDay: Boolean;
 
     reminder: Date[];
     repeat: Date[];
@@ -29,6 +30,7 @@ export class Task {
     constructor(
         title: string = '',
         description: string = "",
+        isAllDay: Boolean = false,
 
         id: string = getUUID(),
         parentId: string = '',
@@ -64,6 +66,7 @@ export class Task {
 
         this.startDate = startDate;
         this.dueDate = dueDate;
+        this.isAllDay = isAllDay;
 
         this.reminder = reminder;
         this.repeat = repeat;
@@ -90,6 +93,7 @@ export class Task {
 
             startDate: this.startDate && this.startDate.toISOString(),
             dueDate: this.dueDate && this.dueDate.toISOString(),
+            isAllDay: this.isAllDay,
 
             reminder: this.reminder.map(date => date.toISOString()),
             repeat: this.repeat.map(date => date.toISOString()),
@@ -105,6 +109,7 @@ export class Task {
         return new Task(
             obj.title,
             obj.description,
+            obj.isAllDay ? obj.isAllDay : false,
 
             obj.taskId,
             obj.parentId,

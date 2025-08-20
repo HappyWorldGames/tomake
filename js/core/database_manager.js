@@ -74,8 +74,11 @@ export class DatabaseManager {
             };
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
+                const transaction = event.target.transaction;
+                if (!transaction)
+                    return;
                 db.onerror = reject;
-                this.initTasksStore(db);
+                this.initTasksStore(db, transaction, event.oldVersion);
                 this.initProjectsStore(db);
             };
             request.onsuccess = (event) => {
@@ -88,7 +91,7 @@ export class DatabaseManager {
             request.onerror = reject;
         });
     }
-    initTasksStore(db) {
+    initTasksStore(db, transaction, oldVersion) {
         if (!db.objectStoreNames.contains(DatabaseManager.storeTasksName)) {
             const tasksStore = db.createObjectStore(DatabaseManager.storeTasksName, { keyPath: 'taskId', autoIncrement: false });
             tasksStore.createIndex('parentId', 'parentId', { unique: false });
@@ -106,12 +109,14 @@ export class DatabaseManager {
             tasksStore.createIndex('priority', 'priority', { unique: false });
             tasksStore.createIndex('status', 'status', { unique: false });
         }
-        if (db.version < DatabaseManager.version) {
-            const tasksStore = db.transaction(DatabaseManager.storeTasksName, 'readwrite').objectStore(DatabaseManager.storeTasksName);
-            if (db.version < 2) {
+        if (oldVersion < DatabaseManager.version) {
+            const tasksStore = transaction.objectStore(DatabaseManager.storeTasksName);
+            if (!tasksStore.indexNames.contains('order'))
                 tasksStore.createIndex('order', 'order', { unique: false });
+            if (!tasksStore.indexNames.contains('tags'))
                 tasksStore.createIndex('tags', 'tags', { unique: false, multiEntry: true });
-            }
+            if (!tasksStore.indexNames.contains('isAllDay'))
+                tasksStore.createIndex('isAllDay', 'isAllDay', { unique: false });
         }
     }
     initProjectsStore(db) {
@@ -199,7 +204,7 @@ _DatabaseManager_instances = new WeakSet(), _DatabaseManager_downloadFile = func
         reader.readAsText(file);
     });
 };
-DatabaseManager.version = 2;
+DatabaseManager.version = 3;
 DatabaseManager.dbName = 'ToMake';
 DatabaseManager.storeTasksName = 'tasks';
 DatabaseManager.storeProjectsName = 'projects';

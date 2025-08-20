@@ -92,10 +92,10 @@ export class MainSideUI {
             this.taskForm.style.outlineColor = 'green';
         }
 
-        let taskStartDate: Date | null = null;
+        let taskStartDate: [string, boolean] | null = null;
         this.taskNewDateButton.onclick = (event) => {
             this.customContextMenuUI.showDateTime(event).then(dateString => {
-                taskStartDate = dateString ? getUTCDateFromLocal(dateString) : null;
+                taskStartDate = dateString;
             });
         }
 
@@ -105,7 +105,10 @@ export class MainSideUI {
 
             const task = new Task(titleTask);
             task.description = this.taskAddDescriptionInput.value;
-            task.startDate = taskStartDate;
+
+            task.startDate = taskStartDate ? getUTCDateFromLocal(taskStartDate[0]) : null;
+            task.isAllDay = taskStartDate ? taskStartDate[1] : false;
+
             task.priority = Number(this.taskNewPrioritySelect.value) as TaskPriority;
             task.listNameId = this.taskNewProjectSelect.value;
 
@@ -326,7 +329,7 @@ export class MainSideUI {
         const taskDateButton = document.createElement('button') as HTMLButtonElement;
         taskDateButton.type = 'button';
         taskDateButton.classList.add('task-date-btn');
-        taskDateButton.textContent = task.startDate != null ? this.dateToString(task.startDate) : '';
+        taskDateButton.textContent = task.startDate ? this.dateToString(task.startDate, task.isAllDay) : '';
 
         const toDayDate = new Date();
         toDayDate.setHours(0, 0, 0, 0);
@@ -375,7 +378,8 @@ export class MainSideUI {
 
     async addUntilToDay() {
         const endDate = new Date();
-        endDate.setHours(0, 0, 0, 0);
+        endDate.setDate(endDate.getDate() - 1)
+        endDate.setHours(23, 59, 59, 999);
 
         this.addFiltredList('startDate', IDBKeyRange.upperBound(endDate.toISOString()), 'Overdue', false);
     }
@@ -432,11 +436,11 @@ export class MainSideUI {
             this.addItem(task);
     }
 
-    dateToString(date: Date, fromDate: Date = new Date()): string {
+    dateToString(date: Date, isAllDay: Boolean, fromDate: Date = new Date()): string {
         let result = '';
 
         if (date.getFullYear() !== fromDate.getFullYear()) result += `${date.getFullYear()} `;
-        if (date.getDate() !== fromDate.getDate() || date.getMonth() !== fromDate.getMonth())
+        if (date.getDate() !== fromDate.getDate() || date.getMonth() !== fromDate.getMonth() || isAllDay)
             result += `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
         else result += date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 

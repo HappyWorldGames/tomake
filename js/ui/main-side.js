@@ -49,7 +49,7 @@ export class MainSideUI {
         let taskStartDate = null;
         this.taskNewDateButton.onclick = (event) => {
             this.customContextMenuUI.showDateTime(event).then(dateString => {
-                taskStartDate = dateString ? getUTCDateFromLocal(dateString) : null;
+                taskStartDate = dateString;
             });
         };
         const addTaskUI = () => {
@@ -58,7 +58,8 @@ export class MainSideUI {
                 return;
             const task = new Task(titleTask);
             task.description = this.taskAddDescriptionInput.value;
-            task.startDate = taskStartDate;
+            task.startDate = taskStartDate ? getUTCDateFromLocal(taskStartDate[0]) : null;
+            task.isAllDay = taskStartDate ? taskStartDate[1] : false;
             task.priority = Number(this.taskNewPrioritySelect.value);
             task.listNameId = this.taskNewProjectSelect.value;
             this.tasksManager.addTask(task).then(() => {
@@ -238,7 +239,7 @@ export class MainSideUI {
         const taskDateButton = document.createElement('button');
         taskDateButton.type = 'button';
         taskDateButton.classList.add('task-date-btn');
-        taskDateButton.textContent = task.startDate != null ? this.dateToString(task.startDate) : '';
+        taskDateButton.textContent = task.startDate ? this.dateToString(task.startDate, task.isAllDay) : '';
         const toDayDate = new Date();
         toDayDate.setHours(0, 0, 0, 0);
         if (task.startDate !== null && task.startDate < toDayDate)
@@ -272,7 +273,8 @@ export class MainSideUI {
     }
     async addUntilToDay() {
         const endDate = new Date();
-        endDate.setHours(0, 0, 0, 0);
+        endDate.setDate(endDate.getDate() - 1);
+        endDate.setHours(23, 59, 59, 999);
         this.addFiltredList('startDate', IDBKeyRange.upperBound(endDate.toISOString()), 'Overdue', false);
     }
     async addFiltredList(index, dateRange, taskListName = '', withCompleteTasks = true, withToDayCompleteTasks = false) {
@@ -319,11 +321,11 @@ export class MainSideUI {
         for (const task of completeTasks)
             this.addItem(task);
     }
-    dateToString(date, fromDate = new Date()) {
+    dateToString(date, isAllDay, fromDate = new Date()) {
         let result = '';
         if (date.getFullYear() !== fromDate.getFullYear())
             result += `${date.getFullYear()} `;
-        if (date.getDate() !== fromDate.getDate() || date.getMonth() !== fromDate.getMonth())
+        if (date.getDate() !== fromDate.getDate() || date.getMonth() !== fromDate.getMonth() || isAllDay)
             result += `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
         else
             result += date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

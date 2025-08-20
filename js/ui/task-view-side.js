@@ -27,11 +27,11 @@ export class TaskViewSideUI {
             this.saveTask();
         };
         this.taskDateTimeButton.onclick = (event) => {
-            var _a;
-            customContextMenuUI.showDateTime(event, (_a = this.selectedTask) === null || _a === void 0 ? void 0 : _a.startDate).then(dateString => {
-                const dateText = getUTCDateFromLocal(dateString);
-                this.taskDateTimeButton.textContent = `𝄜 ${dateText ? dateText.toLocaleString() : ''}`;
-                this.taskDateTimeButton.value = dateString;
+            var _a, _b;
+            customContextMenuUI.showDateTime(event, (_a = this.selectedTask) === null || _a === void 0 ? void 0 : _a.startDate, (_b = this.selectedTask) === null || _b === void 0 ? void 0 : _b.isAllDay).then(dateString => {
+                const dateText = getUTCDateFromLocal(dateString[0]);
+                this.taskDateTimeButton.textContent = `𝄜 ${dateText ? dateString[1] ? dateText.toLocaleString().split(',')[0] : dateText.toLocaleString() : ''}`;
+                this.taskDateTimeButton.value = dateString.join('|');
                 this.saveTask();
             });
         };
@@ -94,7 +94,7 @@ export class TaskViewSideUI {
         };
         this.updateCompleteCheckBox();
         this.taskCheckboxComplete.checked = !!task.completedDate;
-        this.taskDateTimeButton.textContent = `𝄜 ${task.startDate ? task.startDate.toLocaleString() : ''}`;
+        this.taskDateTimeButton.textContent = `𝄜 ${task.startDate ? task.isAllDay ? task.startDate.toLocaleString().split(',')[0] : task.startDate.toLocaleString() : ''}`;
         this.taskDateTimeButton.value = task.startDate ? convertToDateTimeLocalString(task.startDate) : '';
         this.taskPrioritySelect.selectedIndex = task.priority;
         this.taskTitleInput.value = task.title;
@@ -203,9 +203,12 @@ export class TaskViewSideUI {
             this.selectedTask.status = this.taskCheckboxComplete.checked ? TaskStatus.Completed : TaskStatus.Normal;
             isEdited = true;
         }
-        const dateTime = getUTCDateFromLocal(this.taskDateTimeButton.value);
-        if (this.selectedTask.startDate !== dateTime) {
+        const dateTimeValues = this.taskDateTimeButton.value.split('|');
+        const dateTime = getUTCDateFromLocal(dateTimeValues[0]);
+        const isAllDay = dateTimeValues[1] === 'true';
+        if (this.selectedTask.startDate !== dateTime || this.selectedTask.isAllDay !== isAllDay) {
             this.selectedTask.startDate = dateTime;
+            this.selectedTask.isAllDay = isAllDay;
             isEdited = true;
         }
         if (this.selectedTask.priority !== +this.taskPrioritySelect.value) {

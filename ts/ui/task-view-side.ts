@@ -62,10 +62,10 @@ export class TaskViewSideUI {
             this.saveTask();
         }
         this.taskDateTimeButton.onclick = (event) => {
-            customContextMenuUI.showDateTime(event, this.selectedTask?.startDate).then(dateString => {
-                const dateText = getUTCDateFromLocal(dateString);
-                this.taskDateTimeButton.textContent = `𝄜 ${dateText ? dateText.toLocaleString() : ''}`;
-                this.taskDateTimeButton.value = dateString;
+            customContextMenuUI.showDateTime(event, this.selectedTask?.startDate, this.selectedTask?.isAllDay).then(dateString => {
+                const dateText = getUTCDateFromLocal(dateString[0]);
+                this.taskDateTimeButton.textContent = `𝄜 ${dateText ? dateString[1] ? dateText.toLocaleString().split(',')[0] : dateText.toLocaleString() : ''}`;
+                this.taskDateTimeButton.value = dateString.join('|');
                 this.saveTask();
             });
         }
@@ -140,7 +140,7 @@ export class TaskViewSideUI {
         this.taskCheckboxComplete.checked = !!task.completedDate;
 
         // Input date
-        this.taskDateTimeButton.textContent = `𝄜 ${task.startDate ? task.startDate.toLocaleString() : ''}`;
+        this.taskDateTimeButton.textContent = `𝄜 ${task.startDate ? task.isAllDay ? task.startDate.toLocaleString().split(',')[0] : task.startDate.toLocaleString() : ''}`;
         this.taskDateTimeButton.value = task.startDate ? convertToDateTimeLocalString(task.startDate) : '';
 
         // Priority select
@@ -283,9 +283,12 @@ export class TaskViewSideUI {
         }
 
         // check datetime
-        const dateTime = getUTCDateFromLocal(this.taskDateTimeButton.value);
-        if (this.selectedTask.startDate !== dateTime) {
+        const dateTimeValues = this.taskDateTimeButton.value.split('|');
+        const dateTime = getUTCDateFromLocal(dateTimeValues[0]);
+        const isAllDay = dateTimeValues[1] === 'true'
+        if (this.selectedTask.startDate !== dateTime || this.selectedTask.isAllDay !== isAllDay) {
             this.selectedTask.startDate = dateTime;
+            this.selectedTask.isAllDay = isAllDay;
             isEdited = true;
         }
 

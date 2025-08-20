@@ -1,7 +1,7 @@
 import { SysProjectId } from "../ui/project-list-side.js";
 import { getUUID } from "../utils/uuid.js";
 export class Task {
-    constructor(title = '', description = "", id = getUUID(), parentId = '', childIdList = [], listNameId = SysProjectId.Inbox, createdDate = new Date(), updatedDate = new Date(), completedDate = null, startDate = null, dueDate = null, reminder = [], repeat = [], priority = TaskPriority.Nope, status = TaskStatus.Normal, order = -1, tags = []) {
+    constructor(title = '', description = "", isAllDay = false, id = getUUID(), parentId = '', childIdList = [], listNameId = SysProjectId.Inbox, createdDate = new Date(), updatedDate = new Date(), completedDate = null, startDate = null, dueDate = null, reminder = [], repeat = [], priority = TaskPriority.Nope, status = TaskStatus.Normal, order = -1, tags = []) {
         this.id = id;
         this.parentId = parentId;
         this.childIdList = childIdList;
@@ -13,6 +13,7 @@ export class Task {
         this.completedDate = completedDate;
         this.startDate = startDate;
         this.dueDate = dueDate;
+        this.isAllDay = isAllDay;
         this.reminder = reminder;
         this.repeat = repeat;
         this.priority = priority;
@@ -33,6 +34,7 @@ export class Task {
             completedDate: this.completedDate && this.completedDate.toISOString(),
             startDate: this.startDate && this.startDate.toISOString(),
             dueDate: this.dueDate && this.dueDate.toISOString(),
+            isAllDay: this.isAllDay,
             reminder: this.reminder.map(date => date.toISOString()),
             repeat: this.repeat.map(date => date.toISOString()),
             priority: this.priority,
@@ -42,7 +44,7 @@ export class Task {
         };
     }
     static fromDB(obj) {
-        return new Task(obj.title, obj.description, obj.taskId, obj.parentId, JSON.parse(obj.childIdList), obj.listNameId, new Date(obj.createdDate), new Date(obj.updatedDate), obj.completedDate && new Date(obj.completedDate), obj.startDate && new Date(obj.startDate), obj.dueDate && new Date(obj.dueDate), obj.reminder.map((date) => new Date(date)), obj.repeat.map((date) => new Date(date)), Number(obj.priority || 0), obj.status, obj.order ? obj.order : -1, obj.tags ? JSON.parse(obj.tags) : []);
+        return new Task(obj.title, obj.description, obj.isAllDay ? obj.isAllDay : false, obj.taskId, obj.parentId, JSON.parse(obj.childIdList), obj.listNameId, new Date(obj.createdDate), new Date(obj.updatedDate), obj.completedDate && new Date(obj.completedDate), obj.startDate && new Date(obj.startDate), obj.dueDate && new Date(obj.dueDate), obj.reminder.map((date) => new Date(date)), obj.repeat.map((date) => new Date(date)), Number(obj.priority || 0), obj.status, obj.order ? obj.order : -1, obj.tags ? JSON.parse(obj.tags) : []);
     }
 }
 export var TaskPriority;

@@ -7,7 +7,7 @@ import { TasksManager } from "./tasks_manager.js";
 
 export class DatabaseManager {
 
-    static version = 2;
+    static version = 3;
     static dbName: string = 'ToMake';
     static storeTasksName: string = 'tasks';
     static storeProjectsName: string = 'projects';
@@ -29,10 +29,12 @@ export class DatabaseManager {
 
         request.onupgradeneeded = (event) => {
             const db = (event.target as IDBOpenDBRequest).result;
+            const transaction = (event.target as IDBOpenDBRequest).transaction;
+            if (!transaction) return;
 
             db.onerror = reject;
 
-            this.initTasksStore(db);
+            this.initTasksStore(db, transaction, event.oldVersion);
             this.initProjectsStore(db);
         }
 
@@ -49,7 +51,7 @@ export class DatabaseManager {
         request.onerror = reject;
     });}
 
-    private initTasksStore(db: IDBDatabase) {
+    private initTasksStore(db: IDBDatabase, transaction: IDBTransaction, oldVersion: number) {
         if (!db.objectStoreNames.contains(DatabaseManager.storeTasksName)) {
             const tasksStore = db.createObjectStore(DatabaseManager.storeTasksName, { keyPath: 'taskId', autoIncrement: false });
 
@@ -73,12 +75,14 @@ export class DatabaseManager {
             tasksStore.createIndex('priority', 'priority', { unique: false });
             tasksStore.createIndex('status', 'status', { unique: false });
         }
-        if (db.version < DatabaseManager.version) {
-            const tasksStore = db.transaction(DatabaseManager.storeTasksName, 'readwrite').objectStore(DatabaseManager.storeTasksName);
-            if (db.version < 2) {
-                tasksStore.createIndex('order', 'order', { unique: false });
-                tasksStore.createIndex('tags', 'tags', { unique: false, multiEntry: true });
-            }
+        if (oldVersion < DatabaseManager.version) {
+            // TODO Change to check has not check version
+            const tasksStore = transaction.objectStore(DatabaseManager.storeTasksName);
+            // after version 2
+            if (!tasksStore.indexNames.contains('order')) tasksStore.createIndex('order', 'order', { unique: false });
+            if (!tasksStore.indexNames.contains('tags')) tasksStore.createIndex('tags', 'tags', { unique: false, multiEntry: true });
+            // after version 3
+            if (!tasksStore.indexNames.contains('isAllDay')) tasksStore.createIndex('isAllDay', 'isAllDay', { unique: false });
         }
     }
 
