@@ -92,6 +92,7 @@ export class CustomContextMenuUI {
 
         this.customContextMenuDiv!.style.display = 'block';
     }
+
     showProject(project: Project) {
         // TODO
     }

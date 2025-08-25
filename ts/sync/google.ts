@@ -1,19 +1,26 @@
 import { DatabaseManager } from "../core/database_manager.js";
 import { showSnackbar } from "../utils/notification.js";
 
+// Class to manage Google Drive synchronization for ToMake app
 export class GoogleSyncManager {
+    // Static variable to store the Google Client ID
     private static readonly GOOGLE_CLIENT_ID = '774036925552-vubfh392de99c3kafcv1d8dut6t1gvd5.apps.googleusercontent.com';
+
+    // Variables to store file name and Google Drive file URL
     private readonly FILE_NAME = 'ToMake.json';
     private readonly GOOGLE_FILE_URL = `https://www.googleapis.com/drive/v3/files?q=name="${this.FILE_NAME}"`;
 
+    // DatabaseManager instance and token variable
     private dbManager: DatabaseManager;
     private token: string | null;
 
+    // Constructor to initialize the GoogleSyncManager with a DatabaseManager instance
     constructor(dbManager: DatabaseManager) {
         this.dbManager = dbManager;
         this.token = null;
     }
 
+    // Method to initiate authentication with Google
     initAuth = () => {
         if (typeof google === 'undefined') {
             showSnackbar("Google is unavailable. Try again later...");
@@ -37,6 +44,7 @@ export class GoogleSyncManager {
         this.requestToken();
     }
 
+    // Method to synchronize data with Google Drive
     sync = async (): Promise<void> => {
         try {
             await this.requestToken();
@@ -56,6 +64,7 @@ export class GoogleSyncManager {
         }
     }
 
+    // Method to request a token from Google
     private requestToken = (): Promise<void> => {
         this.token = sessionStorage.getItem('google_token');
         if (this.token) return Promise.resolve();
@@ -75,6 +84,7 @@ export class GoogleSyncManager {
         });
     }
 
+    // Method to fetch data from Google Drive
     private fetchDriveData = async (): Promise<string> => {
         const searchResponse = await fetch(this.GOOGLE_FILE_URL, {
             headers: { 'Authorization': `Bearer ${this.token}` }
@@ -90,6 +100,7 @@ export class GoogleSyncManager {
         return await fileContent.text();
     }
 
+    // Method to upload data to Google Drive
     private uploadToDrive = async (data: string): Promise<void> => {
         const searchResponse = await fetch(this.GOOGLE_FILE_URL, {
             headers: { 'Authorization': `Bearer ${this.token}` }
