@@ -42,18 +42,25 @@ export class GoogleSyncManager {
             }
         };
         this.requestToken = () => {
-            this.token = sessionStorage.getItem('google_token');
+            this.token = localStorage.getItem('google_token');
             if (this.token)
                 return Promise.resolve();
             return new Promise((resolve, reject) => {
                 const tokenClient = google.accounts.oauth2.initTokenClient({
                     client_id: GoogleSyncManager.GOOGLE_CLIENT_ID,
                     scope: 'https://www.googleapis.com/auth/drive.file',
-                    callback: (response) => {
-                        if (response.error)
-                            reject(new Error(response.error));
-                        this.token = response.access_token;
-                        sessionStorage.setItem('google_token', this.token);
+                    callback: (tokenResponse) => {
+                        if (tokenResponse.error)
+                            reject(new Error(tokenResponse.error));
+                        this.token = tokenResponse.access_token;
+                        const expiresIn = Number(tokenResponse.expires_in);
+                        const receivedAt = Date.now();
+                        const expiresAt = receivedAt + (expiresIn * 1000);
+                        localStorage.setItem('google_token', this.token);
+                        localStorage.setItem('google_expires_at', expiresAt.toString());
+                        if (tokenResponse.refresh_token) {
+                            localStorage.setItem('google_refresh_token', tokenResponse.refresh_token);
+                        }
                         resolve();
                     }
                 });
